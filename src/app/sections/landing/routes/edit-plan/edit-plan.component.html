@@ -1,0 +1,11 @@
+
+    <mat-form-field >
+        <mat-label>Autosize textarea</mat-label>
+        <input 
+            matInput
+            matTextareaAutosize
+            matAutosizeMinRows="5"
+            matAutosizeMaxRows="5"
+            [(ngModel)]="value">
+    </mat-form-field>
+    <button mat-flat-button color="primary" (click)="process()">Click</button>

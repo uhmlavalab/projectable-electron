@@ -1,0 +1,62 @@
+<div class="example-container">
+
+  <mat-tab-group>
+
+    <mat-tab label="Plan Info">
+
+      <mat-form-field>
+        <input matInput placeholder="Name">
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput placeholder="Description">
+      </mat-form-field>
+
+    </mat-tab>
+
+    <!-- <mat-tab label="Controls">
+
+    </mat-tab>
+
+    <mat-tab label="Data">
+      </mat-tab>
+
+    <mat-tab label="Scenarios">
+      <mat-accordion>
+        <mat-expansion-panel *ngFor="let scenario of scenarios" hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{scenario.name}}
+            </mat-panel-title>
+            <mat-panel-description>
+              {{scenario.description}}
+              <mat-icon (click)="removeScenario(scenario)">close</mat-icon>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <mat-form-field>
+            <input matInput placeholder="Name">
+          </mat-form-field>
+
+          <mat-form-field>
+            <input matInput placeholder="Description">
+          </mat-form-field>
+
+        </mat-expansion-panel>
+
+      </mat-accordion>
+
+      <button mat-flat-button class="add-scenario-button" color="primary" (click)="addScenario()">Add Scenario</button>
+    </mat-tab>
+
+    <mat-tab label="Map">
+
+      <div class="map" leaflet [leafletOptions]="options">
+      </div>
+    </mat-tab> -->
+
+  </mat-tab-group>
+
+  <button mat-flat-button class="create-button" color="primary" (click)="savePlan()">Create</button>
+
+</div>

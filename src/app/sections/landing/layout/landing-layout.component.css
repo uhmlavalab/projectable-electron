@@ -1,0 +1,38 @@
+mat-drawer-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  color: white;
+}
+
+mat-drawer-content {
+  padding: 0 3rem 0 3rem;
+}
+
+mat-drawer {
+  width: 30vw;
+  background-color: black;
+  overflow: hidden;
+  padding-top: 0.5rem;
+}
+
+mat-list {
+  margin-top: 1rem;
+}
+mat-list-item {
+  width: 100%;
+}
+
+.routeTitle { 
+  text-align: center;
+  letter-spacing: 0.5rem;
+  font-size: 2rem;
+}
+
+button {
+  width: 100%;
+  margin: 1rem;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
