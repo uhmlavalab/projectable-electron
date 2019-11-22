@@ -4,22 +4,22 @@
 
     <mat-tab label="Plan Info">
 
-      <mat-form-field>
-        <input matInput placeholder="Name">
+      <mat-form-field >
+        <input matInput placeholder="Name" [(ngModel)]="plan.name">
       </mat-form-field>
 
-      <mat-form-field>
-        <input matInput placeholder="Description">
+      <mat-form-field >
+        <input matInput placeholder="Description" [(ngModel)]="plan.description">
       </mat-form-field>
 
     </mat-tab>
 
-    <!-- <mat-tab label="Controls">
+    <mat-tab label="Controls">
 
     </mat-tab>
 
     <mat-tab label="Data">
-      </mat-tab>
+    </mat-tab>
 
     <mat-tab label="Scenarios">
       <mat-accordion>
@@ -49,14 +49,15 @@
       <button mat-flat-button class="add-scenario-button" color="primary" (click)="addScenario()">Add Scenario</button>
     </mat-tab>
 
-    <mat-tab label="Map">
+    <mat-tab label="Map" (click)="invalidMapSize()">
 
-      <div class="map" leaflet [leafletOptions]="options">
+      <div class="map" leaflet [leafletOptions]="options" (leafletMapReady)="onMapReady($event)">
       </div>
-    </mat-tab> -->
+    </mat-tab>
 
   </mat-tab-group>
 
-  <button mat-flat-button class="create-button" color="primary" (click)="savePlan()">Create</button>
+  <button mat-flat-button class="create-button" color="primary" (click)="saveFile()">Save</button>
+  <button mat-flat-button class="create-button" color="primary" (click)="loadFile()">Load</button>
 
 </div>

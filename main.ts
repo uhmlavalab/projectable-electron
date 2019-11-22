@@ -46,6 +46,7 @@ function createWindow() {
   }
 
   ipcMain.on('saveFile', (evt, msg) => saveFile(msg));
+  ipcMain.on('loadFile', (evt, msg) => loadFile(msg));
   ipcMain.on('close', () => {
     win.close();
     app.quit();
@@ -61,13 +62,19 @@ function createWindow() {
   });
 
 }
+function loadFile(fileName: string) {
+  fs.readFile(`${dataDir}/${fileName}`, (err, data) => {
+    if (err) throw err;
+    win.webContents.send('fileLoaded', data);
+  });
+}
+
 
 function saveFile(msg: string) {
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir);
   }
   fs.writeFile(`${dataDir}/test.txt`, msg, (err) => {
-    // throws an error, you could also catch it here
     if (err) throw err;
     win.webContents.send('fileSaved', 'File Write Complete');
   });
