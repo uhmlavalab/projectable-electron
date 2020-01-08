@@ -2,18 +2,15 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { LandingModule } from './landing/landing.module';
-import { MapModule } from './map/map.module';
-import { SecondScreenModule } from './second-screen/second-screen.module';
+import { MapWindowModule } from './map-window/map-window.module';
+import { MainWindowModule } from './main-window/main-window.module';
 
 @NgModule({
-  declarations: [
-
-  ],
   imports: [
     CommonModule,
     LandingModule,
-    MapModule,
-    SecondScreenModule
+    MapWindowModule,
+    MainWindowModule
   ]
 })
 export class SectionsModule { }

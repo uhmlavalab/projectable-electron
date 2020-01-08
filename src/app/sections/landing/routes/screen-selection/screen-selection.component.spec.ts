@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SecondScreenPageComponent } from './second-screen-page.component';
+import { ScreenSelectionComponent } from './screen-selection.component';
 
-describe('SecondScreenPageComponent', () => {
-  let component: SecondScreenPageComponent;
-  let fixture: ComponentFixture<SecondScreenPageComponent>;
+describe('ScreenSelectionComponent', () => {
+  let component: ScreenSelectionComponent;
+  let fixture: ComponentFixture<ScreenSelectionComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SecondScreenPageComponent ]
+      declarations: [ ScreenSelectionComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SecondScreenPageComponent);
+    fixture = TestBed.createComponent(ScreenSelectionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

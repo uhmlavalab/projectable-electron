@@ -12,6 +12,7 @@ import { LandingRoutingModule } from './landing-routing.module';
 import { NewPlanComponent } from './routes/new-plan/new-plan.component';
 import { EditPlanComponent } from './routes/edit-plan/edit-plan.component';
 import { PlansListComponent } from './routes/plans-list/plans-list.component';
+import { ScreenSelectionComponent } from './routes/screen-selection/screen-selection.component';
 
 // Components
 import { BouncingTitleComponent } from './components/bouncing-title/bouncing-title.component';
@@ -24,7 +25,8 @@ import { TextTitleComponent } from './components/text-title/text-title.component
     TextTitleComponent,
     NewPlanComponent,
     EditPlanComponent,
-    PlansListComponent
+    PlansListComponent,
+    ScreenSelectionComponent
   ],
   imports: [
     CommonModule,

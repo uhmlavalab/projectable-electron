@@ -20,15 +20,15 @@ function createWindows() {
     windows.push(window);
   })
 
-  ipcMain.on('set-as-main-window', (evt, msg) => { 
+  ipcMain.on('set-main-window', (evt, msg) => {
     windows.forEach(el => {
       if (el.webContents === evt.sender && mainWindow === undefined) {
         mainWindow = el;
-        mainWindow.webContents.send('main-window-data', 'Main Window successfully set.');
+        mainWindow.webContents.send('main-window-confirmation', 'Main Window successfully set.');
         if (windows.length == 2) {
-          const el2 = (windows.indexOf(el) == 0) ?  windows[1] : windows[0];
+          const el2 = (windows.indexOf(el) == 0) ? windows[1] : windows[0];
           mapWindow = el2;
-          mapWindow.webContents.send('map-window-data', 'Map Window successfully set.');
+          mapWindow.webContents.send('map-window-confirmation', 'Map Window successfully set.');
         }
       }
     })
@@ -37,16 +37,16 @@ function createWindows() {
     }
   });
 
-  ipcMain.on('set-as-map-window', (evt, msg) => { 
+  ipcMain.on('set-map-window', (evt, msg) => {
     windows.forEach(el => {
       if (el.webContents === evt.sender && mapWindow === undefined) {
         mapWindow = el;
-        mapWindow.webContents.send('map-window-data', 'Map Window successfully set.');
+        mapWindow.webContents.send('map-window-confirmation', 'Map Window successfully set.');
         if (windows.length == 2) {
-          const el2 = (windows.indexOf(el) == 0) ?  windows[1] : windows[0];
+          const el2 = (windows.indexOf(el) == 0) ? windows[1] : windows[0];
           mainWindow = el2;
-          mainWindow.webContents.send('main-window-data', 'Main Window successfully set.');
-       }
+          mainWindow.webContents.send('main-window-confirmation', 'Main Window successfully set.');
+        }
       }
     })
     if (mainWindow && mapWindow) {
@@ -54,13 +54,38 @@ function createWindows() {
     }
   });
 
+  ipcMain.on('is-window-set', (evt, msg) => {
+    if (mainWindow && mainWindow.webContents == evt.sender) {
+      mainWindow.webContents.send('main-window-confirmation', msg);
+    }
+    if (mapWindow && mapWindow.webContents == evt.sender) {
+      mapWindow.webContents.send('map-window-confirmation', msg);
+    }
+    if (mainWindow && mapWindow ) {
+      closeExtraWindows();
+    }
+  });
+
+  ipcMain.on('message-to-main-window', (evt, msg) => {
+    if (mainWindow) {
+      mainWindow.webContents.send('message-for-main-window', msg);
+    }
+  });
+
+  ipcMain.on('message-to-map-window', (evt, msg) => {
+    if (mapWindow) {
+      mapWindow.webContents.send('message-for-map-window', msg);
+    }
+  });
+
+
   ipcMain.on('saveFile', (evt, msg) => functions.saveFile(mainWindow, msg));
   ipcMain.on('loadFile', (evt, msg) => functions.loadFile(mainWindow, msg));
   ipcMain.on('close', () => closeProgram());
 }
 
 function setupWindow(display: Display): BrowserWindow {
-  const window =  new BrowserWindow({
+  const window = new BrowserWindow({
     x: 0 + display.bounds.x,
     y: 0 + display.bounds.y,
     width: display.workAreaSize.width * display.scaleFactor,
@@ -73,9 +98,9 @@ function setupWindow(display: Display): BrowserWindow {
   });
   if (serve) {
     require('electron-reload')(__dirname, {
-      electron: require(`${__dirname}/node_modules/electron`)
+      electron: require(`${__dirname}/node_modules/electron`),
+      hardResetMethod: 'exit'
     });
-    window.loadURL('http://localhost:4200');
     window.loadURL('http://localhost:4200');
     window.webContents.openDevTools();
   } else {

@@ -1,6 +1,8 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ipcRenderer } from 'electron';
+import { WindowService } from '@app/modules/window';
+import { Subscriber, Subscription } from 'rxjs';
 
 interface NavButton {
   name: string;
@@ -17,10 +19,8 @@ export class LandingLayoutComponent implements OnInit {
   titleFreq = 4;
 
   routeTitle = 'Plan List';
-
   windowSet = false;
-  mainWindowSet = false;
-  mapWindowSet = false;
+  windowSetSub: Subscription;
 
   navButtons = [
     {
@@ -39,14 +39,20 @@ export class LandingLayoutComponent implements OnInit {
     }
   ] as NavButton[];
 
-  constructor(private router: Router, private activeRoute: ActivatedRoute, private detectorRef: ChangeDetectorRef) {
+  constructor(private router: Router, private activeRoute: ActivatedRoute, private detectorRef: ChangeDetectorRef, private windowService: WindowService) {
+    this.routeTitle = 'Screen Selection';
+    this.router.navigate(['screenselection'], { relativeTo: this.activeRoute });
 
   }
 
   ngOnInit() {
-    this.navigateTo(this.navButtons[0]);
-    ipcRenderer.on('main-window-data', (event, message) => this.confirmMainWindow(message));
-    ipcRenderer.on('map-window-data',  (event, message) => this.confirmMapWindow(message));
+    this.windowSetSub = this.windowService.windowSet.subscribe(value => {
+      this.windowSet = value;
+      if (this.windowSet) {
+        this.navigateTo(this.navButtons[0]);
+        this.windowSetSub.unsubscribe();
+      }
+    })
   }
 
   navigateTo(button: NavButton): void {
@@ -56,33 +62,6 @@ export class LandingLayoutComponent implements OnInit {
 
   close() {
     ipcRenderer.send('close');
-  }
-
-  setAsMainWindow() {
-    ipcRenderer.send('set-as-main-window');
-  }
-
-  confirmMainWindow(message: string) {
-    console.log(message);
-    this.windowSet = true;
-    this.mainWindowSet = true;
-    ipcRenderer.removeListener('map-window-data', () => this.confirmMapWindow(null));
-    ipcRenderer.removeListener('main-window-data', () => this.confirmMainWindow(null));
-    this.detectorRef.detectChanges();
-
-  }
-
-  setAsMapWindow() {
-    ipcRenderer.send('set-as-map-window');
-  }
-
-  confirmMapWindow(message: string) {
-    console.log(message);
-    this.windowSet = true;
-    this.mapWindowSet = true;
-    ipcRenderer.removeListener('map-window-data', () => this.confirmMapWindow(null));
-    ipcRenderer.removeListener('main-window-data', () => this.confirmMainWindow(null));
-    this.detectorRef.detectChanges();
   }
 
 }

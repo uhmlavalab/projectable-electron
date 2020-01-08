@@ -8,12 +8,12 @@ const appRoutes: Routes = [
     loadChildren: () => import('./sections/landing/landing.module').then(mod => mod.LandingModule),
   },
   {
-    path: 'map',
-    loadChildren: () => import('./sections/map/map.module').then(mod => mod.MapModule),
+    path: 'map-window',
+    loadChildren: () => import('./sections/map-window/map-window.module').then(mod => mod.MapWindowModule),
   },
   {
-    path: 'secondscreen',
-    loadChildren: () => import('./sections/second-screen/second-screen.module').then(mod => mod.SecondScreenModule),
+    path: 'main-window',
+    loadChildren: () => import('./sections/main-window/main-window.module').then(mod => mod.MainWindowModule),
   },
   {
     path: '**',

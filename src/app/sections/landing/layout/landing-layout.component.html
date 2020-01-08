@@ -1,24 +1,20 @@
-
-<div *ngIf="!windowSet">
-  <button mat-flat-button color="Primary" (click)="setAsMainWindow()">Main Window</button>
-  <button mat-flat-button color="Primary" (click)="setAsMapWindow()">Map Window</button>
-</div>
-
-
-<mat-drawer-container *ngIf="mainWindowSet">
+<mat-drawer-container>
 
   <mat-drawer mode="side" opened>
 
     <app-bouncing-title [title]="title" [freq]="titleFreq"></app-bouncing-title>
 
-    <mat-list role="list">
+    <mat-list role="list" *ngIf="windowSet">
 
-      <mat-list-item *ngFor="let navbutton of navButtons"> <button mat-flat-button color="primary"
-          (click)="navigateTo(navbutton)">{{ navbutton.name}}</button></mat-list-item>
+      <mat-list-item *ngFor="let navbutton of navButtons" >
+        <button mat-flat-button color="primary" (click)="navigateTo(navbutton)">{{ navbutton.name}}</button>
+      </mat-list-item>
+
+      <mat-list-item>
+        <button mat-flat-button color="warn" (click)="close()">CLOSE</button>
+      </mat-list-item>
+
     </mat-list>
-    <mat-list-item>
-      <button mat-flat-button color="warn" (click)="close()">CLOSE</button>
-    </mat-list-item>
 
   </mat-drawer>
 
@@ -31,7 +27,3 @@
   </mat-drawer-content>
 
 </mat-drawer-container>
-
-<div>
-  <mat-spinner *ngIf="mapWindowSet"></mat-spinner>
-</div>

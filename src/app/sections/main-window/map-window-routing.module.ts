@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { MapPageComponent } from './routes/map-page/map-page.component';
+import { MainWindowLayoutComponent } from './layout/main-window-layout.component';
 
 const mapRoutes: Routes = [
   {
     path: '',
-    component: MapPageComponent,
+    component: MainWindowLayoutComponent,
   }
 ];
 
@@ -18,4 +18,4 @@ const mapRoutes: Routes = [
     RouterModule
   ]
 })
-export class MapRoutingModule {}
+export class MainWindowRoutingModule {}
