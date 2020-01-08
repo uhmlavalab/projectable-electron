@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ipcRenderer } from 'electron';
-
 
 interface NavButton {
   name: string;
@@ -18,6 +17,10 @@ export class LandingLayoutComponent implements OnInit {
   titleFreq = 4;
 
   routeTitle = 'Plan List';
+
+  windowSet = false;
+  mainWindowSet = false;
+  mapWindowSet = false;
 
   navButtons = [
     {
@@ -36,11 +39,14 @@ export class LandingLayoutComponent implements OnInit {
     }
   ] as NavButton[];
 
-  constructor(private router: Router, private activeRoute: ActivatedRoute) {
+  constructor(private router: Router, private activeRoute: ActivatedRoute, private detectorRef: ChangeDetectorRef) {
+
   }
 
   ngOnInit() {
     this.navigateTo(this.navButtons[0]);
+    ipcRenderer.on('main-window-data', (event, message) => this.confirmMainWindow(message));
+    ipcRenderer.on('map-window-data',  (event, message) => this.confirmMapWindow(message));
   }
 
   navigateTo(button: NavButton): void {
@@ -50,6 +56,33 @@ export class LandingLayoutComponent implements OnInit {
 
   close() {
     ipcRenderer.send('close');
+  }
+
+  setAsMainWindow() {
+    ipcRenderer.send('set-as-main-window');
+  }
+
+  confirmMainWindow(message: string) {
+    console.log(message);
+    this.windowSet = true;
+    this.mainWindowSet = true;
+    ipcRenderer.removeListener('map-window-data', () => this.confirmMapWindow(null));
+    ipcRenderer.removeListener('main-window-data', () => this.confirmMainWindow(null));
+    this.detectorRef.detectChanges();
+
+  }
+
+  setAsMapWindow() {
+    ipcRenderer.send('set-as-map-window');
+  }
+
+  confirmMapWindow(message: string) {
+    console.log(message);
+    this.windowSet = true;
+    this.mapWindowSet = true;
+    ipcRenderer.removeListener('map-window-data', () => this.confirmMapWindow(null));
+    ipcRenderer.removeListener('main-window-data', () => this.confirmMainWindow(null));
+    this.detectorRef.detectChanges();
   }
 
 }

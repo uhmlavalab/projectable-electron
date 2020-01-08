@@ -1,91 +1,116 @@
-import { app, BrowserWindow, screen, ipcMain } from 'electron';
+import { app, BrowserWindow, screen, ipcMain, Display } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
-import * as fs from 'fs';
+import * as functions from './electron-functions';
 
-let win, serve;
+let displays: Display[] = [];
+let windows: BrowserWindow[] = [];
+let mainWindow: BrowserWindow;
+let mapWindow: BrowserWindow;
 const args = process.argv.slice(1);
-serve = args.some(val => val === '--serve');
+const serve = args.some(val => val === '--serve');
 
-const dataDir = 'C:/ProgramData/ProjecTable';
+function createWindows() {
 
-function createWindow() {
+  const allDisplays = screen.getAllDisplays();
+  allDisplays.forEach(el => {
+    displays.push(el);
+    const window = setupWindow(el);
+    windows.push(window);
+  })
 
-  const electronScreen = screen;
-  const size = electronScreen.getPrimaryDisplay().workAreaSize;
+  ipcMain.on('set-as-main-window', (evt, msg) => { 
+    windows.forEach(el => {
+      if (el.webContents === evt.sender && mainWindow === undefined) {
+        mainWindow = el;
+        mainWindow.webContents.send('main-window-data', 'Main Window successfully set.');
+        if (windows.length == 2) {
+          const el2 = (windows.indexOf(el) == 0) ?  windows[1] : windows[0];
+          mapWindow = el2;
+          mapWindow.webContents.send('map-window-data', 'Map Window successfully set.');
+        }
+      }
+    })
+    if (mainWindow && mapWindow) {
+      closeExtraWindows();
+    }
+  });
 
-  // Create the browser window.
-  win = new BrowserWindow({
-    x: 0,
-    y: 0,
-    width: size.width,
-    height: size.height,
+  ipcMain.on('set-as-map-window', (evt, msg) => { 
+    windows.forEach(el => {
+      if (el.webContents === evt.sender && mapWindow === undefined) {
+        mapWindow = el;
+        mapWindow.webContents.send('map-window-data', 'Map Window successfully set.');
+        if (windows.length == 2) {
+          const el2 = (windows.indexOf(el) == 0) ?  windows[1] : windows[0];
+          mainWindow = el2;
+          mainWindow.webContents.send('main-window-data', 'Main Window successfully set.');
+       }
+      }
+    })
+    if (mainWindow && mapWindow) {
+      closeExtraWindows();
+    }
+  });
+
+  ipcMain.on('saveFile', (evt, msg) => functions.saveFile(mainWindow, msg));
+  ipcMain.on('loadFile', (evt, msg) => functions.loadFile(mainWindow, msg));
+  ipcMain.on('close', () => closeProgram());
+}
+
+function setupWindow(display: Display): BrowserWindow {
+  const window =  new BrowserWindow({
+    x: 0 + display.bounds.x,
+    y: 0 + display.bounds.y,
+    width: display.workAreaSize.width * display.scaleFactor,
+    height: display.workAreaSize.height * display.scaleFactor,
     fullscreen: true,
     frame: false,
     webPreferences: {
       nodeIntegration: true,
     },
   });
-
   if (serve) {
     require('electron-reload')(__dirname, {
       electron: require(`${__dirname}/node_modules/electron`)
     });
-    win.loadURL('http://localhost:4200');
+    window.loadURL('http://localhost:4200');
+    window.loadURL('http://localhost:4200');
+    window.webContents.openDevTools();
   } else {
-    win.loadURL(url.format({
+    window.loadURL(url.format({
       pathname: path.join(__dirname, 'dist/index.html'),
       protocol: 'file:',
       slashes: true
     }));
   }
-
-  if (serve) {
-    win.webContents.openDevTools();
-  }
-
-  ipcMain.on('saveFile', (evt, msg) => saveFile(msg));
-  ipcMain.on('loadFile', (evt, msg) => loadFile(msg));
-  ipcMain.on('close', () => {
-    win.close();
-    app.quit();
-  });
-
-
-  // Emitted when the window is closed.
-  win.on('closed', () => {
-    // Dereference the window object, usually you would store window
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    win = null;
-  });
-
+  return window;
 }
-function loadFile(fileName: string) {
-  fs.readFile(`${dataDir}/${fileName}`, (err, data) => {
-    if (err) throw err;
-    win.webContents.send('fileLoaded', data);
+
+function closeExtraWindows() {
+  windows.forEach(el => {
+    if (el !== mainWindow && el !== mapWindow) {
+      el.close();
+    }
   });
 }
 
-
-function saveFile(msg: string) {
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir);
+function closeProgram() {
+  if (mainWindow) {
+    mainWindow.close();
   }
-  fs.writeFile(`${dataDir}/test.txt`, msg, (err) => {
-    if (err) throw err;
-    win.webContents.send('fileSaved', 'File Write Complete');
-  });
+  if (mapWindow) {
+    mapWindow.close();
+  }
+  app.quit();
 }
 
 try {
-
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
-  app.on('ready', createWindow);
+  app.on('ready', createWindows);
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
@@ -93,14 +118,6 @@ try {
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
       app.quit();
-    }
-  });
-
-  app.on('activate', () => {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (win === null) {
-      createWindow();
     }
   });
 
