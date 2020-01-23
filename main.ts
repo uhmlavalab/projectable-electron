@@ -22,14 +22,13 @@ function createWindows() {
 
   ipcMain.on('set-main-window', (evt, msg) => {
     windows.forEach(el => {
-      if (el.webContents === evt.sender && mainWindow === undefined) {
+      if (el.webContents === evt.sender) {
         mainWindow = el;
         mainWindow.webContents.send('main-window-confirmation', 'Main Window successfully set.');
-        if (windows.length == 2) {
-          const el2 = (windows.indexOf(el) == 0) ? windows[1] : windows[0];
-          mapWindow = el2;
-          mapWindow.webContents.send('map-window-confirmation', 'Map Window successfully set.');
-        }
+      }
+      if (windows.length === 2) {
+        mapWindow = windows.find(win => el !== win);
+        mapWindow.webContents.send('map-window-confirmation', 'Map Window successfully set.');
       }
     })
     if (mainWindow && mapWindow) {
@@ -39,14 +38,13 @@ function createWindows() {
 
   ipcMain.on('set-map-window', (evt, msg) => {
     windows.forEach(el => {
-      if (el.webContents === evt.sender && mapWindow === undefined) {
+      if (el.webContents === evt.sender) {
         mapWindow = el;
         mapWindow.webContents.send('map-window-confirmation', 'Map Window successfully set.');
-        if (windows.length == 2) {
-          const el2 = (windows.indexOf(el) == 0) ? windows[1] : windows[0];
-          mainWindow = el2;
-          mainWindow.webContents.send('main-window-confirmation', 'Main Window successfully set.');
-        }
+      }
+      if (windows.length === 2) {
+        mainWindow = windows.find(win => el !== win);
+        mainWindow.webContents.send('main-window-confirmation', 'Main Window successfully set.');
       }
     })
     if (mainWindow && mapWindow) {
@@ -54,17 +52,14 @@ function createWindows() {
     }
   });
 
-  ipcMain.on('is-window-set', (evt, msg) => {
-    if (mainWindow && mainWindow.webContents == evt.sender) {
-      mainWindow.webContents.send('main-window-confirmation', msg);
-    }
-    if (mapWindow && mapWindow.webContents == evt.sender) {
-      mapWindow.webContents.send('map-window-confirmation', msg);
-    }
-    if (mainWindow && mapWindow ) {
-      closeExtraWindows();
+  ipcMain.on('remove-window', (evt, msg) => {
+    for (let i = 0; i < windows.length; i++) {
+      if (windows[i].webContents === evt.sender) {
+        windows.splice(i, 1);
+      }
     }
   });
+
 
   ipcMain.on('message-to-main-window', (evt, msg) => {
     if (mainWindow) {
@@ -78,6 +73,10 @@ function createWindows() {
     }
   });
 
+  ipcMain.on('clear-window-selections', (evt, msg) => {
+    mapWindow = null;
+    mainWindow = null;
+  });
 
   ipcMain.on('saveFile', (evt, msg) => functions.saveFile(mainWindow, msg));
   ipcMain.on('loadFile', (evt, msg) => functions.loadFile(mainWindow, msg));

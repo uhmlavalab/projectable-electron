@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-map-window-layout',
@@ -7,7 +8,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MapWindowLayoutComponent implements OnInit {
 
-  constructor() { }
+  constructor(private router: Router, private activeRoute: ActivatedRoute) {
+    this.router.navigate(['waiting-screen'], { relativeTo: this.activeRoute });
+  }
 
   ngOnInit() {
   }

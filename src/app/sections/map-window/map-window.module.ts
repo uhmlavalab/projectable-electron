@@ -7,11 +7,13 @@ import { MapWindowRoutingModule } from './map-window-routing.module'
 
 // Layout
 import { MapWindowLayoutComponent } from './layout/map-window-layout.component';
+import { WaitingScreenComponent } from './routes/waiting-screen/waiting-screen.component';
 
 
 @NgModule({
   declarations: [
-    MapWindowLayoutComponent
+    MapWindowLayoutComponent,
+    WaitingScreenComponent
   ],
   imports: [
     CommonModule,

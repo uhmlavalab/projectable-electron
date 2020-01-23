@@ -7,6 +7,9 @@ import { WindowService } from './services/window.service';
   declarations: [],
   imports: [
     CommonModule
+  ],
+  providers: [
+    WindowService
   ]
 })
 export class WindowModule { }
