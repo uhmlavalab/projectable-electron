@@ -8,7 +8,6 @@ const landingRoutes: Routes = [
   {
     path: '',
     component: LandingLayoutComponent,
-    
   }
 ];
 
@@ -20,4 +19,4 @@ const landingRoutes: Routes = [
     RouterModule
   ]
 })
-export class LandingRoutingModule {}
+export class LandingRoutingModule { }

@@ -21,16 +21,22 @@ export class LandingLayoutComponent implements OnInit {
 
   windowSet = false;
   windowSetSub: Subscription;
-  
+
   constructor(private router: Router, private activeRoute: ActivatedRoute, private detectorRef: ChangeDetectorRef, private windowService: WindowService) {
   }
 
   ngOnInit() {
-    
+
   }
 
   close() {
     ipcRenderer.send('close');
   }
+  setAsMainWindow() {
+    this.windowService.setAsMainWindow();
+  }
 
+  setAsMapWindow() {
+    this.windowService.setAsMapWindow();
+  }
 }

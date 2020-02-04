@@ -1,6 +1,22 @@
-<mat-drawer-container>
-
-
 <app-bouncing-title [title]="title" [freq]="titleFreq"></app-bouncing-title>
-<app-screen-selection></app-screen-selection>
-<button mat-raised-button color="warn" (click)="close()">CLOSE</button>
+
+<div class="grid-container">
+  <div class="grid-item">
+  </div>
+ 
+  <div class="grid-item">
+    <div class="button-container">
+      <div class="button-click" (click)="setAsMainWindow()">Main</div>
+    </div>
+  </div>
+  <div class="grid-item">
+    <div class="button-container">
+      <div class="button-click" (click)="setAsMapWindow()">Map</div>
+    </div>
+  </div>
+  <div class="grid-item">
+</div>
+</div>
+
+
+<button mat-raised-button color="warn" (click)="close()">Close Application</button>

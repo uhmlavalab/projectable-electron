@@ -3,26 +3,26 @@
   letter-spacing: -5px;
   width: 100%;
   text-align: center;
-  height: 52px;
+  height: 104px;
 }
 .normal-style {
-  font-size: 40px;
-  line-height: 52px;
+  font-size: 80px;
+  line-height: 104px;
   font-weight: bolder;
 }
 .bounce-style {
-  font-size: 52px;
-  line-height: 52px;
+  font-size: 104px;
+  line-height: 104px;
   font-weight: bolder;
 }
 
 img {
-  height: 52px;
-  line-height: 52px;
+  height: 104px;
+  line-height: 104px;
   transform: translateY(10px);
   margin-left: 0.5rem;
 }
 
 span {
-  line-height: 52px;
+  line-height: 104px;
 }

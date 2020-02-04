@@ -52,7 +52,7 @@ export class BouncingTitleComponent implements OnInit {
     } else {
       this.bounceId = index;
       index++;
-      setTimeout(() => { this.bounce(index); }, 75);
+      setTimeout(() => { this.bounce(index); }, 115);
     }
   }
 

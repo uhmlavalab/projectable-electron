@@ -19,20 +19,57 @@ mat-drawer {
 mat-list {
   margin-top: 1rem;
 }
+
 mat-list-item {
   width: 100%;
 }
 
-.routeTitle { 
+.routeTitle {
   text-align: center;
   letter-spacing: 0.5rem;
   font-size: 2rem;
 }
 
-button {
-  width: 100%;
+.button-container {
+  width: 25vw;
+  height: 25vw;
   margin: 1rem;
   font-weight: bold;
   font-size: 1.25rem;
 }
 
+.button-click {
+  width: 20vw;
+  height: 20vw;
+  background: linear-gradient(#2026b5, #2b0b5c);
+  text-align: center;
+  line-height: 20vw;
+  color: white;
+  font-size: 5vh;
+  border-radius: 100%;
+  border: double white 8px;
+  cursor: pointer;
+}
+
+.button-click:hover {
+  font-size: 7vh;
+}
+
+.mat-raised-button {
+  bottom: 1rem;
+  right: 1rem;
+  position: absolute;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 25vw 25vw 25vw 25vw;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.grid-item {
+  width: 100%;
+  padding: 1rem;
+}

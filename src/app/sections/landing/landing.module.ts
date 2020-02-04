@@ -8,7 +8,6 @@ import { SharedModule } from '../../modules/shared'
 import { LandingLayoutComponent } from './layout/landing-layout.component';
 
 // Routes
-import { ScreenSelectionComponent } from './components/screen-selection/screen-selection.component';
 import { LandingRoutingModule } from './landing-routing.module';
 
 // Components
@@ -16,7 +15,6 @@ import { LandingRoutingModule } from './landing-routing.module';
 @NgModule({
   declarations: [
     LandingLayoutComponent,
-    ScreenSelectionComponent
   ],
   imports: [
     CommonModule,
