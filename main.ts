@@ -4,7 +4,6 @@ import * as url from 'url';
 
 import * as functions from './electron-functions';
 
-let displays: Display[] = [];
 let windows: BrowserWindow[] = [];
 let mainWindow: BrowserWindow;
 let mapWindow: BrowserWindow;
@@ -12,10 +11,11 @@ const args = process.argv.slice(1);
 const serve = args.some(val => val === '--serve');
 
 function createWindows() {
+  
+  mapWindow = null;
+  mainWindow = null;
 
-  const allDisplays = screen.getAllDisplays();
-  allDisplays.forEach(el => {
-    displays.push(el);
+  screen.getAllDisplays().forEach(el => {
     const window = setupWindow(el);
     windows.push(window);
   })
@@ -25,10 +25,6 @@ function createWindows() {
       if (el.webContents === evt.sender) {
         mainWindow = el;
         mainWindow.webContents.send('main-window-confirmation', 'Main Window successfully set.');
-      }
-      if (windows.length === 2) {
-        mapWindow = windows.find(win => el !== win);
-        mapWindow.webContents.send('map-window-confirmation', 'Map Window successfully set.');
       }
     })
     if (mainWindow && mapWindow) {
@@ -41,10 +37,6 @@ function createWindows() {
       if (el.webContents === evt.sender) {
         mapWindow = el;
         mapWindow.webContents.send('map-window-confirmation', 'Map Window successfully set.');
-      }
-      if (windows.length === 2) {
-        mainWindow = windows.find(win => el !== win);
-        mainWindow.webContents.send('main-window-confirmation', 'Main Window successfully set.');
       }
     })
     if (mainWindow && mapWindow) {
@@ -74,8 +66,22 @@ function createWindows() {
   });
 
   ipcMain.on('clear-window-selections', (evt, msg) => {
+    if (mapWindow) {
+      mapWindow.webContents.send('message-for-map-window', { reset: true });
+    }
+    if (mainWindow) {
+      mainWindow.webContents.send('message-for-main-window', { reset: true });
+    }
     mapWindow = null;
     mainWindow = null;
+  });
+
+  ipcMain.on('is-window-set', (evt, msg) => {
+    if (mapWindow && mapWindow.webContents === evt.sender) {
+      mapWindow.webContents.send('window-is-set', { windowName: "map" });
+    } else if (mainWindow && mainWindow.webContents === evt.sender) {
+      mainWindow.webContents.send('window-is-set', { windowName: "main" });
+    }
   });
 
   ipcMain.on('saveFile', (evt, msg) => functions.saveFile(mainWindow, msg));

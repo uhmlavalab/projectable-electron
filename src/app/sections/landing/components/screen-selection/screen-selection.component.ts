@@ -10,36 +10,19 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class ScreenSelectionComponent implements OnInit {
 
-  constructor(private windowService: WindowService, private router: Router, private detectorRef: ChangeDetectorRef) { }
+  constructor(private windowService: WindowService) { }
 
   ngOnInit() {
-    ipcRenderer.on('main-window-confirmation', (event, message) => this.confirmMainWindow());
-    ipcRenderer.on('map-window-confirmation',  (event, message) => this.confirmMapWindow());
+
   }
 
   setAsMainWindow() {
-    ipcRenderer.send('set-main-window');
+    this.windowService.setAsMainWindow();
   }
 
   setAsMapWindow() {
-    ipcRenderer.send('set-map-window'); 
-  }
-
-  confirmMainWindow() {
-    ipcRenderer.removeListener('map-window-confirmation', () => this.confirmMapWindow());
-    ipcRenderer.removeListener('main-window-confirmation', () => this.confirmMainWindow());
-    this.windowService.setAsMainWindow();
-    this.router.navigate(['main-window']);
-    this.detectorRef.detectChanges();
-  }
-
-  confirmMapWindow() {
-    ipcRenderer.removeListener('map-window-confirmation', () => this.confirmMapWindow());
-    ipcRenderer.removeListener('main-window-confirmation', () => this.confirmMainWindow());
     this.windowService.setAsMapWindow();
-    this.router.navigate(['map-window']);
-    this.detectorRef.detectChanges();
-
   }
+
 
 }

@@ -13,5 +13,7 @@ export class PlanSelectionComponent implements OnInit {
   ngOnInit() {
     this.windowService.sendMessage(["hihi from MainWindow", {animal: 'cat'}]);
   }
-
+  reset() {
+    this.windowService.resetAllWindows();
+  }
 }

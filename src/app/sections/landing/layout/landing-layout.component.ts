@@ -23,9 +23,6 @@ export class LandingLayoutComponent implements OnInit {
   windowSetSub: Subscription;
   
   constructor(private router: Router, private activeRoute: ActivatedRoute, private detectorRef: ChangeDetectorRef, private windowService: WindowService) {
-    this.windowSetSub = this.windowService.windowSet.subscribe(value => {
-      this.windowSet = value;
-    })
   }
 
   ngOnInit() {

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { WindowService } from '@app/modules/window';
 
 @Component({
   selector: 'app-main-window-layout',
@@ -8,11 +9,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class MainWindowLayoutComponent implements OnInit {
 
-  constructor(private router: Router, private activeRoute: ActivatedRoute) {
+  constructor(private router: Router, private activeRoute: ActivatedRoute, private windowService: WindowService) {
     this.router.navigate(['plan-selection'],  { relativeTo: this.activeRoute});
    }
 
   ngOnInit() {
   }
+
 
 }
