@@ -1,21 +1,47 @@
-<app-bouncing-title [title]="title" [freq]="titleFreq"></app-bouncing-title>
+<app-bouncing-title [title]="title" [freq]="1000"></app-bouncing-title>
 
 <div class="grid-container">
+  <div class="grid-item"></div>
+
   <div class="grid-item">
-  </div>
- 
-  <div class="grid-item">
-    <div class="button-container">
-      <div class="button-click" (click)="setAsMainWindow()">Main</div>
+    <div class="grid-text"> Main</div>
+    <div class="loader" (click)="setAsMainWindow()">
+      <div class="part">
+        <div class="part">
+          <div class="part">
+            <div class="part">
+              <div class="part">
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
   </div>
-  <div class="grid-item">
-    <div class="button-container">
-      <div class="button-click" (click)="setAsMapWindow()">Map</div>
-    </div>
-  </div>
+
   <div class="grid-item">
 </div>
+  <div class="grid-item">
+    <div class="grid-text"> Map</div>
+    <div class="loader" (click)="setAsMapWindow()" >
+      <div class="part">
+        <div class="part">
+          <div class="part">
+            <div class="part">
+              <div class="part">
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="grid-item">
+  </div>
 </div>
 
 
