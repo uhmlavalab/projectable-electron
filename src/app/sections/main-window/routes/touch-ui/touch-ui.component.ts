@@ -60,6 +60,7 @@ export class TouchUiComponent implements AfterViewInit {
     this.planService.planSubject.subscribe(plan => {
       if (plan) {
         this.planSet = true;
+        this.setupUI(plan);
       }
     });
   }
@@ -82,9 +83,10 @@ export class TouchUiComponent implements AfterViewInit {
   }
 
   private setupUI(plan: Plan): void {
-    this.year = this.startPlanService(plan);
+    this.year = this.planService.getCurrentYear();
     this.test = plan.displayName;
     this.layers = plan.map.mapLayers;
+    console.log(this.layers);
   }
 
   /**
