@@ -12,7 +12,7 @@
 
 .options-touch-overlay {
     height: 100%;
-    width: 100%;
+    width: 20%;
     z-index: 100;
     position: absolute;
     top: 0;

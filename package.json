@@ -94,5 +94,8 @@
   },
   "engines": {
     "node": ">=10.9.0"
+  },
+  "dependencies": {
+    "ng-circle-progress": "^1.5.1"
   }
 }

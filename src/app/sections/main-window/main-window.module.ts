@@ -7,6 +7,8 @@ import { SharedModule } from '@app/shared';
 import { ChartsModule } from '@app/charts';
 import { MapsModule } from '@app/maps';
 import { MainWindowRoutingModule } from './main-window-routing.module'
+import { NgCircleProgressModule } from 'ng-circle-progress';
+
 
 // Layout
 import { MainWindowLayoutComponent } from './layout/main-window-layout.component';
@@ -46,7 +48,16 @@ import { YearDisplayComponent } from './components/year-display/year-display.com
     SharedModule,
     ChartsModule,
     MapsModule,
-    MainWindowRoutingModule
+    MainWindowRoutingModule,
+    NgCircleProgressModule.forRoot({
+      // set defaults here
+      radius: 40,
+      outerStrokeWidth: 4,
+      innerStrokeWidth: 0,
+      outerStrokeColor: "#78C000",
+      innerStrokeColor: "#C7E596",
+      animationDuration: 700
+    })
   ],
 
 })
