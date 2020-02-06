@@ -29,9 +29,14 @@ export class LandingLayoutComponent implements OnInit {
 
   }
 
-  close() {
-    ipcRenderer.send('close');
+  reset() {
+    this.windowService.resetAllWindows();
   }
+
+  close() {
+    this.windowService.closeAppliction();
+  }
+
   setAsMainWindow() {
     this.windowService.setAsMainWindow();
   }

@@ -1,0 +1,24 @@
+h1 {
+  color: white;
+  width: 100%;
+  text-align: center;
+  font-size: 5vw;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 10vw 40vw 40vw 10vw;
+  position: absolute;
+  top: 55%;
+  transform: translateY(-50%);
+}
+
+.grid-item {
+  height: 30vh;
+  width: 20vh;
+  padding: 5vh 0;
+}
+
+img {
+  transform: translateX(calc(20vw - 50%));
+}

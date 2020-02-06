@@ -44,18 +44,13 @@ export class WindowService {
   }
 
   private mapWindowMessage(event: Electron.IpcRendererEvent, data: any) {
-    if (data.reset) {
-      this.windowName = '';
-      this.router.navigate(['landing']);
-    }
+    this.resetCheck(data.reset);
     this.windowMessageSubject.next(data);
     console.log(data);
-  }
+  } 
 
   private mainWindowMessage(event: Electron.IpcRendererEvent, data: any) {
-    if (data.reset) {
-      this.router.navigate(['landing']);
-    }
+    this.resetCheck(data.reset);
     this.windowMessageSubject.next(data);
     console.log(data);
   }
@@ -72,4 +67,13 @@ export class WindowService {
     ipcRenderer.send('clear-window-selections', {});
   }
 
+  private resetCheck(value: boolean) {
+    if (value) {
+      window.location.reload();
+    }
+  }
+
+  public closeAppliction() {
+    ipcRenderer.send('close');
+  }
 }

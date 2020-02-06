@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 // Modules
-import { SoundsModule } from '@app/sounds';
 import { SectionsModule } from '@app/sections';
 
 // Components
@@ -20,7 +19,6 @@ import { AppComponent } from './app.component';
     AppRoutingModule,
     BrowserAnimationsModule,
     SectionsModule,
-    SoundsModule,
   ],
   bootstrap: [AppComponent]
 })

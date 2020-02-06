@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { WindowService } from '@app/modules/window';
 
@@ -7,14 +7,18 @@ import { WindowService } from '@app/modules/window';
   templateUrl: './main-window-layout.component.html',
   styleUrls: ['./main-window-layout.component.css']
 })
-export class MainWindowLayoutComponent implements OnInit {
+export class MainWindowLayoutComponent {
 
   constructor(private router: Router, private activeRoute: ActivatedRoute, private windowService: WindowService) {
-    this.router.navigate(['plan-selection'],  { relativeTo: this.activeRoute});
-   }
-
-  ngOnInit() {
+    this.router.navigate(['plan-selection'], { relativeTo: this.activeRoute });
   }
 
+  reset() {
+    this.windowService.resetAllWindows();
+  }
+
+  close() {
+    this.windowService.closeAppliction();
+  }
 
 }

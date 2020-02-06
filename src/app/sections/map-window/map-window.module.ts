@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
+// Modules
 import { MaterialModule } from '../../modules/material';
+import { SharedModule } from '../../modules/shared';
 
 // Routes
 import { MapWindowRoutingModule } from './map-window-routing.module'
@@ -18,7 +21,8 @@ import { WaitingScreenComponent } from './routes/waiting-screen/waiting-screen.c
   imports: [
     CommonModule,
     MapWindowRoutingModule,
-    MaterialModule
+    MaterialModule,
+    SharedModule
   ]
 })
 export class MapWindowModule { }

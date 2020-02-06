@@ -20,4 +20,8 @@ export class MapWindowLayoutComponent implements OnInit {
     this.windowService.resetAllWindows();
   }
 
+  close() {
+    this.windowService.closeAppliction();
+  }
+
 }
