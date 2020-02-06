@@ -1,0 +1,11 @@
+.grid-container {
+  display: grid;
+  grid-template-columns: 15vw 25vw 20vw 25vw 15vw;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.grid-item {
+  width: 100%;
+}

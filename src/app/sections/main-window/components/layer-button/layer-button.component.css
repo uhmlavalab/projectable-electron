@@ -1,0 +1,15 @@
+img {
+    width: 96%;
+    position: absolute;
+    margin-left: 2%;
+    margin-top: 2%;
+    z-index: 1;
+}
+
+p {
+    position: absolute;
+    top: 90%;
+    font-size: 11px;
+    width: 100%;
+    text-align: center;
+}

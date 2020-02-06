@@ -4,16 +4,14 @@
     "paths": {
       "*": ["types/*"],
       "@app/*": ["src/app/*"],
+      "@app/services": ["src/services"],
       "@app/charts": ["src/app/modules/charts/"],
-      "@app/plan": ["src/app/modules/plan/"],
       "@app/pages": ["src/app/sections/pages"],
       "@app/maps": ["src/app/modules/maps/"],
       "@app/sounds": ["src/app/modules/sounds/"],
-      "@app/input": ["src/app/modules/input/"],
-      "@app/inputTypes": ["src/app/modules/input/inputTypes"],
       "@app/window": ["src/app/modules/window/"],
-      "@app/material": ["src/app/modules/material/"]
-
+      "@app/material": ["src/app/modules/material/"],
+      "@app/shared": ["src/app/modules/shared/"],
      },
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
@@ -23,7 +21,8 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es2015",
+    "target": "es5",
+    "downlevelIteration": true,
     "typeRoots": [
       "node_modules/@types"
     ],

@@ -1,0 +1,12 @@
+.rectangle {
+    height: 103%;
+    background-color: rgb(11, 110, 9);
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+    display: inline-block;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    left: 0;
+    top: -3px;
+}

@@ -1,0 +1,42 @@
+
+.content-wrapper {
+    width: 150px;
+    height: 150px;
+    position: relative;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    left: 30%;
+    margin-top: 15%;
+
+}
+.border-line {
+    width: 80%;
+    left: 10%;
+    position: relative;
+    height: 1px;
+    background-color: transparent;
+}
+
+.border-line:first-child {
+    margin-top: calc(5vw - 25px);
+}
+
+p {
+    width: 100%;
+    text-align: center;
+    font-size: 32px;
+    margin: 5px 0 5px 0;
+}
+
+.year-bar-wrapper {
+    width: 150px;
+    height: 150px;
+    position: absolute;
+}
+
+.year-bar {
+    width: 2px;
+    height: 10px;
+    position: absolute;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}

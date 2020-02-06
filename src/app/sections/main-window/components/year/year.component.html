@@ -1,0 +1,10 @@
+<div class="year-bar-wrapper" #yearWrapper>
+  <app-year-bar *ngFor="let year of years" class="year-bar" data={{year}} #yearBar></app-year-bar>
+</div>
+<div class="content-wrapper" #wrapper>
+  <div class="border-line"></div>
+  <p>
+    {{ year }}
+  </p>
+  <div class="border-line"></div>
+</div>

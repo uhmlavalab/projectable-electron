@@ -1,0 +1,53 @@
+<!-- This is the main component for the touch UI interface. -->
+<img src="assets/images/BackGround.png" class="background-image"> 
+<!-- This section contains the charts-->
+<div class="left-container">
+  <div class="chart">
+    <app-line-chart></app-line-chart>
+    <!-- <app-progress-ring></app-progress-ring> -->
+  </div>
+  <div class="chart">
+    <app-pie-chart></app-pie-chart>
+  </div>
+</div>
+
+<!-- Center column.  Largest column, contains mini map and the year controls -->
+<div class="center-container">
+  <div class="top">
+      <div class="section-title">{{mapTitle}}</div>
+      <app-map-element *ngIf="planSet" class="map-container" cdkDrag #map>
+      </app-map-element>
+  </div>
+  <div class="middle">
+    <div class="left">
+      <app-scrolling-menu type="scenario"></app-scrolling-menu>
+    </div>
+    <div class="middle">
+      <div class="section-title">{{yearTitle}}</div>
+      <!-- Graphic that shows the year -->
+      <app-year class="year-container" #year></app-year>
+    </div>
+    <div class="right">
+      <app-scrolling-menu type="year"></app-scrolling-menu>
+    </div>
+  </div>
+</div>
+<!-- right column has two rows. -->
+<div class="right-container">
+  <div class="top">
+    <!-- Layer Buttons for turning on and off the layers. -->
+    <div class="layer-button-container" #layerButtonContainer>
+      <div class="section-title">{{layerTitle}}</div>
+      <!-- Wrapper forces the buttons to be 1 to 1 ratio -->
+      <div class="buttons-container">
+        <div class="layer-button-wrapper" *ngFor="let layer of layers">
+          <app-layer-button class="layer-button" layerName={{layer.name}} layerDisplayName={{layer.displayName}}
+            layerIcon={{layer.iconPath}}></app-layer-button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom">
+    <div class="section-title">{{layerInfoTitle}}</div>
+  </div>
+</div>

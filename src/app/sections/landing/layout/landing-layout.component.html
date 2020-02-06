@@ -1,22 +1,6 @@
 <app-bouncing-title [title]="title" [freq]="1000"></app-bouncing-title>
 
-<div class="grid-container">
-
-  <div class="grid-item"></div>
-
-  <div class="grid-item">
-    <app-spinning-button text="Main" color="#00d2ff" (click)="setAsMainWindow()"></app-spinning-button>
-  </div>
-
-  <div class="grid-item"></div>
-
-  <div class="grid-item" >
-    <app-spinning-button text="Map" color="#00d2ff" (click)="setAsMapWindow()"></app-spinning-button>
-  </div>
-
-  <div class="grid-item"></div>
-
-</div>
+<router-outlet></router-outlet>
 
 
 <div style="position: absolute; right: 1rem; bottom: 1rem;">

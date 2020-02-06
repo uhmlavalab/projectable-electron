@@ -10,8 +10,9 @@ import { WindowService } from '@app/modules/window';
 export class MainWindowLayoutComponent {
 
   constructor(private router: Router, private activeRoute: ActivatedRoute, private windowService: WindowService) {
-    this.router.navigate(['plan-selection'], { relativeTo: this.activeRoute });
+    this.reRoute('plan-selection')
   }
+
 
   reset() {
     this.windowService.resetAllWindows();
@@ -19,6 +20,10 @@ export class MainWindowLayoutComponent {
 
   close() {
     this.windowService.closeAppliction();
+  }
+
+  reRoute(route: string) {
+    this.router.navigate([route], { relativeTo: this.activeRoute });
   }
 
 }

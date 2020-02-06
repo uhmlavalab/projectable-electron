@@ -5,6 +5,7 @@ import { MainWindowLayoutComponent } from './layout/main-window-layout.component
 
 // Routes
 import { PlanSelectionComponent } from './routes/plan-selection/plan-selection.component';
+import { TouchUiComponent } from './routes/touch-ui/touch-ui.component';
 
 const mainRoutes: Routes = [
   {
@@ -13,7 +14,12 @@ const mainRoutes: Routes = [
     children: [
       {
         path: 'plan-selection',
-        component: PlanSelectionComponent
+        component: PlanSelectionComponent,
+        
+      },
+      {
+        path: 'touch-ui',
+        component: TouchUiComponent
       }
     ]
   }

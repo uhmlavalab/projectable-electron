@@ -2,8 +2,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // Modules
-import { MaterialModule } from '../../modules/material';
-import { SharedModule } from '../../modules/shared';
+import { MaterialModule } from '@app/material';
+import { SharedModule } from '@app/shared';
+import { ChartsModule } from '@app/charts';
+import { MapsModule } from '@app/maps';
 
 // Routes
 import { MapWindowRoutingModule } from './map-window-routing.module'
@@ -22,7 +24,9 @@ import { WaitingScreenComponent } from './routes/waiting-screen/waiting-screen.c
     CommonModule,
     MapWindowRoutingModule,
     MaterialModule,
-    SharedModule
+    SharedModule,
+    ChartsModule,
+    MapsModule,
   ]
 })
 export class MapWindowModule { }

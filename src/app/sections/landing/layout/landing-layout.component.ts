@@ -1,9 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { ipcRenderer } from 'electron';
+import { Component } from '@angular/core';
 import { WindowService } from '@app/modules/window';
-import { Subscription } from 'rxjs';
-
+import { Router, ActivatedRoute } from '@angular/router';
 
 interface NavButton {
   name: string;
@@ -14,18 +11,13 @@ interface NavButton {
   templateUrl: './landing-layout.component.html',
   styleUrls: ['./landing-layout.component.css']
 })
-export class LandingLayoutComponent implements OnInit {
+export class LandingLayoutComponent {
 
-  title = 'ProjecTable';
+  title = 'HecoTable';
   titleFreq = 4;
 
-  windowSet = false;
-  windowSetSub: Subscription;
-
-  constructor(private router: Router, private activeRoute: ActivatedRoute, private detectorRef: ChangeDetectorRef, private windowService: WindowService) {
-  }
-
-  ngOnInit() {
+  constructor(private router: Router, private activeRoute: ActivatedRoute, private windowService: WindowService) {
+    this.router.navigate(['screen-selection'], { relativeTo: this.activeRoute });
 
   }
 
@@ -37,11 +29,4 @@ export class LandingLayoutComponent implements OnInit {
     this.windowService.closeAppliction();
   }
 
-  setAsMainWindow() {
-    this.windowService.setAsMainWindow();
-  }
-
-  setAsMapWindow() {
-    this.windowService.setAsMapWindow();
-  }
 }

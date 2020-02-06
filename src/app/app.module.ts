@@ -9,6 +9,11 @@ import { SectionsModule } from '@app/sections';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
+// Services
+import { ContentDeliveryService } from './services/content-delivery.service';
+import { PlanService } from './services/plan.service';
+import { TouchService } from './services/touch.service';
+import { UiServiceService } from './services/ui-service.service';
 
 @NgModule({
   declarations: [
@@ -19,6 +24,12 @@ import { AppComponent } from './app.component';
     AppRoutingModule,
     BrowserAnimationsModule,
     SectionsModule,
+  ],
+  providers: [
+    ContentDeliveryService,
+    PlanService,
+    TouchService,
+    UiServiceService
   ],
   bootstrap: [AppComponent]
 })
