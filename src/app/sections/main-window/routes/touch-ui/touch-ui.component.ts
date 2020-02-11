@@ -98,4 +98,12 @@ export class TouchUiComponent implements AfterViewInit {
     return this.planService.startTheMap(plan);
   }
 
+  toggleLayer(event, layer) {
+    if(event.type == 'click') {
+      console.log(event, layer);
+      this.planService.toggleSelectedLayer(layer.name);
+    }
+
+  }
+
 }

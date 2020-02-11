@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { WindowService } from '@app/modules/window';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -9,8 +9,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class ScreenSelectionComponent  {
 
-  constructor(private router: Router, private activeRoute: ActivatedRoute, private windowService: WindowService) {
-    this.router.navigate(['screen-selection'], { relativeTo: this.activeRoute });
+  constructor(private router: Router, private activeRoute: ActivatedRoute, private windowService: WindowService, private ngZone: NgZone) {
+    this.ngZone.run(() => {
+      this.router.navigate(['screen-selection'], { relativeTo: this.activeRoute });
+    });
   }
 
   setAsMainWindow() {

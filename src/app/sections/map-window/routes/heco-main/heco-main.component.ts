@@ -1,14 +1,16 @@
-import { Component, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
 import { TouchService } from '@app/services/touch.service';
 import { Router } from '@angular/router';
+import { WindowService } from '@app/modules/window';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-heco-main',
   templateUrl: './heco-main.component.html',
   styleUrls: ['./heco-main.component.css']
 })
-export class HecoMainComponent implements AfterViewInit {
+export class HecoMainComponent implements OnInit, OnDestroy {
 
   @ViewChild('map', { static: false, read: ElementRef }) mapElement;
   @ViewChild('pieChart', { static: false, read: ElementRef }) pieChart; // The custom Map component.
@@ -19,45 +21,24 @@ export class HecoMainComponent implements AfterViewInit {
   private currentScenario: string;      // Current scenario.
   private messageCheckInterval: any;    // How often to check the local storage for messages (in Milliseconds.)
 
-  constructor(private planService: PlanService,
-    private window: Window,
-    private touchService: TouchService,
-    private router: Router) {
+  private messageSub = new Subscription();
 
-    this.messageCheckInterval = 20; // Set Milliseconds to check app for updates.
+  constructor(private planService: PlanService, private touchService: TouchService, private windowService: WindowService) {
+    this.currentYear = this.planService.getMinimumYear();
+    this.currentScenario = this.planService.getCurrentScenario().displayName;
 
-    /* Set the year and current scenario.  This data comes from the plan service.  If there is an error getting the data
-    Then the plan was not properly set.  Rerout the application back to the landing page to try agian. */
-    try {
-      this.currentYear = this.planService.getMinimumYear();
-      this.currentScenario = this.planService.getCurrentScenario().displayName;
-    } catch (error) {
-      this.router.navigateByUrl('');
-      this.planService.setState('landing');
-      this.touchService.closeUIWindow();
-      console.log('No Plan Found --> Route to setup');
-    }
   }
 
-  ngAfterViewInit() {
-
+  ngOnInit() {
     // Map and Charts are positioned from CSS data from the plan.
     this.positionMap();
     this.positionTopChart();
     this.positionBottomChart();
 
-    // Open the second screen for the Touch UI and notify it of the current plan.
-    this.touchService.openUIWindow();
-    this.touchService.messageUI('plan', 'heco-oahu');
-
-    // Subscribe to the local storages.
-    this.messageCheckInterval = setInterval(() => {
-      try {
-        this.reviewMessage(this.touchService.readMessage());
-      } catch (err) {
-        // console.log('Failed to revieve a new message');
-      }
-    }, this.messageCheckInterval);
+    this.messageSub = this.windowService.windowMessageSubject.subscribe(message => {
+      console.log('review messsage ', message)
+      this.reviewMessage(message);
+    });
 
     // Subscribe to scenario Changes.
     this.planService.scenarioSubject.subscribe(scenario => {
@@ -73,19 +54,22 @@ export class HecoMainComponent implements AfterViewInit {
       }
     });
   }
+  ngOnDestroy() {
+    this.messageSub.unsubscribe();
+  }
 
   private reviewMessage(msg): void {
-    const data = JSON.parse(msg);
-    if (data.newMsg === 'true') {
-      this.touchService.clearMessages();
-      if (data.type === 'layer-update') {
-        this.planService.toggleSelectedLayer(data.data);
-      } else if (data.type === 'change year') {
-        this.planService.setCurrentYear(parseInt(data.data, 10));
-      } else if (data.type === 'change scenario') {
-        this.planService.setScenario(data.data);
-      }
+    const data = msg;
+    if (Object.keys(msg).indexOf('layer') != -1) {
+      this.planService.toggleSelectedLayer(data.layer);
     }
+    if (Object.keys(msg).indexOf('year') != -1) {
+      console.log('update year ', msg.year);
+      this.planService.setCurrentYear(msg.year);
+    } if (Object.keys(msg).indexOf('scenario') != -1) {
+      this.planService.setScenario(msg.scenario);
+    }
+
   }
 
   private positionMap(): void {

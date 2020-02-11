@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component} from '@angular/core';
 
 @Component({
   selector: 'app-waiting-screen',
   templateUrl: './waiting-screen.component.html',
   styleUrls: ['./waiting-screen.component.css']
 })
-export class WaitingScreenComponent implements OnInit {
+export class WaitingScreenComponent  {
 
+  
   constructor() { }
 
-  ngOnInit() {
-  }
+
+ 
 
 }

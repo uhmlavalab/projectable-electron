@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, NgZone } from '@angular/core';
 import { WindowService } from '@app/modules/window';
 import { PlanService } from '@app/services/plan.service';
 import { ContentDeliveryService } from '@app/services/content-delivery.service';
@@ -16,7 +16,7 @@ export class PlanSelectionComponent  {
   view: any;
   plans: Plan[];
 
-  constructor(private windowService: WindowService, private planService: PlanService, private router: Router, private activeRoute: ActivatedRoute, ) {
+  constructor(private windowService: WindowService, private planService: PlanService, private router: Router, private activeRoute: ActivatedRoute, private ngZone: NgZone) {
     this.plans = this.planService.getPlans();
    }
 
@@ -26,13 +26,13 @@ export class PlanSelectionComponent  {
   }
 
   startPlan(plan) {
-    console.log(this.plans[0])
     this.planService.startTheMap(this.plans[0]);
-    this.reRoute('touch-ui')
+    this.ngZone.run(() => {
+      this.reRoute('touch-ui')
+    });
   }
 
   reRoute(route: string) {
-    console.log(route);
     this.router.navigate([`../${route}`], { relativeTo: this.activeRoute });
   }
 }

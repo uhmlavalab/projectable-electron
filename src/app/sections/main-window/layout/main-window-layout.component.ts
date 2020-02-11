@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { WindowService } from '@app/modules/window';
 
@@ -9,8 +9,11 @@ import { WindowService } from '@app/modules/window';
 })
 export class MainWindowLayoutComponent {
 
-  constructor(private router: Router, private activeRoute: ActivatedRoute, private windowService: WindowService) {
-    this.reRoute('plan-selection')
+  constructor(private router: Router, private activeRoute: ActivatedRoute, private windowService: WindowService, private ngZone: NgZone) {
+    this.ngZone.run(() => {
+      this.reRoute('plan-selection');
+    });
+
   }
 
 

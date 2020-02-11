@@ -25,7 +25,7 @@ export class TouchService {
   private plans: Plan[];
   private currentPlan: Plan;
 
-  constructor(private window: Window) {
+  constructor() {
     this.plans = Plans;
     this.POINT_HISTORY_MAX = 5;
     this.MIN_CLUSTER_SIZE = 1;
@@ -39,7 +39,7 @@ export class TouchService {
   }
 
   public openUIWindow(): void {
-    this.uiWindow = this.window.open('/heco-main/touch-ui', 'touch-ui');
+    this.uiWindow = window.open('/heco-main/touch-ui', 'touch-ui');
   }
 
   public closeUIWindow(): void {
@@ -47,13 +47,13 @@ export class TouchService {
   }
 
   public readMessage(): string {
-     const message = this.window.localStorage.getItem('map-msg');
+     const message = window.localStorage.getItem('map-msg');
      return message;
   }
 
   public messageUI(idString: string, data: any): void {
     const msg = {type: idString, data: data, newMsg: 'true'};
-    this.window.localStorage.setItem('ui-msg', JSON.stringify(msg));
+    localStorage.setItem('ui-msg', JSON.stringify(msg));
   }
 
   public clearMessages(): void {
@@ -62,7 +62,7 @@ export class TouchService {
       data: 'none',
       newMsg: 'false'
     };
-    this.window.localStorage.setItem('map-msg', JSON.stringify(msg));
+    localStorage.setItem('map-msg', JSON.stringify(msg));
   }
 
   /** Takes any array of any size and will trim it

@@ -42,7 +42,7 @@
       <div class="buttons-container">
         <div class="layer-button-wrapper" *ngFor="let layer of layers">
           <app-layer-button class="layer-button" layerName={{layer.name}} layerDisplayName={{layer.displayName}}
-            layerIcon={{layer.iconPath}} color={{layer.legendColor}}></app-layer-button>
+            layerIcon={{layer.iconPath}} color={{layer.legendColor}} (click)="toggleLayer($event, layer)"></app-layer-button>
         </div>
       </div>
     </div>

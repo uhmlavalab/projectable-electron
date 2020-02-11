@@ -7,6 +7,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import {chartColors} from '../../assets/plans/defaultColors';
 import { SoundsService } from '@app/sounds';
 import * as d3 from 'd3/d3.min';
+import { WindowService } from '@app/modules/window';
 
 @Injectable({
   providedIn: 'root'
@@ -56,7 +57,7 @@ export class PlanService {
   private curtailmentData = {};
 
 
-  constructor(private soundsService: SoundsService) {
+  constructor(private soundsService: SoundsService, private windowService: WindowService) {
     this.plans = Plans;
     this.state = 'landing'; // Initial state is landing
     this.legendLayouts = ['grid', 'vertical'];
@@ -69,6 +70,7 @@ export class PlanService {
     this.currentPlan = plan;
     this.setupSelectedPlan(this.currentPlan);
     this.setState('run');
+    this.windowService.sendMessage({ type: 'state', message: 'run', plan: plan })
     return this.getCurrentYear();
   }
 
@@ -440,6 +442,7 @@ export class PlanService {
   /** Adds or removes the selected layer after checking it's active state. */
   public toggleLayer(): void {
     this.selectedLayer.active ? this.removeLayer() : this.addLayer();
+    this.windowService.sendMessage({layer: this.selectedLayer.name, add: this.selectedLayer.active});
   }
 
   /** Adds or removes the selected layer after checking it's active state. */

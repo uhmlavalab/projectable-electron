@@ -107,7 +107,7 @@ function setupWindow(display: Display): BrowserWindow {
       hardResetMethod: 'exit'
     });
     window.loadURL('http://localhost:4200');
-    window.webContents.openDevTools();
+    // window.webContents.openDevTools();
   } else {
     window.loadURL(url.format({
       pathname: path.join(__dirname, 'dist/index.html'),
