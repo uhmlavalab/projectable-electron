@@ -124,7 +124,7 @@ export const HecoPlan: Plan = {
         borderColor: mapLayerColors.Dod.border,
         borderWidth: 1,
         legendColor: mapLayerColors.Dod.fill,
-        filePath: 'assets/plans/oahu-heco/layers/government1.json',
+        filePath: 'assets/plans/oahu-heco/layers/government.json',
         parcels: [],
         setupFunction(planService: PlanService) {
           const colors = {
@@ -189,7 +189,7 @@ export const HecoPlan: Plan = {
         included: true,
         iconPath: 'assets/plans/oahu-heco/images/icons/WIND.png',
         secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/layer-images/wind.jpg',
-        secondScreenText: 'This layer shows land owned by different levels of government including Federal, State, County, and DHHL. ',
+        secondScreenText: 'This layer represents this technical potential of solar based on an analysis by the National Renewable Energy Laboratory that accounts for the wind resource by location.',
         fillColor: mapLayerColors.Wind.fill,
         borderColor: mapLayerColors.Wind.border,
         borderWidth: 0.2,
@@ -302,12 +302,32 @@ export const HecoPlan: Plan = {
         secondScreenText: 'This layer shows the Land Study Bureau’s Overall Productivity Rating (LSB) for agricultural lands. The ratings of the land move from Class A (most productive) to Class E (least productive). ',
         fillColor: mapLayerColors.Agriculture.fill,
         borderColor: mapLayerColors.Agriculture.border,
-        borderWidth: 1,
+        borderWidth: 0.25,
         legendColor: mapLayerColors.Agriculture.fill,
-        filePath: 'assets/plans/oahu-heco/layers/agriculture.json',
+        filePath: 'assets/plans/oahu-heco/layers/lsb2.json',
         parcels: [],
-        setupFunction: null,
-        updateFunction: null,
+        setupFunction(planService: PlanService) {
+          const colors = {
+            'A': '#7de87d',
+            'B': '#2edd2e',
+            'C': '#00d100',
+            'D': '#009300',
+            'E': '#005400',
+          };
+          this.parcels.forEach(parcel => {
+            d3.select(parcel.path)
+              .style('fill', colors[parcel.properties.type])
+              .style('opacity', this.active ? 0.85 : 0.0)
+              .style('stroke', this.borderColor)
+              .style('stroke-width', this.borderWidth + 'px');
+          });
+        },
+        updateFunction(planService: PlanService) {
+          this.parcels.forEach(parcel => {
+            d3.select(parcel.path)
+              .style('opacity', this.active ? 0.85 : 0.0);
+          });
+        },
       },
       {
         name: 'ial',
@@ -389,10 +409,117 @@ export const HecoPlan: Plan = {
         borderColor: 'orange',
         borderWidth: .1,
         legendColor: 'orange',
-        filePath: 'assets/plans/oahu-heco/layers/HECODER.json',
+        filePath: 'assets/plans/oahu-heco/layers/DERdata.json',
         parcels: [],
-        setupFunction: null,
-        updateFunction: null,
+        setupFunction(planService: PlanService) {
+          this.derColors = [
+            {
+              minValue: 0.75,
+              color: '#f5f500',
+            },
+            {
+              minValue: 0.675,
+              color: '#f5da00',
+            },
+            {
+              minValue: 0.6,
+              color: '#f5be00',
+            },
+            {
+              minValue: 0.525,
+              color: '#f5a300',
+            },
+            {
+              minValue: 0.45,
+              color: '#f58800',
+            },
+            {
+              minValue: 0.375,
+              color: '#f56d00',
+            },
+            {
+              minValue: 0.3,
+              color: '#f55200',
+            },
+            {
+              minValue: 0.15,
+              color: '#f53600',
+            },
+            {
+              minValue: 0.05,
+              color: '#f51b00',
+            },
+            {
+              minValue: 0.00,
+              color: '#f50000',
+            },
+          ];
+
+          this.capData = {};
+          d3.csv('assets/plans/oahu-heco/data/DER_Group_Cap.csv', (data) => {
+            data.forEach(element => {
+              const id = element.GroupId.toString();
+              const year = element.Year.toString();
+              const value = Number(element.Value);
+              if (!this.capData.hasOwnProperty(id)) {
+                this.capData[id] = {};
+              }
+              if (!this.capData[id].hasOwnProperty(year)) {
+                this.capData[id][year] = value;
+              }
+            });
+            this.parcels.forEach(parcel => {
+              const id = parcel.properties.Building_F.toString().split('_')[1];
+              const year = (planService.getCurrentYear()).toString();
+              if (Number(year) >= 2018) {
+                if (this.capData.hasOwnProperty(id)) {
+                  const value = this.capData[id][year];
+                  const color = () => {
+                    let max = 1;
+                    let min = 0;
+                    for (let i = 0; i < this.derColors.length; i++) {
+                      min = this.derColors[i].minValue;
+                      if (value <= max && value >= min) {
+                        return this.derColors[i].color;
+                      }
+                      max = min;
+                    }
+                    return this.derColors[this.derColors.length - 1].color;
+                  };
+                  d3.select(parcel.path)
+                    .style('fill', color)
+                    .style('opacity', (this.active) ? 0.85 : 0.0);
+                }
+              }
+            });
+          });
+        },
+        updateFunction(planService: PlanService) {
+          this.parcels.forEach(parcel => {
+            const id = parcel.properties.Building_F.toString().split('_')[1];
+            const year = (planService.getCurrentYear()).toString();
+            if (Number(year) >= 2018) {
+              if (this.capData.hasOwnProperty(id)) {
+                const value = this.capData[id][year];
+                const color = () => {
+                  let max = 1;
+                  let min = 0;
+                  for (let i = 0; i < this.derColors.length; i++) {
+                    min = this.derColors[i].minValue;
+                    if (value <= max && value >= min) {
+                      return this.derColors[i].color;
+                    }
+                    max = min;
+                  }
+                  return this.derColors[this.derColors.length - 1].color;
+                };
+                d3.select(parcel.path)
+                  .style('fill', color)
+                  .style('opacity', (this.active) ? 1.00 : 0.0);
+              }
+            }
+          });
+        },
       }
     ],
   }

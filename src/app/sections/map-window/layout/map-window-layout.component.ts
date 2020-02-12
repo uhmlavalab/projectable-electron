@@ -19,7 +19,7 @@ export class MapWindowLayoutComponent implements OnInit {
       if (message.type = 'state') {
         if (message.message == 'run') {
           this.messageSub.unsubscribe();
-
+          console.log(message);
           this.planService.startTheMap(message.plan);
           this.ngZone.run(() => {
             this.router.navigate(['map-screen'], { relativeTo: this.activeRoute });

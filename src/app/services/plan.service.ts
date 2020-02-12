@@ -67,7 +67,7 @@ export class PlanService {
 
   /* Start The Map */
   public startTheMap(plan: Plan): number {
-    this.currentPlan = plan;
+    this.currentPlan = this.plans.find(el => plan.name == el.name);
     this.setupSelectedPlan(this.currentPlan);
     this.setState('run');
     this.windowService.sendMessage({ type: 'state', message: 'run', plan: plan })
@@ -442,7 +442,7 @@ export class PlanService {
   /** Adds or removes the selected layer after checking it's active state. */
   public toggleLayer(): void {
     this.selectedLayer.active ? this.removeLayer() : this.addLayer();
-    this.windowService.sendMessage({layer: this.selectedLayer.name, add: this.selectedLayer.active});
+    this.windowService.sendMessage({layer: this.selectedLayer.name });
   }
 
   /** Adds or removes the selected layer after checking it's active state. */

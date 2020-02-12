@@ -2,6 +2,7 @@
     height: 100%;
     width: 100%;
     overflow: hidden;
+    text-align: center;
 }
 .options-container {
     height: 100%;
@@ -16,8 +17,25 @@
     z-index: 100;
     position: absolute;
     top: 0;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.9));
 }
 
 .menu-option {
     position: absolute;
+    left: 32px;
+}
+
+.center-box {
+    position: absolute;
+    border: 1px solid white;
+    height: 40px;
+    width: 120px;
+    top: calc(50%);
+    z-index: 50;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9));
+    font-size: 30px;
+    padding-top: 10px;
+    color: white;
+    opacity: 1;
+    font-weight: bolder;
 }
