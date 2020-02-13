@@ -106,4 +106,8 @@ export class TouchUiComponent implements AfterViewInit {
 
   }
 
+  private handleSettingsButtonClick(): void {
+    alert('Settings! RAWR!');
+  }
+
 }

@@ -20,7 +20,7 @@
   </div>
   <div class="middle">
     <div class="left">
-      <app-scrolling-menu type="scenario"></app-scrolling-menu>
+      <app-scrolling-menu class="scenario-menu" type="scenario" largeFontSize="14px"></app-scrolling-menu>
     </div>
     <div class="middle">
       <div class="section-title">{{yearTitle}}</div>
@@ -28,7 +28,7 @@
       <app-year class="year-container" #year></app-year>
     </div>
     <div class="right">
-      <app-scrolling-menu type="year"></app-scrolling-menu>
+      <app-scrolling-menu type="year" largeFontSize="24px"></app-scrolling-menu>
     </div>
   </div>
 </div>
@@ -50,4 +50,7 @@
   <div class="bottom">
     <div class="section-title">{{layerInfoTitle}}</div>
   </div>
+</div>
+<div class="settings-button" (click)="handleSettingsButtonClick()">
+  <img src="../../../../../assets/images/gear-icon.png" #settingsButton>
 </div>

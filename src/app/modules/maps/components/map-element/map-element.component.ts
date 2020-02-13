@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
 import * as d3 from 'd3';
 import { MapLayer, Parcel } from '@app/interfaces';
+import { WindowService } from '@app/modules/window';
 
 @Component({
   selector: 'app-map-element',
@@ -24,8 +25,8 @@ export class MapElementComponent implements OnInit {
 
   @ViewChild('mapDiv', { static: true }) mapDiv: ElementRef;
 
-  constructor(private planService: PlanService) {
-    this.scale = this.planService.getMain() ? planService.getMapScale() : planService.getMiniMapScale();
+  constructor(private planService: PlanService, private windowService: WindowService) {
+    this.scale = this.windowService.isMain() ? planService.getMiniMapScale() : planService.getMapScale();
     this.width = planService.getMapImageWidth() * this.scale;
     this.height = planService.getMapImageHeight() * this.scale;
     this.rasterBounds = planService.getMapBounds();

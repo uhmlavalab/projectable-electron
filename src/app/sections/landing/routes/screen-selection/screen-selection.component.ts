@@ -17,6 +17,7 @@ export class ScreenSelectionComponent  {
 
   setAsMainWindow() {
     this.windowService.setAsMainWindow();
+    
   }
 
   setAsMapWindow() {

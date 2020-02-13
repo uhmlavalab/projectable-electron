@@ -18,6 +18,10 @@ export class PlanSelectionComponent  {
 
   constructor(private windowService: WindowService, private planService: PlanService, private router: Router, private activeRoute: ActivatedRoute, private ngZone: NgZone) {
     this.plans = this.planService.getPlans();
+    const jsonfile = { name: 'cast' };
+    this.windowService.saveFile({ filename: 'testfile.json', file: JSON.stringify(jsonfile) });
+    this.windowService.loadFile('testfile.json');
+
    }
 
 

@@ -26,6 +26,7 @@ import { SliderComponent } from './components/slider/slider.component';
 import { YearComponent } from './components/year/year.component';
 import { YearBarComponent } from './components/year/components/year-bar/year-bar.component';
 import { YearDisplayComponent } from './components/year-display/year-display.component';
+import { SettingsModalComponent } from './components/settings-modal/settings-modal.component';
 
 
 @NgModule({
@@ -40,7 +41,8 @@ import { YearDisplayComponent } from './components/year-display/year-display.com
     SliderComponent,
     YearBarComponent,
     YearComponent,
-    YearDisplayComponent
+    YearDisplayComponent,
+    SettingsModalComponent
   ],
   imports: [
     CommonModule,

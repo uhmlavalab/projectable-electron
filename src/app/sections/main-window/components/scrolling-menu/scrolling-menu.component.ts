@@ -13,8 +13,8 @@ import { UiServiceService } from '@app/services/ui-service.service';
  * You can select the direction of the curve, either right or left.
  */
 export class ScrollingMenuComponent implements AfterViewInit {
-  @Input() type;
-  @Input() curve;
+  @Input() type: string;
+  @Input() largeFontSize: string;
   @ViewChildren('menuOption', { read: ElementRef }) menuOptions: QueryList<ElementRef>;
   @ViewChild('container', { static: false }) container: ElementRef;
   @ViewChild('touchOverlay', { static: false }) overlay: ElementRef;
@@ -62,6 +62,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
+    this.centerBox.nativeElement.style.fontSize = this.largeFontSize;
     // The plan service will publish the data that goes into the menu.  the type passed by the
     // plan service subject must match the type of this menu to populate data.
     this.planService.scrollingMenuSubject.subscribe(val => {
@@ -131,19 +132,20 @@ export class ScrollingMenuComponent implements AfterViewInit {
   private setOptionsData(options): void {
     // Divide the height of the size of the parent container by the number of visible elements to get hight of each menu option.
     this.dividedHeight = this.overlay.nativeElement.getBoundingClientRect().height / this.numberVisible;
-    this.menuOptions.forEach((option, index) => {
-      this.optionsData.push(
-        {
-          value: options[index], // Option Value
-          element: option.nativeElement, // The HTML element for the option
-          top: this.dividedHeight * index, // The CSS top value of this element
-          left: 0, // Css left value
-          opacity: 1, // CSS opacity value
-          fontSize: 999, // Font size of the particular element
-          position: index // What position is it in the menu (changes when options are moved around in the menu as its scrolled.)
-        }
-      );
-    });
+    // If there are less options than the number of visible, you must duplicate the elements until it fills the area plus extra.
+      this.menuOptions.forEach((option, index) => {
+        this.optionsData.push(
+          {
+            value: options[index], // Option Value
+            element: option.nativeElement, // The HTML element for the option
+            top: this.dividedHeight * this.optionsData.length, // The CSS top value of this element
+            left: 0, // Css left value
+            opacity: 1, // CSS opacity value
+            fontSize: 999, // Font size of the particular element
+            position: index // What position is it in the menu (changes when options are moved around in the menu as its scrolled.)
+          }
+        );
+      });
   }
 
 
@@ -159,7 +161,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
 
   private updateSelectedOption(): void {
     const centerIndex = this.getCenterIndex();
-    if (centerIndex >= 0 && (this.optionsData[centerIndex].value !== this.selectedOption) ) {
+    if (centerIndex >= 0 && (this.optionsData[centerIndex].value !== this.selectedValue) ) {
       this.selectedOption = this.optionsData[centerIndex];
       this.uiService.handleMenuChange(this.type, this.selectedOption.value);
       this.selectedValue = this.selectedOption.value;
@@ -175,7 +177,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
   private adjustToCenter(value: any): boolean {
     let firstIndex = -1;
     this.optionsData.forEach((item, index) => {
-      if (item.value === value) {
+      if (item.value === value && firstIndex === -1) {
         firstIndex = index;
       }
     });
@@ -263,7 +265,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
   }
 
   private setTouchId(touchlist): void {
-    if (this.touchId === -1) {
+    if (this.touchId === -1 && touchlist) {
       Object.values(touchlist).forEach((touch: Touch) => {
         if (touch.target === this.overlay.nativeElement) {
           this.touchId = touch.identifier;

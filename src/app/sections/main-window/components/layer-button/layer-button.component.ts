@@ -34,7 +34,14 @@ export class LayerButtonComponent implements OnInit {
 
   /** When these toggles are touched, they show a loading up animation */
   @HostListener('touchstart') onTouchStart(event: TouchEvent) {
+    this.toggleButtons();
+  }
 
+  @HostListener('mousedown') onMouseDown(event: Event) {
+    this.toggleButtons();
+  }
+
+  private toggleButtons(): void {
     if (this.progress >= 100) {
       this.progress = 0;
       this.on = false;

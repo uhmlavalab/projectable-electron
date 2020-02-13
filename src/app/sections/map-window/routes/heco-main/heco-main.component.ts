@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
 import { TouchService } from '@app/services/touch.service';
 import { Router } from '@angular/router';
@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './heco-main.component.html',
   styleUrls: ['./heco-main.component.css']
 })
-export class HecoMainComponent implements OnInit, OnDestroy {
+export class HecoMainComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('map', { static: false, read: ElementRef }) mapElement;
   @ViewChild('pieChart', { static: false, read: ElementRef }) pieChart; // The custom Map component.
@@ -29,7 +29,7 @@ export class HecoMainComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnInit() {
+  ngAfterViewInit() {
     // Map and Charts are positioned from CSS data from the plan.
     this.positionMap();
     this.positionTopChart();

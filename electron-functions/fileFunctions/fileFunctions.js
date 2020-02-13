@@ -6,6 +6,7 @@ function loadFile(window, fileName) {
     fs.readFile(dataDir + "/" + fileName, function (err, data) {
         if (err)
             throw err;
+        console.log(fileName);
         window.webContents.send('fileLoaded', data);
     });
 }
@@ -14,7 +15,8 @@ function saveFile(window, msg) {
     if (!fs.existsSync(dataDir)) {
         fs.mkdirSync(dataDir);
     }
-    fs.writeFile(dataDir + "/test.txt", msg, function (err) {
+    console.log(msg);
+    fs.writeFile(dataDir + "/" + msg.filename, msg.file, function (err) {
         if (err)
             throw err;
         window.webContents.send('fileSaved', 'File Write Complete');

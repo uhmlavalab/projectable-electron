@@ -23,10 +23,10 @@ export class WindowService {
         this.setAsMapWindow();
       }
     });
-    ipcRenderer.send('is-window-set', {});
-    console.log('hi')
+
+
   }
- 
+
   public setAsMainWindow() {
     this.windowName = 'main';
     ipcRenderer.removeListener('window-is-set', () => { });
@@ -45,6 +45,10 @@ export class WindowService {
     this.ngZone.run(() => {
       this.router.navigate(['map-window']);
     });
+  }
+
+  public isMain(): boolean {
+    return this.windowName === 'main';
   }
 
   private mapWindowMessage(event: Electron.IpcRendererEvent, data: any) {
@@ -79,5 +83,19 @@ export class WindowService {
 
   public closeAppliction() {
     ipcRenderer.send('close');
+  }
+
+  public saveFile(data: { filename: string, file: any }) {
+    ipcRenderer.send('saveFile', data);
+  }
+
+  public loadFile(fileUrl: string) {
+    ipcRenderer.send('loadFile', fileUrl);
+    ipcRenderer.on('fileLoaded', (event, message) => { 
+      console.log(JSON.parse(message));
+      ipcRenderer.removeListener('fileLoaded', () => { });
+     }
+    );
+
   }
 }
