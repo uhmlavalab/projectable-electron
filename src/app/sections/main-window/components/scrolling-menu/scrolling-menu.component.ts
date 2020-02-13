@@ -22,7 +22,6 @@ export class ScrollingMenuComponent implements AfterViewInit {
 
   private options: any[]; // Array holding all menu options.
   private numberVisible: number; // How many options are visible at one time on the screen.  The rest are hidden.
-  private curveLeft: boolean;
   private dragging: boolean; // True if elements are being dragged.  False if not.
 
   private optionsData: any[];
@@ -34,8 +33,8 @@ export class ScrollingMenuComponent implements AfterViewInit {
   private speedDecayRate: number;
   private speedInterval: any;
   private repeatRate: number;
-  private intervalRunning: boolean;
-  private center: number;
+  private intervalRunning: boolean; // Sentinal that detects if there is an interval associated with this menu.  Prevents losing track of any intervals.
+  private center: number; // Holds the value of the center of the visible menu div.
 
   private dividedHeight: number;
 
@@ -47,7 +46,6 @@ export class ScrollingMenuComponent implements AfterViewInit {
 
   constructor(private el: ElementRef, private planService: PlanService, private uiService: UiServiceService) {
     this.optionsData = [];
-    this.curveLeft = false;
     this.numberVisible = 10;
     this.speedInterval = -1;
     this.intervalRunning = false;
@@ -64,20 +62,28 @@ export class ScrollingMenuComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
+    // The plan service will publish the data that goes into the menu.  the type passed by the
+    // plan service subject must match the type of this menu to populate data.
     this.planService.scrollingMenuSubject.subscribe(val => {
       if (val) {
         if (val.type === this.type) {
           this.options = val.data;
           this.selectedValue = val.data[0];
+          // Wait 100 ms for the ngfor to update the dom.
           setTimeout(() => {
-            this.center = this.findCenter();
-            this.setOptionsData(this.options);
-            this.positionOptions();
-            this.selectedOption = val.data[0];
+            this.center = this.findCenter();  // Set the center of the visible menu window.
+            this.setOptionsData(this.options); // Create the menu options objects.
+            this.positionOptions(); // Set the top position for each element in the menu.
+            this.selectedValue = val.data[0]; // Always initialize the initial selected option to the first in the list.
+            this.selectedOption = this.optionsData[0];
+            /* If there are overflowing elements, move half of them from the bottom of the list to the top.  They are offscreen
+              but this allows for a smoother animation */
             for (let i = 0; i < Math.floor((this.optionsData.length - this.numberVisible) / 2); i++) {
                 this.switchOptions(1);
             }
+            // Make sure the selected element is in the center of the menu.
             this.adjustToCenter(val.data[0]);
+            this.centerSelectedValue();
           }, 100);
         }
       }
@@ -90,6 +96,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
     });
     this.overlay.nativeElement.style.top = '0';
 
+    /* EVENT LISTENERS FOR TOUCH AND MOUSE */
     this.overlay.nativeElement.addEventListener('mousedown', () => this.startDrag(event));
     this.overlay.nativeElement.addEventListener('mouseup', () => this.stopDragging());
     this.overlay.nativeElement.addEventListener('mouseleave', () => {
@@ -99,7 +106,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
     });
     this.overlay.nativeElement.addEventListener('mousemove', event => {
       if (this.dragging) {
-        this.drag(event, this.container);
+        this.drag(event);
       }
     });
 
@@ -111,24 +118,29 @@ export class ScrollingMenuComponent implements AfterViewInit {
     }, { passive: false });
     this.overlay.nativeElement.addEventListener('touchmove', event => {
       if (this.dragging) {
-        this.drag(event, this.container);
+        this.drag(event);
       }
     }, { passive: false });
 
   }
 
+  /**  This function creates an array of objects that hold the data for each of the
+   * menu options in the menu.
+   * @param options The array holding the list of menu option values.
+  */
   private setOptionsData(options): void {
+    // Divide the height of the size of the parent container by the number of visible elements to get hight of each menu option.
     this.dividedHeight = this.overlay.nativeElement.getBoundingClientRect().height / this.numberVisible;
     this.menuOptions.forEach((option, index) => {
       this.optionsData.push(
         {
-          value: options[index],
-          element: option.nativeElement,
-          top: this.dividedHeight * index,
-          left: 0,
-          opacity: 1,
-          fontSize: 999,
-          position: index
+          value: options[index], // Option Value
+          element: option.nativeElement, // The HTML element for the option
+          top: this.dividedHeight * index, // The CSS top value of this element
+          left: 0, // Css left value
+          opacity: 1, // CSS opacity value
+          fontSize: 999, // Font size of the particular element
+          position: index // What position is it in the menu (changes when options are moved around in the menu as its scrolled.)
         }
       );
     });
@@ -147,7 +159,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
 
   private updateSelectedOption(): void {
     const centerIndex = this.getCenterIndex();
-    if (centerIndex > 0 && (this.optionsData[centerIndex].value !== this.selectedOption) ) {
+    if (centerIndex >= 0 && (this.optionsData[centerIndex].value !== this.selectedOption) ) {
       this.selectedOption = this.optionsData[centerIndex];
       this.uiService.handleMenuChange(this.type, this.selectedOption.value);
       this.selectedValue = this.selectedOption.value;
@@ -158,6 +170,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
     return this.centerBox.nativeElement.getBoundingClientRect().height / 2 +
       this.centerBox.nativeElement.getBoundingClientRect().top - this.container.nativeElement.getBoundingClientRect().top;
   }
+
 
   private adjustToCenter(value: any): boolean {
     let firstIndex = -1;
@@ -194,6 +207,13 @@ export class ScrollingMenuComponent implements AfterViewInit {
       this.positionOptions();
       }
     return true;
+  }
+
+  private centerSelectedValue(): void {
+    
+    const distance = this.selectedOption.top + this.dividedHeight / 2 - this.center + 5;
+    this.moveEachOption(-distance);
+    this.positionOptions();
   }
 
   private getCenterIndex(): number {
@@ -237,6 +257,8 @@ export class ScrollingMenuComponent implements AfterViewInit {
       this.positionHistory = [];
       this.speed = 0;
       this.touchId = -1;
+      this.updateSelectedOption();
+      this.centerSelectedValue();
     }
   }
 
@@ -250,14 +272,16 @@ export class ScrollingMenuComponent implements AfterViewInit {
     }
   }
 
-  private drag(event, e): number {
+  private drag(event): number {
     try {
       // Capture Y position of mouse or touch
       let mouseY = event.screenY;
       if (mouseY === undefined) {
-        mouseY = event.touches[this.touchId].screenY;
+        if (this.touchId !== undefined) {
+          console.log(event.touches);
+          mouseY = event.touches[this.touchId].screenY;
+        }
       }
-
       if (mouseY) {
         this.positionHistory.push({ pos: mouseY, time: new Date().getTime() });
         if (this.positionHistory.length > 3) {
@@ -356,6 +380,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
       this.speed = 0;
       this.speedInterval = -1;
       this.updateSelectedOption();
+      this.centerSelectedValue();
     } else {
       const sign = Math.sign(this.speed);
       this.speed = Math.floor(Math.abs(this.speed * this.speedDecayRate)) * sign;
@@ -364,8 +389,6 @@ export class ScrollingMenuComponent implements AfterViewInit {
       this.runningTotal = this.checkRunningTotal(this.speed);
     }
   }
-
-  private advanceByOne
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {

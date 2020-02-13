@@ -61,6 +61,7 @@ export class LayerButtonComponent implements OnInit {
 
   private stopAnimation(intervalId): void {
     clearInterval(intervalId);
+    this.animationInterval = -1;
   }
 
   private reverseAnimate(): void {

@@ -28,13 +28,13 @@
 .center-box {
     position: absolute;
     border: 1px solid white;
-    height: 40px;
+    height: 30px;
     width: 120px;
-    top: calc(50%);
+    top: calc(50% - 18px);
     z-index: 50;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9));
-    font-size: 30px;
-    padding-top: 10px;
+    background-color: black;
+    font-size: 24px;
+    padding-top: 6px;
     color: white;
     opacity: 1;
     font-weight: bolder;

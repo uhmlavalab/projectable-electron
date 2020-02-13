@@ -26,7 +26,7 @@ export class WindowService {
     ipcRenderer.send('is-window-set', {});
     console.log('hi')
   }
-
+ 
   public setAsMainWindow() {
     this.windowName = 'main';
     ipcRenderer.removeListener('window-is-set', () => { });
