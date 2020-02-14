@@ -44,7 +44,7 @@ export class PlanService {
         scale: 0,
         miniScale: 0,
         width: 0,
-        height: 0,
+        height: 0, 
         bounds: null,
         path: ''
       },
