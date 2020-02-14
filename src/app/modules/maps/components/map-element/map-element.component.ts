@@ -26,11 +26,12 @@ export class MapElementComponent implements OnInit {
   @ViewChild('mapDiv', { static: true }) mapDiv: ElementRef;
 
   constructor(private planService: PlanService, private windowService: WindowService) {
-    this.scale = this.windowService.isMain() ? planService.getMiniMapScale() : planService.getMapScale();
-    this.width = planService.getMapImageWidth() * this.scale;
-    this.height = planService.getMapImageHeight() * this.scale;
-    this.rasterBounds = planService.getMapBounds();
-    this.baseMapImagePath = planService.getBaseMapPath();
+    const mapData = planService.getMapData();
+    this.scale = this.windowService.isMain() ? mapData.miniScale : mapData.scale;
+    this.width = mapData.width * this.scale;
+    this.height = mapData.height * this.scale;
+    this.rasterBounds = mapData.bounds;
+    this.baseMapImagePath = mapData.path;
   }
 
   ngOnInit() {

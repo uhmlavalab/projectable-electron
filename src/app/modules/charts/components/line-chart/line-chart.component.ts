@@ -1,8 +1,6 @@
 import { Component, AfterViewInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
-
 import { Scenario } from '@app/interfaces';
-
 import { chartColors } from '../../../../../assets/plans/defaultColors';
 
 @Component({
@@ -23,15 +21,22 @@ export class LineChartComponent implements AfterViewInit {
   data: any;
   labels: any;
   chartMax: number;
-  
+
+  allReady: {
+    planSet: boolean,
+    scenarioSet: boolean,
+    yearSet: boolean
+  };
+
   constructor(private planService: PlanService) {
-    
+    this.allReady.planSet = false;
+    this.allReady.scenarioSet = false;
+    this.allReady.yearSet = false;
   }
 
   ngAfterViewInit() {
 
     this.planService.planSubject.subscribe(plan => {
-      console.log(plan)
       if (plan) {
         this.scenario = this.planService.getCurrentScenario();
         this.year = this.planService.getCurrentYear();
@@ -51,6 +56,10 @@ export class LineChartComponent implements AfterViewInit {
       }
     });
 
+  }
+
+  private ready(): boolean {
+    return this.allReady.planSet && this.allReady.scenarioSet && this.allReady.yearSet;
   }
 
   fetchData() {

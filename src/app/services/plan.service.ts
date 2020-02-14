@@ -1,10 +1,9 @@
-import { Injectable, ɵCompiler_compileModuleSync__POST_R3__ } from '@angular/core';
-import { _ } from 'underscore';
+import { Injectable } from '@angular/core';
 import { Plan } from '@app/interfaces/plan';
 import { Plans } from '../../assets/plans/plans';
-import { Scenario, Map, MapLayer } from '@app/interfaces';
-import { BehaviorSubject, Subject } from 'rxjs';
-import {chartColors} from '../../assets/plans/defaultColors';
+import { Scenario } from '@app/interfaces';
+import { BehaviorSubject} from 'rxjs';
+import { chartColors } from '../../assets/plans/defaultColors';
 import { SoundsService } from '@app/sounds';
 import * as d3 from 'd3/d3.min';
 import { WindowService } from '@app/modules/window';
@@ -14,108 +13,130 @@ import { WindowService } from '@app/modules/window';
 })
 export class PlanService {
 
-  private state: string;  // Current state of the machine
-  private isMain: boolean; // True if main map, false if ui.
+  private plans: Plan[]; // Array holding all plans (memory is cleared when plan is set.)
 
-  private currentMap: Map;                      // Current Map
-
-  private layers: MapLayer[] = [];              // Array Holding All Layers
-  private selectedLayer: MapLayer;              // Currently Selected Layer
-  public selectedLayerSubject = new BehaviorSubject<MapLayer>(null); // layer publisher
-  public toggleLayerSubject = new BehaviorSubject<MapLayer>(null);      // Pubisher for when a layer is toggled
-  public updateLayerSubject = new BehaviorSubject<MapLayer>(null);
-  public layerChangeSubject = new BehaviorSubject<string>(null);
+  public planSetSubject = new BehaviorSubject<boolean>(null); // Tells components when the plan is set.
+  public toggleLayerSubject = new BehaviorSubject<any>(null);      // Pubisher for when a layer is toggled
   public layersSubject = new BehaviorSubject<any[]>(null);
-
   public scrollingMenuSubject = new BehaviorSubject<any>(null);
-
-  private plans: Plan[];                        // Array Holding All Plans
-  private currentPlan: Plan;                    // Currently Active Plan
+  // Array Holding All Plans
   public planSubject = new BehaviorSubject<Plan>(null);     // Plan Publisher
 
-  private scenarios: Scenario[];                // Array Holding All Scenarios
-  private currentScenario: Scenario;            // Currently active scenario
   public scenarioSubject = new BehaviorSubject<Scenario>(null); // Scenario publisher
   public scenarioListSubject = new BehaviorSubject<any[]>(null);
-
-  private currentYear: number;                  // Current year
+  // Current year
   public yearSubject = new BehaviorSubject<number>(null);   // Year Publisher
   public yearsSubject = new BehaviorSubject<number[]>(null);
 
-  private legendLayouts: string[] = [];         // Array holding possible layouts (grid / vertical)
-  private currentLegendLayout: number;          // Currently selected legend layout
-  public legendSubject = new BehaviorSubject<string>(null); // Legend Publisher
-
   public technologySubject = new BehaviorSubject<any>(null);
 
-  /* Reset Subjects */
-  public resetLayersSubject = new Subject<any>();
-
-  /* Data Objects */
-  private capacityData = {};
-  private generationData = {};
-  private curtailmentData = {};
-
+  private dataTable: any;
 
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
+    this.dataTable = {
+      state: 0,
+      plan: {
+        current: null,
+        isSet: false,
+        name: ''
+      },
+      map: {
+        scale: 0,
+        miniScale: 0,
+        width: 0,
+        height: 0,
+        bounds: null,
+        path: ''
+      },
+      year: {
+        all: [],
+        current: 0,
+        max: 0,
+        min: 0,
+      },
+      scenario: {
+        all: [],
+        current: null,
+        name: '',
+        display: '',
+        currentIndex: 0
+      },
+      yearMenu: {
+        state: 0,
+      },
+      layers: {
+        all: []
+      },
+      components: {
+        all: [],
+      },
+      controls: {
+        keyboard: true,
+        touch: true,
+        pucks: false
+      },
+      data: {
+        generationPath: null,
+        curtailmentPath: null,
+        capacityPath: null,
+        generation: null,
+        capacity: null,
+        curtailment: null,
+        tech: null
+      }
+    };
+
     this.plans = Plans;
-    this.state = 'landing'; // Initial state is landing
-    this.legendLayouts = ['grid', 'vertical'];
-    this.currentLegendLayout = 0;
   }
 
-
   /* Start The Map */
-  public startTheMap(plan: Plan): number {
-    this.currentPlan = this.plans.find(el => plan.name == el.name);
-    this.setupSelectedPlan(this.currentPlan);
-    this.setState('run');
-    this.windowService.sendMessage({ type: 'state', message: 'run', plan: plan })
-    return this.getCurrentYear();
+  public startTheMap(plan: Plan): void {
+    this.setupSelectedPlan(this.plans.find(el => plan.name === el.name));
+    this.plans = [];  // Free Up the memory.
+    this.setState(1);
+    this.windowService.sendMessage({ type: 'state', message: 'run', plan: plan });
   }
 
   /** Sets Up the Current Plan
    * @param plan The plan to set up
    */
   public setupSelectedPlan(plan: Plan): void {
+    this.dataTable.plan.current = plan;
+    this.dataTable.plan.name = plan.name;
+    this.dataTable.plan.isSet = true;
 
-    this.currentMap = plan.map; // Sets the base map image.
-
-    // Load layers array with each layer associated with the current map.
-    this.currentMap.mapLayers.forEach(layer => {
-      if (layer.included) {
-        this.layers.push(layer);
-      }
+    plan.map.mapLayers.forEach(layer => {
+      this.dataTable.layers.all.push({ layer: layer, state: 0 });
     });
 
-    this.selectedLayer = this.layers[0];  // This is the layer that can currently be added/removed.
-    this.currentYear = this.currentPlan.minYear;  // Begin with the lowest allowed year.
-    this.scenarios = this.currentPlan.scenarios;  // Load array with all scenarios associated with this plan
-    this.currentScenario = this.scenarios[0];     // Always start with index 0.
+    this.dataTable.map.scale = plan.map.scale;
+    this.dataTable.map.miniScale = plan.map.miniMapScale;
+    this.dataTable.map.width = plan.map.width;
+    this.dataTable.map.height = plan.map.height;
+    this.dataTable.map.bounds = plan.map.bounds;
+    this.dataTable.map.path = plan.map.baseMapPath;
+    this.dataTable.year.min = plan.minYear;  // Begin with the lowest allowed year.
+    this.dataTable.year.max = plan.maxYear;  // Begin with the lowest allowed year.
+    this.dataTable.scenario.all = plan.scenarios;  // Load array with all scenarios associated with this plan
+    this.dataTable.scenario.name = plan.scenarios[0].name;
+    this.dataTable.scenario.display = plan.scenarios[0].displayName;
+    this.dataTable.scenario.currentIndex = 0;
+    this.dataTable.components.all = ['map', 'pie', 'line'];
+    this.dataTable.data.generationPath = plan.data.generationPath;
+    this.dataTable.data.curtailmentPath = plan.data.curtailmentPath;
+    this.dataTable.data.Path = plan.data.generationPath;
 
-    // Publish the data to the components.
-    this.planSubject.next(plan); // Publish the current plan.
-    this.yearSubject.next(this.currentYear);      // Publish current year
-    this.yearsSubject.next(this.getYears());
-    this.scenarioListSubject.next(this.scenarios); // Publish a list of scenarios.
-    this.layersSubject.next(this.layers); // Publish All Layers
-    this.selectedLayerSubject.next(this.selectedLayer); // Publish current selected layer
-    this.scenarioSubject.next(this.currentScenario); // Publish current scenario
-
-    // Load All Plan Data
-    this.getCapacityData();
-    this.getGenerationData().then(genData => {
-      this.generationData = genData;
-      this.technologySubject.next(this.getTechData());
-    });
-    this.getCurtailmentData();
-
-
-
-    // Change Legend Layout if it is not 'grid'.
-    if (this.currentPlan.css.legend.defaultLayout === 'vertical') {
-      this.changeCurrentLegendLayout();
+    if (this.loadAllData()) {
+      this.publishSetupData();
     }
+  }
+
+  private publishSetupData(): void {
+    this.planSetSubject.next(this.dataTable.plan.isSet);
+    this.yearSubject.next(this.dataTable.year.current);      // Publish current year
+    this.yearsSubject.next(this.getYears());
+    this.scenarioListSubject.next(this.dataTable.scenario.all); // Publish a list of scenarios.
+    this.scenarioSubject.next(this.dataTable.scenario.all[this.dataTable.scenario.currentIndex]); // Publish current scenario
   }
 
   /****************************************************************************************
@@ -124,21 +145,35 @@ export class PlanService {
    * **************************************************************************************
    * **************************************************************************************
    */
+  public loadAllData(): boolean {
+    // Load All Plan Data
+    try {
+      this.getCapacityData().then(capData => this.dataTable.data.capacity = capData);
+      this.getGenerationData().then(genData => this.dataTable.data.generation = genData);
+      this.getCurtailmentData().then(curData => this.dataTable.data.curtailment = curData);
+      this.dataTable.data.tech = this.getTechData();
+      return true;
+    } catch (error) {
+      console.log(error);
+      console.log('failed to get all data during setup');
+      return false;
+    }
+  }
 
-   public getTechData(): any {
-     const technologies = [];
-     Object.keys(this.generationData[this.currentScenario.name]).forEach(tech => {
-      technologies.push({name: tech, color: chartColors[tech]});
-     });
-     return technologies;
-   }
+  public getTechData(): any {
+    const technologies = [];
+    Object.keys(this.dataTable.data.generation[this.dataTable.plan.name]).forEach(tech => {
+      technologies.push({ name: tech, color: chartColors[tech] });
+    });
+    return technologies;
+  }
 
   public getGenerationTotalForCurrentYear(technologies: string[]): number {
     let generationTotal = 0;
     try {
       technologies.forEach(tech => {
-        this.generationData[this.currentScenario.name][tech].forEach(el => {
-          if (el.year === this.currentYear) {
+        this.dataTable.data.generation[this.dataTable.scenario.name][tech].forEach(el => {
+          if (el.year === this.dataTable.year.current) {
             generationTotal += el.value;
           }
         });
@@ -153,8 +188,8 @@ export class PlanService {
   public getCapacityTotalForCurrentYear(technologies: string[]): number {
     let capacityTotal = 0;
     technologies.forEach(tech => {
-      this.capacityData[this.currentScenario.name][tech].forEach(el => {
-        if (el.year === this.currentYear) {
+      this.dataTable.data.capactiy[this.dataTable.scenario.name][tech].forEach(el => {
+        if (el.year === this.dataTable.year.current) {
           capacityTotal += el.value;
         }
       });
@@ -165,8 +200,8 @@ export class PlanService {
   public getCurtailmentTotalForCurrentYear(technologies: string[]): number {
     let curtailmentTotal = 0;
     technologies.forEach(tech => {
-      this.curtailmentData[this.currentScenario.name][tech].forEach(el => {
-        if (el.year === this.currentYear) {
+      this.dataTable.data.curtailment[this.dataTable.scenario.name][tech].forEach(el => {
+        if (el.year === this.dataTable.year.current) {
           curtailmentTotal += el.value;
         }
       });
@@ -174,13 +209,11 @@ export class PlanService {
     return curtailmentTotal;
   }
 
-  /** Gets Generation Data
-   * 
-   */
+  /** Gets Generation Data */
   public getGenerationData(): Promise<any> {
     return new Promise((resolve, error) => {
-      let generationData = {};
-      d3.csv(this.currentPlan.data.generationPath, (data) => {
+      const generationData = {};
+      d3.csv(this.dataTable.data.generationPath, data => {
         data.forEach(element => {
           const year = element.year;
           const technology = element.technology;
@@ -199,27 +232,25 @@ export class PlanService {
     });
   }
 
-  /** Gets Curtailment Data
-   * 
-   */
+  /** Gets Curtailment Data */
   public getCurtailmentData(): Promise<any> {
-    this.curtailmentData = {};
+    const curtailmentData = {};
     return new Promise((resolve, error) => {
-      d3.csv(this.currentPlan.data.curtailmentPath, (data) => {
+      d3.csv(this.dataTable.data.curtailmentPath, (data) => {
         data.forEach(element => {
           const year = element.year;
           const technology = element.technology;
           const value = element.value;
           const scenario = element.scenario;
-          if (!this.curtailmentData.hasOwnProperty(scenario)) {
-            this.curtailmentData[scenario] = {};
+          if (!curtailmentData.hasOwnProperty(scenario)) {
+            curtailmentData[scenario] = {};
           }
-          if (!this.curtailmentData[scenario].hasOwnProperty(technology)) {
-            this.curtailmentData[scenario][technology] = [];
+          if (!curtailmentData[scenario].hasOwnProperty(technology)) {
+            curtailmentData[scenario][technology] = [];
           }
-          this.curtailmentData[scenario][technology].push({ year: Number(year), value: Number(value) });
+          curtailmentData[scenario][technology].push({ year: Number(year), value: Number(value) });
         });
-        return resolve(this.curtailmentData);
+        return resolve(curtailmentData);
       });
 
     });
@@ -228,410 +259,145 @@ export class PlanService {
   /** Gets Capacity Data */
   public getCapacityData(): Promise<any> {
     return new Promise((resolve, error) => {
-      this.capacityData = {};
-      d3.csv(this.currentPlan.data.capacityPath, (data) => {
+      const capacityData = {};
+      d3.csv(this.dataTable.data.capacityPath, data => {
         data.forEach(element => {
           const year = element.year;
           const technology = element.technology;
           const value = element.value;
           const scenario = element.scenario;
-          if (!this.capacityData.hasOwnProperty(scenario)) {
-            this.capacityData[scenario] = {};
+          if (!capacityData.hasOwnProperty(scenario)) {
+            capacityData[scenario] = {};
           }
-          if (!this.capacityData[scenario].hasOwnProperty(technology)) {
-            this.capacityData[scenario][technology] = [];
+          if (!capacityData[scenario].hasOwnProperty(technology)) {
+            capacityData[scenario][technology] = [];
           }
-          this.capacityData[scenario][technology].push({ year: Number(year), value: Number(value) });
+          capacityData[scenario][technology].push({ year: Number(year), value: Number(value) });
         });
-        return resolve(this.capacityData);
-
+        return resolve(capacityData);
       });
     });
   }
 
   /******************* GETTERS AND SETTERS **************/
 
-  /** Sets the main Variable.  If this is true, this plan service runs
-   * the main map.  If it is false, it runs the UI.
-   * @param main true if map, false if UI
-   */
-  public setMain(main: boolean): void {
-    this.isMain = main;
-  }
-
-  /** Gets the main variable.  
-   * @return true if is map service, false if is ui service.
-   */
-  public getMain(): boolean {
-    return this.isMain;
-  }
-
-  /** Gets the currently active plan
-   * @return the current plan
-   */
-  public getCurrentPlan(): Plan {
-    return this.currentPlan;
-  }
-
-  public getScenarioNameFromDisplayName(displayName: string): string {
-    let name = this.currentScenario.name;
-    this.scenarios.forEach(scenario => {
-      if (displayName == scenario.displayName) {
-        name = scenario.name;
-      }
-    });
-    return name;
-  }
-
-  /** Gets all plans
-   * @return array of all plans
-   */
-  public getPlans(): Plan[] {
-    return this.plans;
-  }
-
-  /** Gets the current Year
-   * @return the current year
-   */
-  public getCurrentYear(): number {
-    return this.currentYear;
-  }
-
-  /** Gets the current scenario
-   * @return the current scenario
-   */
-  public getCurrentScenario(): Scenario {
-    return this.currentScenario;
-  }
-
-  /** Gets all scenarios
-   * @return array holding all scenarios
-   */
-  public getScenarios(): Scenario[] {
-    return this.scenarios;
-  }
-
-  /** Gets the active layers
-   * @return the array of active layers.
-   */
-  public getLayers(): MapLayer[] {
-    return this.layers;
-  }
-
   /** Sets the state of the machine.  Resets the plan when returning to landing.
  * @param state the new machine state.
  */
   public setState(state): void {
-    this.state = state;
-    if (this.state === 'landing') {
+    this.dataTable.state = state;
+    if (state === 0) {
       this.resetPlan();
     }
-  }
-
-  /** Gets the state of the machine
-   * @return the current state.
-   */
-  public getState(): string {
-    return this.state;
-  }
-
-  /** Gets the current CSS styles for the legend based on the currently selected
-   * plan.
-   * @return object containing key value pairs for the legend styles.
-   */
-  public getCss(): any {
-    return this.currentPlan.css;
   }
 
   /************** Data Manipulation Functions *****************
    ************************************************************/
 
   /** Increments the current year by 1 and plays a sound */
-  public incrementCurrentYear(): number {
+  public incrementCurrentYear(): void {
     try {
-      if (this.currentYear < this.currentPlan.maxYear) {
-        this.currentYear++;
+      if (this.dataTable.year.current < this.dataTable.year.max) {
+        this.dataTable.year.current++;
         this.soundsService.playClick();
+        this.yearSubject.next(this.dataTable.year.current);
+        // MESSAGE
       }
-      this.yearSubject.next(this.currentYear);
-
     } catch (error) {
-      // Catch error when setting up
+      console.log('failed to increment current year');
     }
-    return this.currentYear;
   }
 
   /** Decrements the current year by 1 and plays a sound */
-  public decrementCurrentYear(): number {
+  public decrementCurrentYear(): void {
     try {
-      if (this.currentYear > this.currentPlan.minYear) {
-        this.currentYear--;
+      if (this.dataTable.year.current > this.dataTable.year.min) {
+        this.dataTable.year.current--;
         this.soundsService.playClick();
+        // MESSAGE
       }
-      this.yearSubject.next(this.currentYear);
+      this.yearSubject.next(this.dataTable.year.current);
     } catch (error) {
-      // catch error when setting up
+      console.log('failed to decrement current year');
     }
-    return this.currentYear;
   }
 
   /** Sets the year to a specific value
    * @param year the year to set
    */
-  public setCurrentYear(year): number {
-    if (year >= this.currentPlan.minYear && year <= this.currentPlan.maxYear) {
-      this.currentYear = year;
+  public updateYear(year): void {
+    if (this.yearIsValid(year) && this.dataTable.year.current !== year) {
+      this.dataTable.year.current = year;
+      this.yearSubject.next(year);
+      // MESSAGE
     }
-    this.yearSubject.next(this.currentYear);
-    return this.currentYear;
   }
 
-  public setScenario(scenarioName: string): void {
-    let scenario = null;
-    this.scenarios.forEach(s => {
-      if (s.name === scenarioName) {
-        this.currentScenario = s;
+  private yearIsValid(year: number): boolean {
+    return year >= this.dataTable.year.min && year <= this.dataTable.year.max;
+  }
+
+  public updateScenario(scenarioName: string): void {
+    if (scenarioName !== this.dataTable.scenario.name) {
+      const scenario = this.dataTable.scenarios.all.find(s => s.name === scenarioName);
+      if (scenario) {
+        const index = this.dataTable.scenario.all.indexOf(scenario);
+        this.dataTable.scenario.currentIndex = index;
+        this.dataTable.scenario.name = scenario.name;
+        this.dataTable.scenario.display = scenario.displayName;
+        this.scenarioSubject.next(scenario);
+        this.yearSubject.next(this.dataTable.year.current);
+        this.soundsService.playTick();
+        // MESSAGE
       }
-    });
-    this.scenarioSubject.next(this.currentScenario);
-    this.yearSubject.next(this.currentYear);
-    this.soundsService.playTick();
-  }
-
-  /** Advances to the next scenario */
-  public incrementScenario(): void {
-    const index = this.scenarios.indexOf(this.currentScenario) + 1;
-    this.currentScenario = this.scenarios[(index) % this.scenarios.length];
-    this.scenarioSubject.next(this.currentScenario);
-    this.soundsService.playTick();
-  }
-
-  /** Goes to the previous scenario */
-  public decrementScenario(): void {
-    let index = this.scenarios.indexOf(this.currentScenario) - 1;
-    if (index === -1) {
-      index = this.scenarios.length - 1;
     }
-    this.currentScenario = this.scenarios[(index) % this.scenarios.length];
-    this.scenarioSubject.next(this.currentScenario);
-    this.soundsService.playTick();
-  }
-
-  /** Cycles backwards through layers */
-  public decrementNextLayer() {
-    let index = this.layers.indexOf(this.selectedLayer) - 1;
-    if (index === -1) {
-      index = this.layers.length - 1;
-    }
-    this.selectedLayer = this.layers[(index) % this.layers.length];
-    this.selectedLayerSubject.next(this.selectedLayer);
-    this.layerChangeSubject.next('decrement');
-    this.soundsService.playTick();
-
-  }
-
-  /** Cycles forwards through layers */
-  public incrementNextLayer() {
-    const index = this.layers.indexOf(this.selectedLayer) + 1;
-    this.selectedLayer = this.layers[(index) % this.layers.length];
-    this.selectedLayerSubject.next(this.selectedLayer);
-    this.layerChangeSubject.next('increment');
-    this.soundsService.playTick();
   }
 
   /** Adds or removes the selected layer after checking it's active state. */
-  public toggleLayer(): void {
-    this.selectedLayer.active ? this.removeLayer() : this.addLayer();
-    this.windowService.sendMessage({layer: this.selectedLayer.name });
-  }
-
-  /** Adds or removes the selected layer after checking it's active state. */
-  public toggleSelectedLayer(layerName: string): void {
-    this.layers.forEach(e => {
-      if (e.name === layerName) {
-        this.selectedLayer = e;
-      }
-    });
-    this.toggleLayer();
-  }
-
-  /** Adds a layer to the map
-   * @return true if successful, false if not.
-   */
-  public addLayer(): boolean {
-    const layer = this.selectedLayer;
-    if (!layer.active) {
-      layer.active = true;
-      this.toggleLayerSubject.next(layer);
-      if (this.isMain) {
-        this.soundsService.playUp();
-      }
-      return true;
-    } else {
-      return false;
+  public toggleLayer(layer): void {
+    const el = this.dataTable.layers.all.find(e => e.name === layer);
+    if (el) {
+      el.status = 1 - el.status;
+      this.toggleLayerSubject.next({ layer: el.name, status: el.status });
+      this.windowService.sendMessage({ layer: el.name });
+      el.status === 0 ? this.soundsService.playDown() : this.soundsService.playUp();
     }
   }
 
-  /** Removes a layer from the table
-   * @return true if successful, false if not
-   */
-  public removeLayer(): boolean {
-    const layer = this.selectedLayer;
-    if (layer.active) {
-      layer.active = false;
-      this.toggleLayerSubject.next(layer);
-      if (this.isMain) {
-        this.soundsService.playDown();
-      }
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  /** Gets the currently selected layer
-   * @return the currently selected layer.
-   *    */
-  public getSelectedLayer(): MapLayer {
-    return this.selectedLayer;
-  }
-
-  /** When returning from the main map to the landing, all layer data for the plan 
+  /** When returning from the main map to the landing, all layer data for the plan
    * needs to be reset.
    */
   public resetPlan() {
-    this.currentPlan.map.mapLayers.forEach(layer => layer.active = false);
-    this.currentYear = this.currentPlan.minYear;
-    this.yearSubject.next(this.currentYear);
-    this.layers = [];
-    this.resetLayersSubject.next(this.layers);
-  }
-
-  /** Gets the class name of the correct legend css to display.
-   * @return the current legend classname
-   */
-  public getCurrentLegendLayout(): string {
-    return this.legendLayouts[this.currentLegendLayout];
-  }
-
-  /** Cycles to the next legend css classname.
-   * @return the current css class name.
-   */
-  public changeCurrentLegendLayout() {
-    this.currentLegendLayout = (this.currentLegendLayout + 1) % this.legendLayouts.length;
-    this.legendSubject.next(this.getCurrentLegendLayout());
+    // RESET PLAN
   }
 
   /** Map Construction Functions */
   /** Gets the scale of the map
    * @return the scale of the map
    */
-  public getMapScale(): number {
-    try {
-      return this.currentMap.scale;
-    } catch (error) {
-      console.log('No Map Selected');
-      return 0;
-    }
-  }
-
-  /** Map Construction Functions */
-  /** Gets the scale of the map
-   * @return the scale of the map
-   */
-  public getMiniMapScale(): number {
-    try {
-      return this.currentMap.miniMapScale;
-    } catch (error) {
-      console.log('No Map Selected');
-      return 0;
-    }
-  }
-
-  /** Gets the map Image width
-   * @return the map image width
-   */
-  public getMapImageWidth(): number {
-    try {
-      return this.currentMap.width;
-    } catch (error) {
-      console.log('No Map Selected');
-      return 0;
-    }
-  }
-
-  /** Get the map Image height
-   * @return the map Image height
-   */
-  public getMapImageHeight(): number {
-    try {
-      return this.currentMap.height;
-    } catch (error) {
-      console.log('No Map Selected');
-      return 0;
-    }
-
-  }
-
-  /** Gets the map bounds
-   * @return array of bounds.
-   */
-  public getMapBounds(): any[] {
-    try {
-      return this.currentMap.bounds;
-    } catch (error) {
-      console.log('No Map Selected');
-      return [];
-    }
-
-  }
-
-  /** Gets the map image name
-   * @return the path to the map Image
-   */
-  public getBaseMapPath(): string {
-    try {
-      return this.currentMap.baseMapPath;
-    } catch (error) {
-      console.log('No Map Selected');
-      return '';
-    }
-  }
-
-  /** Gets the minimum Year
-   * @return the minimum year for the plan
-   */
-  public getMinimumYear(): number {
-    return this.currentPlan.minYear;
-  }
-
-  /** Gets the maximum Year
-   * @return the maximum year for the plan
-   */
-  public getMaximumYear(): number {
-    return this.currentPlan.maxYear;
+  public getMapData(): any {
+    return {
+      scale: this.dataTable.map.scale,
+      miniScale: this.dataTable.map.miniScale,
+      width: this.dataTable.map.width,
+      height: this.dataTable.map.height,
+      bounds: this.dataTable.map.bounds,
+      path: this.dataTable.map.path
+    };
   }
 
   public getScrollingMenuData(type: string) {
     if (type === 'year') {
-      this.scrollingMenuSubject.next({type: type, data: this.getYears()});
+      this.scrollingMenuSubject.next({ type: type, data: this.getYears() });
     } else if (type === 'scenario') {
-      this.scrollingMenuSubject.next({type: type, data: this.getScenarioNames()});
+      this.scrollingMenuSubject.next({ type: type, data: this.dataTable.scenario.all});
     }
   }
 
   private getYears() {
     const arr = [];
-    for (let i = this.currentPlan.minYear; i <= this.currentPlan.maxYear; i++) {
+    for (let i = this.dataTable.year.min; i <= this.dataTable.max; i++) {
       arr.push(i);
-    }
-    return arr;
-  }
-
-  private getScenarioNames() {
-    const arr = [];
-    for (let i = 0; i < this.scenarios.length; i++) {
-      arr.push(this.scenarios[i].displayName);
     }
     return arr;
   }
