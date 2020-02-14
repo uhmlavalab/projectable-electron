@@ -163,7 +163,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
     const centerIndex = this.getCenterIndex();
     if (centerIndex >= 0 && (this.optionsData[centerIndex].value !== this.selectedValue) ) {
       this.selectedOption = this.optionsData[centerIndex];
-      this.uiService.handleMenuChange(this.type, this.selectedOption.value);
+      this.planService.handleMenuChange(this.type, this.selectedOption.value);
       this.selectedValue = this.selectedOption.value;
     }
   }

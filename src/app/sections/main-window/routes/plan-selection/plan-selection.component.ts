@@ -1,28 +1,31 @@
-import { Component, ViewChild, ElementRef, NgZone } from '@angular/core';
+import { Component, ViewChild, ElementRef, NgZone, OnInit } from '@angular/core';
 import { WindowService } from '@app/modules/window';
 import { PlanService } from '@app/services/plan.service';
-import { ContentDeliveryService } from '@app/services/content-delivery.service';
 import { Plan } from '@app/interfaces';
 import { Router, ActivatedRoute } from '@angular/router';
+import { ContentDeliveryService } from '@app/services/content-delivery.service';
 
 @Component({
   selector: 'app-plan-selection',
   templateUrl: './plan-selection.component.html',
   styleUrls: ['./plan-selection.component.css']
 })
-export class PlanSelectionComponent  {
+export class PlanSelectionComponent implements OnInit {
 
   @ViewChild("mapViewNode", { static: true }) private mapViewEl: ElementRef;
   view: any;
   plans: Plan[];
 
-  constructor(private windowService: WindowService, private planService: PlanService, private router: Router, private activeRoute: ActivatedRoute, private ngZone: NgZone) {
-    this.plans = this.planService.getPlans();
+  constructor(private windowService: WindowService, private planService: PlanService, private router: Router, private activeRoute: ActivatedRoute, private ngZone: NgZone, private contentDeliveryService: ContentDeliveryService) {
     const jsonfile = { name: 'cast' };
     this.windowService.saveFile({ filename: 'testfile.json', file: JSON.stringify(jsonfile) });
     this.windowService.loadFile('testfile.json');
 
    }
+
+   ngOnInit(): void {
+    this.plans = this.planService.getAllPlans();
+  }
 
 
   reset() {

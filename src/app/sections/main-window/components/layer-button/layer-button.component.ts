@@ -46,7 +46,7 @@ export class LayerButtonComponent implements OnInit {
       this.progress = 0;
       this.on = false;
       this.uiService.sendMessage({ type: 'layer-update', data: this.layerName, newMsg: 'true' });
-      this.planService.toggleSelectedLayer(this.layerName);
+      this.planService.toggleLayer(this.layerName);
     }
     // Start the effect
     if (this.animationInterval < 0) {
@@ -56,7 +56,7 @@ export class LayerButtonComponent implements OnInit {
           if (this.on === false) {
             this.on = true;
             this.uiService.sendMessage({ type: 'layer-update', data: this.layerName, newMsg: 'true' });
-            this.planService.toggleSelectedLayer(this.layerName);
+            this.planService.toggleLayer(this.layerName);
           }
           this.stopAnimation(this.animationInterval);
         }

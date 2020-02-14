@@ -24,9 +24,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
   private messageSub = new Subscription();
 
   constructor(private planService: PlanService, private touchService: TouchService, private windowService: WindowService) {
-    this.currentYear = this.planService.getMinimumYear();
-    this.currentScenario = this.planService.getCurrentScenario().displayName;
-
+    this.currentYear = 9999;
   }
 
   ngAfterViewInit() {
@@ -61,13 +59,12 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
   private reviewMessage(msg): void {
     const data = msg;
     if (Object.keys(msg).indexOf('layer') != -1) {
-      this.planService.toggleSelectedLayer(data.layer);
+      this.planService.toggleLayer(data.layer);
     }
     if (Object.keys(msg).indexOf('year') != -1) {
-      console.log('update year ', msg.year);
-      this.planService.setCurrentYear(msg.year);
+      this.planService.updateYear(msg.year);
     } if (Object.keys(msg).indexOf('scenario') != -1) {
-      this.planService.setScenario(msg.scenario);
+      this.planService.updateScenario(msg.scenario);
     }
 
   }
@@ -77,9 +74,9 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       //Select map element from viewchild
       const e = this.mapElement.nativeElement;
       // Get styles from the plan service.
-      const styles = this.planService.getCss();
-      e.style.left = styles.map.left;
-      e.style.top = styles.map.top;
+      // const styles = this.planService.getCss();
+      // e.style.left = styles.map.left;
+      // e.style.top = styles.map.top;
     } catch (error) {
       console.log('Failed To locate Element to position');
     }
@@ -91,9 +88,9 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
 
       const e = this.lineChart.nativeElement;
       // Get styles from the plan service.
-      const styles = this.planService.getCss();
-      e.style.left = styles.charts.line.left;
-      e.style.top = styles.charts.line.top;
+      // const styles = this.planService.getCss();
+      // e.style.left = styles.charts.line.left;
+      // e.style.top = styles.charts.line.top;
     } catch (error) {
       console.log('Error.  Failed to find element to position.');
     }
@@ -104,9 +101,9 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       //Select map element from viewchild
       const e = this.pieChart.nativeElement;
       // Get styles from the plan service.
-      const styles = this.planService.getCss();
-      e.style.left = styles.charts.pie.left;
-      e.style.top = styles.charts.pie.top;
+      // const styles = this.planService.getCss();
+      // e.style.left = styles.charts.pie.left;
+      // e.style.top = styles.charts.pie.top;
     } catch (error) {
       console.log('Error. Failed to find the element to position. ');
     }

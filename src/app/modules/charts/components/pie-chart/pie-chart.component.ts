@@ -26,14 +26,10 @@ export class PieChartComponent implements AfterViewInit {
 
   private planData: any;
 
-  private allReady: {
-    planSet: boolean,
-    scenarioSet: boolean,
-    yearSet: boolean,
-    dataSet: boolean
-  };
+  private allReady: any;
 
   constructor(private planService: PlanService) {
+    this.allReady = {};
     this.allReady.planSet = false;
     this.allReady.scenarioSet = false;
     this.allReady.yearSet = false;

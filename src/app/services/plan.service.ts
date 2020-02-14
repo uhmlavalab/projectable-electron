@@ -21,6 +21,7 @@ export class PlanService {
   public scrollingMenuSubject = new BehaviorSubject<any>(null);
   // Array Holding All Plans
   public planSubject = new BehaviorSubject<Plan>(null);     // Plan Publisher
+  public allPlansSubject = new BehaviorSubject<Plan[]>(null);
 
   public scenarioSubject = new BehaviorSubject<Scenario>(null); // Scenario publisher
   public scenarioListSubject = new BehaviorSubject<any[]>(null);
@@ -96,6 +97,7 @@ export class PlanService {
   /* Start The Map */
   public startTheMap(plan: Plan): void {
     this.setupSelectedPlan(this.plans.find(el => plan.name === el.name));
+    this.allPlansSubject.next(this.plans);
     this.plans = [];  // Free Up the memory.
     this.setState(1);
     this.windowService.sendMessage({ type: 'state', message: 'run', plan: plan });
@@ -156,9 +158,11 @@ export class PlanService {
     // Load All Plan Data
     try {
       this.getCapacityData().then(capData => this.dataTable.data.capacity = capData);
-      this.getGenerationData().then(genData => this.dataTable.data.generation = genData);
+      this.getGenerationData().then(genData => {
+          this.dataTable.data.generation = genData;
+          this.dataTable.data.tech = this.getTechData(genData);
+        });
       this.getCurtailmentData().then(curData => this.dataTable.data.curtailment = curData);
-      this.dataTable.data.tech = this.getTechData();
       return true;
     } catch (error) {
       console.log(error);
@@ -167,9 +171,9 @@ export class PlanService {
     }
   }
 
-  public getTechData(): any {
+  public getTechData(data): any {
     const technologies = [];
-    Object.keys(this.dataTable.data.generation[this.dataTable.plan.name]).forEach(tech => {
+    Object.keys(data[this.dataTable.plan.name]).forEach(tech => {
       technologies.push({ name: tech, color: chartColors[tech] });
     });
     return technologies;
@@ -259,7 +263,6 @@ export class PlanService {
         });
         return resolve(curtailmentData);
       });
-
     });
   }
 
@@ -336,7 +339,7 @@ export class PlanService {
     if (this.yearIsValid(year) && this.dataTable.year.current !== year) {
       this.dataTable.year.current = year;
       this.yearSubject.next(year);
-      // MESSAGE
+      this.windowService.sendMessage({year});
     }
   }
 
@@ -355,7 +358,7 @@ export class PlanService {
         this.scenarioSubject.next(scenario);
         this.yearSubject.next(this.dataTable.year.current);
         this.soundsService.playTick();
-        // MESSAGE
+        this.windowService.sendMessage({scenario: scenarioName});
       }
     }
   }
@@ -407,5 +410,26 @@ export class PlanService {
       arr.push(i);
     }
     return arr;
+  }
+
+  public getCurrentYear(): number {
+    return this.dataTable.year;
+  }
+
+  public getAllPlans(): Plan[] {
+    return this.plans;
+  }
+
+    /** The scrollable menu passes data and type to this function and the UI and Map
+   * are notified of the change.
+   * @param type the type of change
+   * @param data the value of the change.
+   */
+  public handleMenuChange(type: string, data: any): void {
+    if (type === 'year') {
+      this.updateYear(data);
+    } else if (type === 'scenario') {
+      this.updateScenario(this.dataTable.scenario.all.find(el => el.displayName === data));
+    }
   }
 }

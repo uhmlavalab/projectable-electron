@@ -6,6 +6,21 @@ import { UiServiceService } from '@app/services/ui-service.service';
   templateUrl: './slider.component.html',
   styleUrls: ['./slider.component.css']
 })
+
+    /** THIS CODE GOES IN A SERVICE **/
+  // /** Changes year based on the data passed by the slider.  This is the percent
+  //  * distance from the left side of the slider.
+  //  * @param percent the percent distance from the left side of the slider component.
+  //  */
+  // public changeYear(percent: number) {
+  //   const max = this.currentPlan.maxYear;
+  //   const min = this.currentPlan.minYear;
+  //   const totalYears = max - min + 1;
+  //   const currentNumber = Math.trunc(Math.round(totalYears * percent + min));
+  //   const year = this.planService.setCurrentYear(currentNumber);
+  //   this.windowService.sendMessage({year});
+  // }
+
 export class SliderComponent implements AfterViewInit {
 
   @ViewChild('slideElement', { static: false }) slideElement;
@@ -26,11 +41,13 @@ export class SliderComponent implements AfterViewInit {
         this.stopDragging()
       }
     });
-    
+  
+
+
     this.slideElement.nativeElement.addEventListener('mousemove', event => {
       if (this.dragging) {
-        this.uiService.changeYear(this.drag(event, this.slideElement));
-      }
+      //   this.uiService.changeYear(this.drag(event, this.slideElement));
+     }
     });
 
     this.slideElement.nativeElement.addEventListener('touchstart', () => {
@@ -41,18 +58,18 @@ export class SliderComponent implements AfterViewInit {
     }, { passive: false });
     this.slideElement.nativeElement.addEventListener('touchmove', event => {
       if (this.dragging) {
-        this.uiService.changeYear(this.drag(event, this.slideElement));
+        // this.uiService.changeYear(this.drag(event, this.slideElement));
       }
     }, { passive: false });
   }
 
-  incrementYear() {
-    this.uiService.incrementYear();
-  }
+  // incrementYear() {
+  //   this.uiService.incrementYear();
+  // }
 
-  decrementYear() {
-    this.uiService.decrementYear();
-  }
+  // decrementYear() {
+  //   this.uiService.decrementYear();
+  // }
 
   private startDrag(): void {
     this.dragging = true;

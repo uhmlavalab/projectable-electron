@@ -11,7 +11,7 @@ export class YearDisplayComponent implements OnInit {
   year: number;
 
   constructor(private planService: PlanService) {
-    this.year = this.planService.getMinimumYear();
+    this.year = 9999;
   }
 
   ngOnInit() {

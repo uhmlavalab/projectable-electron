@@ -12,6 +12,7 @@ import { WindowService } from '@app/modules/window';
 
 export class MapElementComponent implements OnInit {
 
+  @ViewChild('mapDiv', { static: true }) mapDiv: ElementRef;
   scale: number;
   width: number;
   height: number;
@@ -31,10 +32,6 @@ export class MapElementComponent implements OnInit {
     scenariosSet: boolean,
     yearSet: boolean
   }
-
-
-
-  @ViewChild('mapDiv', { static: true }) mapDiv: ElementRef;
 
   constructor(private planService: PlanService, private windowService: WindowService) {
     this.drawn = false;
@@ -65,30 +62,12 @@ export class MapElementComponent implements OnInit {
       }
     });
 
-    this.planService.updateLayerSubject.subscribe(layer => {
-      if (layer) {
-        if (layer.updateFunction !== null && this.planService.getCurrentPlan()) {
-          layer.updateFunction(this.planService);
-        } else {
-          //this.defaultFill(layer);
-        }
-      }
-    });
-
     this.planService.yearSubject.subscribe(year => {
       if (year) {
         this.updateYear(year);
         if (this.ready()) {
           this.updateMap();
         }
-        this.year = year;
-
-        const layers = this.planService.getLayers();
-        layers.forEach(layer => {
-          if (layer.updateFunction !== null && layer.active) {
-            layer.updateFunction(this.planService);
-          }
-        });
       }
     });
   }
@@ -110,7 +89,7 @@ export class MapElementComponent implements OnInit {
       .attr('width', this.width)
       .attr('height', this.height);
 
-    this.planService.getLayers().forEach(layer => {
+    this.layers.forEach(layer => {
       if (layer.filePath === null) {
         return;
       }
@@ -165,19 +144,20 @@ export class MapElementComponent implements OnInit {
     this.year = year;
     if (!this.allReady.yearSet) {
       this.allReady.yearSet = true;
+    } else {
+      this.updateMap();
     }
-  }
-
-  private updateLayers(layers): void {
-    
   }
 
   private updateMap(): void {
     if (this.ready && this.drawn) {
-
+      this.layers.forEach(layer => {
+        if (layer.updateFunction !== null && layer.active) {
+          layer.updateFunction(this.planService);
+        }
+      });
     } else if (this.ready && !this.drawn) {
       this.drawMap();
     }
-
   }
 }

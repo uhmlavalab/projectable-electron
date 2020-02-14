@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { UiServiceService } from '@app/services/ui-service.service';
+import { PlanService } from '@app/services/plan.service';
 
 @Component({
   selector: 'app-scenario-button',
@@ -11,13 +11,13 @@ export class ScenarioButtonComponent implements OnInit {
   @Input() scenarioName: string;
   @Input() scenarioDisplayName: string;
 
-  constructor(private uiService: UiServiceService) { }
+  constructor(private planService: PlanService) { }
 
   ngOnInit() {
   }
 
   private handleClick():void {
-     this.uiService.changeScenario(this.scenarioName);
+     this.planService.updateScenario(this.scenarioName);
   }
 
 }
