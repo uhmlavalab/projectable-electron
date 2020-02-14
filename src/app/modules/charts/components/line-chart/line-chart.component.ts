@@ -25,13 +25,15 @@ export class LineChartComponent implements AfterViewInit {
   allReady: {
     planSet: boolean,
     scenarioSet: boolean,
-    yearSet: boolean
+    yearSet: boolean,
+    dataSet: boolean
   };
 
   constructor(private planService: PlanService) {
     this.allReady.planSet = false;
     this.allReady.scenarioSet = false;
     this.allReady.yearSet = false;
+    this.allReady.dataSet = false;
   }
 
   ngAfterViewInit() {
@@ -39,27 +41,40 @@ export class LineChartComponent implements AfterViewInit {
     this.planService.planSubject.subscribe(plan => {
       if (plan) {
         this.scenario = this.planService.getCurrentScenario();
-        this.year = this.planService.getCurrentYear();
-        this.fetchData();
+        this.checkReadyState();
       }
     });
 
     this.planService.scenarioSubject.subscribe(scenario => {
       if (scenario) {
         this.updateScenario(scenario);
+        this.checkReadyState();
       }
     });
 
     this.planService.yearSubject.subscribe(year => {
       if (year) {
         this.updateYear(year);
+        this.checkReadyState();
       }
     });
 
+    this.planService.capDataSubject.subscribe(value => {
+      if (value) {
+        this.updateCapactiyData(value);
+        this.checkReadyState();
+      }
+    })
+  }
+
+  private checkReadyState(): void {
+    if (this.ready) {
+      this.fetchData();
+    }
   }
 
   private ready(): boolean {
-    return this.allReady.planSet && this.allReady.scenarioSet && this.allReady.yearSet;
+    return this.allReady.planSet && this.allReady.scenarioSet && this.allReady.yearSet && this.allReady.dataSet;
   }
 
   fetchData() {
@@ -198,6 +213,10 @@ export class LineChartComponent implements AfterViewInit {
       }
     }
 
+  }
+
+  private updateData(data: any) {
+    this.capacityData = data;
   }
 
   updateScenario(scenario: Scenario) {
