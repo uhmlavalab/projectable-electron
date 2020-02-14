@@ -14,7 +14,6 @@ export class LineChartComponent implements AfterViewInit {
   ctx: any;
   myChart: any;
 
-  capacityData: any;
   scenario: Scenario;
   year: number;
 
@@ -22,7 +21,8 @@ export class LineChartComponent implements AfterViewInit {
   labels: any;
   chartMax: number;
 
-  allReady: {
+  private planData: any;
+  private allReady: {
     planSet: boolean,
     scenarioSet: boolean,
     yearSet: boolean,
@@ -40,7 +40,7 @@ export class LineChartComponent implements AfterViewInit {
 
     this.planService.planSubject.subscribe(plan => {
       if (plan) {
-        this.scenario = this.planService.getCurrentScenario();
+        this.allReady.planSet = true;
         this.checkReadyState();
       }
     });
@@ -61,10 +61,10 @@ export class LineChartComponent implements AfterViewInit {
 
     this.planService.capDataSubject.subscribe(value => {
       if (value) {
-        this.updateCapactiyData(value);
+        this.updateData(value);
         this.checkReadyState();
       }
-    })
+    });
   }
 
   private checkReadyState(): void {
@@ -78,17 +78,15 @@ export class LineChartComponent implements AfterViewInit {
   }
 
   fetchData() {
-    this.planService.getCapacityData().then(capData => {
-      this.capacityData = capData;
       this.data = {};
       this.data.capacity = {};
       const valueArray = [];
-      Object.keys(this.capacityData).forEach(scenario => {
+      Object.keys(this.planData).forEach(scenario => {
         this.data.capacity[scenario] = {};
         this.data.capacity[scenario].labels = [];
         this.data.capacity[scenario].datasets = [];
 
-        Object.keys(this.capacityData[scenario]).forEach(tech => {
+        Object.keys(this.planData[scenario]).forEach(tech => {
           const dataset = {
             label: tech,
             backgroundColor: chartColors[tech],
@@ -97,9 +95,9 @@ export class LineChartComponent implements AfterViewInit {
             fill: false,
             data: [],
           };
-          Object.keys(this.capacityData[scenario][tech]).forEach(el => {
-            const year = this.capacityData[scenario][tech][el].year;
-            const value = this.capacityData[scenario][tech][el].value;
+          Object.keys(this.planData[scenario][tech]).forEach(el => {
+            const year = this.planData[scenario][tech][el].year;
+            const value = this.planData[scenario][tech][el].value;
             this.data.capacity[scenario].labels.push(year);
             dataset.data.push(value);
             valueArray.push(value);
@@ -110,7 +108,6 @@ export class LineChartComponent implements AfterViewInit {
       });
       this.chartMax = Math.ceil(Math.max(...valueArray) / 100) * 100;
       this.createChart();
-    });
 
   }
 
@@ -216,13 +213,15 @@ export class LineChartComponent implements AfterViewInit {
   }
 
   private updateData(data: any) {
-    this.capacityData = data;
+    this.planData = data;
+    this.allReady.dataSet = true;
   }
 
   updateScenario(scenario: Scenario) {
     if (this.myChart) {
       try {
         this.scenario = scenario;
+        this.allReady.scenarioSet = true;
         this.myChart.data.datasets = this.data.capacity[this.scenario.name].datasets;
         this.myChart.update();
       } catch (error) {

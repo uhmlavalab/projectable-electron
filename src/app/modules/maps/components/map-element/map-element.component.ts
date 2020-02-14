@@ -22,10 +22,22 @@ export class MapElementComponent implements OnInit {
   path: d3.geo.Path;
   map: d3.Selection<any>;
 
+  private drawn: false;
+  private layers: any[];
+  private year: number;
+  private allReady: {
+    layersSet: boolean,
+    planSet: boolean,
+    scenariosSet: boolean,
+    yearSet: boolean
+  }
+
+
 
   @ViewChild('mapDiv', { static: true }) mapDiv: ElementRef;
 
   constructor(private planService: PlanService, private windowService: WindowService) {
+    this.drawn = false;
     const mapData = planService.getMapData();
     this.scale = this.windowService.isMain() ? mapData.miniScale : mapData.scale;
     this.width = mapData.width * this.scale;
@@ -35,6 +47,53 @@ export class MapElementComponent implements OnInit {
   }
 
   ngOnInit() {
+
+
+    this.planService.layersSubject.subscribe(layers => {
+      this.layers = layers;
+      this.allReady.layersSet = true;
+    });
+
+    // Subscribe to layer toggling
+    this.planService.toggleLayerSubject.subscribe(layer => {
+      if (layer) {
+        if (layer.updateFunction !== null) {
+          layer.updateFunction(this.planService);
+        } else {
+          this.defaultFill(layer);
+        }
+      }
+    });
+
+    this.planService.updateLayerSubject.subscribe(layer => {
+      if (layer) {
+        if (layer.updateFunction !== null && this.planService.getCurrentPlan()) {
+          layer.updateFunction(this.planService);
+        } else {
+          //this.defaultFill(layer);
+        }
+      }
+    });
+
+    this.planService.yearSubject.subscribe(year => {
+      if (year) {
+        this.updateYear(year);
+        if (this.ready()) {
+          this.updateMap();
+        }
+        this.year = year;
+
+        const layers = this.planService.getLayers();
+        layers.forEach(layer => {
+          if (layer.updateFunction !== null && layer.active) {
+            layer.updateFunction(this.planService);
+          }
+        });
+      }
+    });
+  }
+
+  private drawMap(): void {
     this.projection = d3.geo.mercator()
       .scale(1)
       .translate([0, 0]);
@@ -86,38 +145,6 @@ export class MapElementComponent implements OnInit {
           });
       });
     });
-
-    // Subscribe to layer toggling
-    this.planService.toggleLayerSubject.subscribe(layer => {
-      if (layer) {
-        if (layer.updateFunction !== null) {
-          layer.updateFunction(this.planService);
-        } else {
-          this.defaultFill(layer);
-        }
-      }
-    });
-
-    this.planService.updateLayerSubject.subscribe(layer => {
-      if (layer) {
-        if (layer.updateFunction !== null && this.planService.getCurrentPlan()) {
-          layer.updateFunction(this.planService);
-        } else {
-          //this.defaultFill(layer);
-        }
-      }
-    });
-
-    this.planService.yearSubject.subscribe(year => {
-      if (year) {
-        const layers = this.planService.getLayers();
-        layers.forEach(layer => {
-          if (layer.updateFunction !== null && layer.active) {
-            layer.updateFunction(this.planService);
-          }
-        });
-      }
-    });
   }
 
   defaultFill(layer: MapLayer) {
@@ -128,5 +155,29 @@ export class MapElementComponent implements OnInit {
         .style('stroke', layer.borderColor)
         .style('stroke-width', layer.borderWidth + 'px');
     });
+  }
+
+  private ready(): boolean {
+    return this.allReady.yearSet && this.allReady.scenariosSet && this.allReady.planSet && this.allReady.layersSet;
+  }
+
+  private updateYear(year: number): void {
+    this.year = year;
+    if (!this.allReady.yearSet) {
+      this.allReady.yearSet = true;
+    }
+  }
+
+  private updateLayers(layers): void {
+    
+  }
+
+  private updateMap(): void {
+    if (this.ready && this.drawn) {
+
+    } else if (this.ready && !this.drawn) {
+      this.drawMap();
+    }
+
   }
 }

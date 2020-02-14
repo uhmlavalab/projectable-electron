@@ -28,6 +28,10 @@ export class PlanService {
   public yearSubject = new BehaviorSubject<number>(null);   // Year Publisher
   public yearsSubject = new BehaviorSubject<number[]>(null);
 
+  /* Data Subjects */
+  public capDataSubject = new BehaviorSubject<any>(null);
+  public genDataSubject = new BehaviorSubject<any>(null);
+  public curDataSubject = new BehaviorSubject<any>(null);
   public technologySubject = new BehaviorSubject<any>(null);
 
   private dataTable: any;
@@ -132,6 +136,9 @@ export class PlanService {
   }
 
   private publishSetupData(): void {
+    this.capDataSubject.next(this.dataTable.data.capacity);
+    this.curDataSubject.next(this.dataTable.data.curtailment);
+    this.genDataSubject.next(this.dataTable.data.generation);
     this.planSetSubject.next(this.dataTable.plan.isSet);
     this.yearSubject.next(this.dataTable.year.current);      // Publish current year
     this.yearsSubject.next(this.getYears());
