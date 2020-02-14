@@ -31,8 +31,8 @@ export const HecoPlan: Plan = {
   ],
   css: {
     map: {
-      left: '3vw',
-      top: '1vh'
+      left: '14vw',
+      top: '3vh'
     },
     legend: {
       display: 'none',
@@ -156,11 +156,11 @@ export const HecoPlan: Plan = {
         iconPath: 'assets/plans/oahu-heco/images/icons/PARK.png',
         secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/layer-images/parks.jpg',
         secondScreenText: 'This layer shows the location of park lands on Oahu.',
-        fillColor: mapLayerColors.Parks.fill,
+        fillColor: 'blue',// mapLayerColors.Parks.fill,
         borderColor: mapLayerColors.Parks.border,
-        borderWidth: 1,
+        borderWidth: 0.1,
         legendColor: mapLayerColors.Parks.fill,
-        filePath: 'assets/plans/oahu-heco/layers/parks.json',
+        filePath: 'assets/plans/oahu-heco/layers/slr.json',
         parcels: [],
         setupFunction: null,
         updateFunction: null,

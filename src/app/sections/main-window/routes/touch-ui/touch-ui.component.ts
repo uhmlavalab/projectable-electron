@@ -24,6 +24,7 @@ export class TouchUiComponent implements AfterViewInit {
   private yearTitle: string;
   private scenarioTitle: string;
   private planSet: boolean;
+  private showSettingsModal: boolean;
 
   private scenarios: any[]; // Array containing all available scenarios in the plan.
 
@@ -37,6 +38,7 @@ export class TouchUiComponent implements AfterViewInit {
     this.yearTitle = 'Year';
     this.scenarioTitle = 'Scenario';
     this.planSet = false;
+    this.showSettingsModal = false;
   }
 
   ngAfterViewInit() {
@@ -107,7 +109,7 @@ export class TouchUiComponent implements AfterViewInit {
   }
 
   private handleSettingsButtonClick(): void {
-    alert('Settings! RAWR!');
+    this.showSettingsModal = !this.showSettingsModal;
   }
 
 }
