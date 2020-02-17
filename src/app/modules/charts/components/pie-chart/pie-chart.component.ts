@@ -25,7 +25,6 @@ export class PieChartComponent implements AfterViewInit {
   chartMax: number;
 
   private planData: any;
-
   private allReady: any;
 
   constructor(private planService: PlanService) {
@@ -67,149 +66,145 @@ export class PieChartComponent implements AfterViewInit {
   }
 
   private checkReadyState(): void {
-    if (this.ready) {
+    if (this.allReady.planSet && this.allReady.scenarioSet && this.allReady.yearSet && this.allReady.dataSet) {
       this.fetchData();
     }
   }
 
-  private ready(): boolean {
-    return this.allReady.planSet && this.allReady.scenarioSet && this.allReady.yearSet && this.allReady.dataSet;
-  }
+  fetchData() {
+    this.planService.getGenerationData().then(genData => {
 
-fetchData() {
-  this.planService.getGenerationData().then(genData => {
+      this.generationData = genData;
+      this.data = {};
+      this.data.generation = {};
 
-    this.generationData = genData;
-    this.data = {};
-    this.data.generation = {};
+      Object.keys(this.generationData).forEach(scenario => {
+        this.data.generation[scenario] = {
+          data: {
+            labels: [],
+            datasets: [{
+              label: 'Generation MWh',
+              data: [],
+              backgroundColor: [],
+              borderColor: [],
+              borderWidth: 4
+            }]
+          },
+          yearlyData: {}
+        };
 
-    Object.keys(this.generationData).forEach(scenario => {
-      this.data.generation[scenario] = {
-        data: {
-          labels: [],
-          datasets: [{
-            label: 'Generation MWh',
-            data: [],
-            backgroundColor: [],
-            borderColor: [],
-            borderWidth: 4
-          }]
-        },
-        yearlyData: {}
-      };
+        Object.keys(this.generationData[scenario]).forEach(tech => {
 
-      Object.keys(this.generationData[scenario]).forEach(tech => {
+          this.data.generation[scenario].data.labels.push(tech);
+          this.data.generation[scenario].data.datasets[0].backgroundColor.push(chartColors[tech]);
+          this.data.generation[scenario].data.datasets[0].borderColor.push('rgba(255,255,255,1)');
 
-        this.data.generation[scenario].data.labels.push(tech);
-        this.data.generation[scenario].data.datasets[0].backgroundColor.push(chartColors[tech]);
-        this.data.generation[scenario].data.datasets[0].borderColor.push('rgba(255,255,255,1)');
-
-        Object.keys(this.generationData[scenario][tech]).forEach(el => {
-          const year = this.generationData[scenario][tech][el].year;
-          const value = this.generationData[scenario][tech][el].value;
-          if (!this.data.generation[scenario].yearlyData.hasOwnProperty(year)) {
-            this.data.generation[scenario].yearlyData[year] = [];
-          }
-          this.data.generation[scenario].yearlyData[year].push(value);
+          Object.keys(this.generationData[scenario][tech]).forEach(el => {
+            const year = this.generationData[scenario][tech][el].year;
+            const value = this.generationData[scenario][tech][el].value;
+            if (!this.data.generation[scenario].yearlyData.hasOwnProperty(year)) {
+              this.data.generation[scenario].yearlyData[year] = [];
+            }
+            this.data.generation[scenario].yearlyData[year].push(value);
+          });
         });
       });
+      this.createChart();
     });
-    this.createChart();
-  });
 
-}
+  }
 
-createChart() {
-  console.log(this.data);
-  const data = this.data.generation[this.scenario.name].data;
-  data.datasets[0].data = this.data.generation[this.scenario.name].yearlyData[this.year];
-  this.createPieChart(data);
-}
+  createChart() {
+    console.log(JSON.stringify(this.allReady));
+    const data = this.data.generation[this.scenario.name].data;
+    data.datasets[0].data = this.data.generation[this.scenario.name].yearlyData[this.year];
+    this.createPieChart(data);
+  }
 
-createPieChart(data: any) {
-  this.ctx = this.chartDiv.nativeElement.getContext('2d');
-  this.myChart = new Chart(this.ctx, {
-    type: 'pie',
-    options: {
-      title: {
-        display: true,
-        text: 'Generation',
-        position: 'top',
-        fontColor: 'white',
-        fontSize: 18,
-        fontFamily: "'Dalton Maag - Elevon OneG'",
-        defaultFontFamily: Chart.defaults.global.defaultFontFamily = "'Dalton Maag - Elevon OneG'"
-      },
-      legend: {
-        display: false,
-        labels: {
+  createPieChart(data: any) {
+    this.ctx = this.chartDiv.nativeElement.getContext('2d');
+    this.myChart = new Chart(this.ctx, {
+      type: 'pie',
+      options: {
+        title: {
+          display: true,
+          text: 'Generation',
+          position: 'top',
           fontColor: 'white',
-          fontStyle: 'bold',
-          fontSize: 14,
-          fontFamily: 'Dalton Maag - Elevon OneG'
-
-        }
-      },
-      responsive: false,
-      plugins: {
-        labels: [{
-          render: 'label',
-          position: 'border',
-          fontSize: 10,
-          overlap: false,
-          fontStyle: 'bold',
-          fontColor: 'white',
-          fontFamily: 'Dalton Maag - Elevon OneG'
-
+          fontSize: 18,
+          fontFamily: "'Dalton Maag - Elevon OneG'",
+          defaultFontFamily: Chart.defaults.global.defaultFontFamily = "'Dalton Maag - Elevon OneG'"
         },
-        {
-          render: 'percentage',
-          fontColor: 'white',
-          fontSize: 8,
-          fontStyle: 'bold',
-          overlap: false,
-          fontFamily: 'Dalton Maag - Elevon OneG'
+        legend: {
+          display: false,
+          labels: {
+            fontColor: 'white',
+            fontStyle: 'bold',
+            fontSize: 14,
+            fontFamily: 'Dalton Maag - Elevon OneG'
 
-        }]
+          }
+        },
+        responsive: false,
+        plugins: {
+          labels: [{
+            render: 'label',
+            position: 'border',
+            fontSize: 10,
+            overlap: false,
+            fontStyle: 'bold',
+            fontColor: 'white',
+            fontFamily: 'Dalton Maag - Elevon OneG'
+
+          },
+          {
+            render: 'percentage',
+            fontColor: 'white',
+            fontSize: 8,
+            fontStyle: 'bold',
+            overlap: false,
+            fontFamily: 'Dalton Maag - Elevon OneG'
+
+          }]
+        },
       },
-    },
-    data
-  });
-}
-
-updateYear(year: number) {
-  if (this.data) {
-    try {
-      this.year = year;
-      const data = this.data.generation[this.scenario.name].data;
-      data.datasets[0].data = this.data.generation[this.scenario.name].yearlyData[this.year];
-      this.myChart.data = data;
-      this.myChart.update();
-    } catch (error) {
-      console.log('Error. Failed to update Year for Pie Chart.');
-    }
+      data
+    });
   }
 
-}
+  updateYear(year: number) {
+    if (this.data) {
+      try {
+        this.year = year;
+        const data = this.data.generation[this.scenario.name].data;
+        data.datasets[0].data = this.data.generation[this.scenario.name].yearlyData[this.year];
+        this.myChart.data = data;
+        this.myChart.update();
+      } catch (error) {
+        console.log('Error. Failed to update Year for Pie Chart.');
+      }
+    }
 
-updateScenario(scenario: Scenario) {
-  if (this.data) {
-    try {
-      this.scenario = scenario;
-      const data = this.data.generation[scenario.name].data;
-      data.datasets[0].data = this.data.generation[scenario.name].yearlyData[this.year];
-      this.myChart.data = data;
-      this.myChart.update();
-    } catch (error) {
-      console.log('Error.  Failed to update Scenario for Pie Chart');
+  }
+
+  updateScenario(scenario: Scenario) {
+    if (this.data) {
+      try {
+        this.scenario = scenario;
+        const data = this.data.generation[scenario.name].data;
+        data.datasets[0].data = this.data.generation[scenario.name].yearlyData[this.year];
+        this.myChart.data = data;
+        this.myChart.update();
+      } catch (error) {
+        console.log('Error.  Failed to update Scenario for Pie Chart');
+      }
     }
   }
-}
 
   private updateData(data: any) {
-  this.planData = data;
-  this.allReady.dataSet = true;
-}
+    this.planData = data;
+    this.allReady.dataSet = true;
+  }
 
 }
 

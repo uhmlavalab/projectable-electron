@@ -25,12 +25,7 @@ export class TouchUiComponent implements AfterViewInit {
   private scenarioTitle: string;
   private planSet: boolean;
   private setupComplete: boolean;
-  private allReady: {
-    planSet: boolean,
-    yearSet: boolean,
-    scenarioSet: boolean,
-    layersSet: boolean
-  }
+  private allReady: any;
 
   private scenarios: any[]; // Array containing all available scenarios in the plan.
 
@@ -45,6 +40,7 @@ export class TouchUiComponent implements AfterViewInit {
     this.yearTitle = 'Year';
     this.scenarioTitle = 'Scenario';
     this.planSet = false;
+    this.allReady = {};
   }
 
   ngAfterViewInit() {

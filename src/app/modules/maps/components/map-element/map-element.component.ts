@@ -23,17 +23,16 @@ export class MapElementComponent implements OnInit {
   path: d3.geo.Path;
   map: d3.Selection<any>;
 
-  private drawn: false;
+  private drawn: boolean;
   private layers: any[];
   private year: number;
-  private allReady: {
-    layersSet: boolean,
-    planSet: boolean,
-    scenariosSet: boolean,
-    yearSet: boolean
-  }
+  private allReady: any;
 
   constructor(private planService: PlanService, private windowService: WindowService) {
+    this.allReady = {};
+    this.allReady.planSet = false;
+    this.allReady.layersSet = false;
+    this.allReady.yearSet = false;
     this.drawn = false;
     const mapData = planService.getMapData();
     this.scale = this.windowService.isMain() ? mapData.miniScale : mapData.scale;
@@ -45,10 +44,15 @@ export class MapElementComponent implements OnInit {
 
   ngOnInit() {
 
-
+    this.planService.planSetSubject.subscribe(plan => {
+      this.allReady.planSet = plan;
+      this.updateMap();
+    });
     this.planService.layersSubject.subscribe(layers => {
       this.layers = layers;
+      console.log(layers);
       this.allReady.layersSet = true;
+      this.updateMap();
     });
 
     // Subscribe to layer toggling
@@ -64,10 +68,8 @@ export class MapElementComponent implements OnInit {
 
     this.planService.yearSubject.subscribe(year => {
       if (year) {
+        console.log(year);
         this.updateYear(year);
-        if (this.ready()) {
-          this.updateMap();
-        }
       }
     });
   }
@@ -124,6 +126,7 @@ export class MapElementComponent implements OnInit {
           });
       });
     });
+    this.drawn = true;
   }
 
   defaultFill(layer: MapLayer) {
@@ -137,26 +140,26 @@ export class MapElementComponent implements OnInit {
   }
 
   private ready(): boolean {
-    return this.allReady.yearSet && this.allReady.scenariosSet && this.allReady.planSet && this.allReady.layersSet;
+    return this.allReady.yearSet && this.allReady.planSet && this.allReady.layersSet;
   }
 
   private updateYear(year: number): void {
     this.year = year;
     if (!this.allReady.yearSet) {
       this.allReady.yearSet = true;
-    } else {
-      this.updateMap();
-    }
+    } 
+    this.updateMap();
   }
 
   private updateMap(): void {
-    if (this.ready && this.drawn) {
+    console.log(JSON.stringify(this.allReady));
+    if (this.ready() && this.drawn) {
       this.layers.forEach(layer => {
         if (layer.updateFunction !== null && layer.active) {
           layer.updateFunction(this.planService);
         }
       });
-    } else if (this.ready && !this.drawn) {
+    } else if (this.ready() && !this.drawn) {
       this.drawMap();
     }
   }

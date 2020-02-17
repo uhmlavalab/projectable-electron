@@ -65,13 +65,13 @@ export class LineChartComponent implements AfterViewInit {
   }
 
   private checkReadyState(): void {
-    if (this.ready) {
+    if (this.ready()) {
       this.fetchData();
     }
   }
 
   private ready(): boolean {
-    return this.allReady.planSet && this.allReady.scenarioSet && this.allReady.yearSet && this.allReady.dataSet;
+    return ;
   }
 
   fetchData() {

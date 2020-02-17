@@ -130,7 +130,7 @@ export class PlanService {
     this.dataTable.components.all = ['map', 'pie', 'line'];
     this.dataTable.data.generationPath = plan.data.generationPath;
     this.dataTable.data.curtailmentPath = plan.data.curtailmentPath;
-    this.dataTable.data.Path = plan.data.generationPath;
+    this.dataTable.data.capacityPath = plan.data.capacityPath;
 
     if (this.loadAllData()) {
       this.publishSetupData();
@@ -173,7 +173,7 @@ export class PlanService {
 
   public getTechData(data): any {
     const technologies = [];
-    Object.keys(data[this.dataTable.plan.name]).forEach(tech => {
+    Object.keys(data[this.dataTable.scenario.name]).forEach(tech => {
       technologies.push({ name: tech, color: chartColors[tech] });
     });
     return technologies;
@@ -270,6 +270,7 @@ export class PlanService {
   public getCapacityData(): Promise<any> {
     return new Promise((resolve, error) => {
       const capacityData = {};
+      console.log(this.dataTable.data.capacityPath);
       d3.csv(this.dataTable.data.capacityPath, data => {
         data.forEach(element => {
           const year = element.year;
