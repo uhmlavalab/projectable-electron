@@ -121,8 +121,9 @@ export class PlanService {
     this.dataTable.map.height = plan.map.height;
     this.dataTable.map.bounds = plan.map.bounds;
     this.dataTable.map.path = plan.map.baseMapPath;
-    this.dataTable.year.min = plan.minYear;  // Begin with the lowest allowed year.
-    this.dataTable.year.max = plan.maxYear;  // Begin with the lowest allowed year.
+    this.dataTable.year.min = plan.minYear;  
+    this.dataTable.year.max = plan.maxYear;
+    this.dataTable.year.current = plan.minYear;
     this.dataTable.scenario.all = plan.scenarios;  // Load array with all scenarios associated with this plan
     this.dataTable.scenario.name = plan.scenarios[0].name;
     this.dataTable.scenario.display = plan.scenarios[0].displayName;
@@ -131,16 +132,11 @@ export class PlanService {
     this.dataTable.data.generationPath = plan.data.generationPath;
     this.dataTable.data.curtailmentPath = plan.data.curtailmentPath;
     this.dataTable.data.capacityPath = plan.data.capacityPath;
-
-    if (this.loadAllData()) {
-      this.publishSetupData();
-    }
+    this.publishSetupData();
+    this.loadAllData();
   }
 
   private publishSetupData(): void {
-    this.capDataSubject.next(this.dataTable.data.capacity);
-    this.curDataSubject.next(this.dataTable.data.curtailment);
-    this.genDataSubject.next(this.dataTable.data.generation);
     this.planSetSubject.next(this.dataTable.plan.isSet);
     this.yearSubject.next(this.dataTable.year.current);      // Publish current year
     this.yearsSubject.next(this.getYears());
@@ -157,12 +153,19 @@ export class PlanService {
   public loadAllData(): boolean {
     // Load All Plan Data
     try {
-      this.getCapacityData().then(capData => this.dataTable.data.capacity = capData);
+      this.getCapacityData().then(capData => {
+        this.dataTable.data.capacity = capData;
+        this.capDataSubject.next(capData);
+      });
       this.getGenerationData().then(genData => {
           this.dataTable.data.generation = genData;
           this.dataTable.data.tech = this.getTechData(genData);
+          this.genDataSubject.next(genData);
         });
-      this.getCurtailmentData().then(curData => this.dataTable.data.curtailment = curData);
+      this.getCurtailmentData().then(curData => {
+        this.dataTable.data.curtailment = curData;
+        this.curDataSubject.next(curData);
+      });
       return true;
     } catch (error) {
       console.log(error);

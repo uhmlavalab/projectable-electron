@@ -19,7 +19,7 @@ export class YearComponent implements AfterViewInit {
   private genData: any;
 
   constructor(private planService: PlanService) {
-    this.year = null;
+    this.year = 999;
     this.years = [];
     this.barLength = 40;
     this.genData = null;

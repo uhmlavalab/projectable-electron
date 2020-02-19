@@ -36,7 +36,7 @@ export class PieChartComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.planService.planSubject.subscribe(plan => {
+    this.planService.planSetSubject.subscribe(plan => {
       if (plan) {
         this.allReady.planSet = true;
         this.checkReadyState();
@@ -72,13 +72,9 @@ export class PieChartComponent implements AfterViewInit {
   }
 
   fetchData() {
-    this.planService.getGenerationData().then(genData => {
-
-      this.generationData = genData;
       this.data = {};
       this.data.generation = {};
-
-      Object.keys(this.generationData).forEach(scenario => {
+      Object.keys(this.planData).forEach(scenario => {
         this.data.generation[scenario] = {
           data: {
             labels: [],
@@ -93,15 +89,15 @@ export class PieChartComponent implements AfterViewInit {
           yearlyData: {}
         };
 
-        Object.keys(this.generationData[scenario]).forEach(tech => {
+        Object.keys(this.planData[scenario]).forEach(tech => {
 
           this.data.generation[scenario].data.labels.push(tech);
           this.data.generation[scenario].data.datasets[0].backgroundColor.push(chartColors[tech]);
           this.data.generation[scenario].data.datasets[0].borderColor.push('rgba(255,255,255,1)');
 
-          Object.keys(this.generationData[scenario][tech]).forEach(el => {
-            const year = this.generationData[scenario][tech][el].year;
-            const value = this.generationData[scenario][tech][el].value;
+          Object.keys(this.planData[scenario][tech]).forEach(el => {
+            const year = this.planData[scenario][tech][el].year;
+            const value = this.planData[scenario][tech][el].value;
             if (!this.data.generation[scenario].yearlyData.hasOwnProperty(year)) {
               this.data.generation[scenario].yearlyData[year] = [];
             }
@@ -110,7 +106,6 @@ export class PieChartComponent implements AfterViewInit {
         });
       });
       this.createChart();
-    });
 
   }
 
@@ -173,7 +168,7 @@ export class PieChartComponent implements AfterViewInit {
   }
 
   updateYear(year: number) {
-    if (this.data) {
+    if (this.myChart) {
       try {
         this.year = year;
         const data = this.data.generation[this.scenario.name].data;
@@ -183,12 +178,15 @@ export class PieChartComponent implements AfterViewInit {
       } catch (error) {
         console.log('Error. Failed to update Year for Pie Chart.');
       }
+    } else {
+      this.year = year;
+      this.allReady.yearSet = true;
     }
 
   }
 
   updateScenario(scenario: Scenario) {
-    if (this.data) {
+    if (this.myChart) {
       try {
         this.scenario = scenario;
         const data = this.data.generation[scenario.name].data;
@@ -198,6 +196,9 @@ export class PieChartComponent implements AfterViewInit {
       } catch (error) {
         console.log('Error.  Failed to update Scenario for Pie Chart');
       }
+    } else {
+      this.scenario = scenario;
+      this.allReady.scenarioSet = true;
     }
   }
 

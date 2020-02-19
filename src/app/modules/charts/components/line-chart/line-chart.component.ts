@@ -13,16 +13,13 @@ export class LineChartComponent implements AfterViewInit {
   @ViewChild('lineDiv', { static: true }) chartDiv: ElementRef;
   ctx: any;
   myChart: any;
-
   scenario: Scenario;
   year: number;
-
   data: any;
   labels: any;
   chartMax: number;
 
   private planData: any;
-
   private allReady: any;
 
   constructor(private planService: PlanService) {
@@ -35,7 +32,7 @@ export class LineChartComponent implements AfterViewInit {
 
   ngAfterViewInit() {
 
-    this.planService.planSubject.subscribe(plan => {
+    this.planService.planSetSubject.subscribe(plan => {
       if (plan) {
         this.allReady.planSet = true;
         this.checkReadyState();
@@ -43,6 +40,7 @@ export class LineChartComponent implements AfterViewInit {
     });
 
     this.planService.scenarioSubject.subscribe(scenario => {
+      console.log(scenario);
       if (scenario) {
         this.updateScenario(scenario);
         this.checkReadyState();
@@ -71,7 +69,7 @@ export class LineChartComponent implements AfterViewInit {
   }
 
   private ready(): boolean {
-    return ;
+    return this.allReady.planSet && this.allReady.yearSet && this.allReady.scenarioSet && this.allReady.dataSet;
   }
 
   fetchData() {
@@ -205,6 +203,9 @@ export class LineChartComponent implements AfterViewInit {
       } catch (error) {
         console.log('Error.  Failed to update year for Line Chart.');
       }
+    } else {
+      this.year = year;
+      this.allReady.yearSet = true;
     }
 
   }
@@ -218,12 +219,14 @@ export class LineChartComponent implements AfterViewInit {
     if (this.myChart) {
       try {
         this.scenario = scenario;
-        this.allReady.scenarioSet = true;
         this.myChart.data.datasets = this.data.capacity[this.scenario.name].datasets;
         this.myChart.update();
       } catch (error) {
         console.log('Error.  Failed to update scenario for Line Chart.');
       }
+    } else {
+      this.scenario = scenario;
+      this.allReady.scenarioSet = true;
     }
   }
 
