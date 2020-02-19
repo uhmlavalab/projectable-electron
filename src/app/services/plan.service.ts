@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Plan } from '@app/interfaces/plan';
 import { Plans } from '../../assets/plans/plans';
 import { Scenario } from '@app/interfaces';
-import { BehaviorSubject} from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { chartColors } from '../../assets/plans/defaultColors';
 import { SoundsService } from '@app/sounds';
 import * as d3 from 'd3/d3.min';
@@ -49,7 +49,7 @@ export class PlanService {
         scale: 0,
         miniScale: 0,
         width: 0,
-        height: 0, 
+        height: 0,
         bounds: null,
         path: ''
       },
@@ -121,7 +121,7 @@ export class PlanService {
     this.dataTable.map.height = plan.map.height;
     this.dataTable.map.bounds = plan.map.bounds;
     this.dataTable.map.path = plan.map.baseMapPath;
-    this.dataTable.year.min = plan.minYear;  
+    this.dataTable.year.min = plan.minYear;
     this.dataTable.year.max = plan.maxYear;
     this.dataTable.year.current = plan.minYear;
     this.dataTable.scenario.all = plan.scenarios;  // Load array with all scenarios associated with this plan
@@ -142,6 +142,8 @@ export class PlanService {
     this.yearsSubject.next(this.getYears());
     this.scenarioListSubject.next(this.dataTable.scenario.all); // Publish a list of scenarios.
     this.scenarioSubject.next(this.dataTable.scenario.all[this.dataTable.scenario.currentIndex]); // Publish current scenario
+    this.layersSubject.next(this.dataTable.layers.all);
+    this.publishScrollingMenuData();
   }
 
   /****************************************************************************************
@@ -158,10 +160,10 @@ export class PlanService {
         this.capDataSubject.next(capData);
       });
       this.getGenerationData().then(genData => {
-          this.dataTable.data.generation = genData;
-          this.dataTable.data.tech = this.getTechData(genData);
-          this.genDataSubject.next(genData);
-        });
+        this.dataTable.data.generation = genData;
+        this.dataTable.data.tech = this.getTechData(genData);
+        this.genDataSubject.next(genData);
+      });
       this.getCurtailmentData().then(curData => {
         this.dataTable.data.curtailment = curData;
         this.curDataSubject.next(curData);
@@ -343,7 +345,7 @@ export class PlanService {
     if (this.yearIsValid(year) && this.dataTable.year.current !== year) {
       this.dataTable.year.current = year;
       this.yearSubject.next(year);
-      this.windowService.sendMessage({year});
+      this.windowService.sendMessage({ year });
     }
   }
 
@@ -362,7 +364,7 @@ export class PlanService {
         this.scenarioSubject.next(scenario);
         this.yearSubject.next(this.dataTable.year.current);
         this.soundsService.playTick();
-        this.windowService.sendMessage({scenario: scenarioName});
+        this.windowService.sendMessage({ scenario: scenarioName });
       }
     }
   }
@@ -400,19 +402,24 @@ export class PlanService {
     };
   }
 
-  public getScrollingMenuData(type: string) {
-    if (type === 'year') {
-      this.scrollingMenuSubject.next({ type: type, data: this.getYears() });
-    } else if (type === 'scenario') {
-      this.scrollingMenuSubject.next({ type: type, data: this.dataTable.scenario.all});
-    }
+  private publishScrollingMenuData(): void {
+      this.scrollingMenuSubject.next([
+        {type: 'year', data: this.getYears()},
+        {type: 'scenario', data: this.getScenarioNames()}
+      ]);
   }
 
-  private getYears() {
+  private getYears(): number[] {
     const arr = [];
-    for (let i = this.dataTable.year.min; i <= this.dataTable.max; i++) {
+    for (let i = this.dataTable.year.min; i <= this.dataTable.year.max; i++) {
       arr.push(i);
     }
+    return arr;
+  }
+
+  private getScenarioNames(): string[] {
+    const arr = [];
+    this.dataTable.scenario.all.forEach(s => arr.push(s.displayName));
     return arr;
   }
 
@@ -424,11 +431,11 @@ export class PlanService {
     return this.plans;
   }
 
-    /** The scrollable menu passes data and type to this function and the UI and Map
-   * are notified of the change.
-   * @param type the type of change
-   * @param data the value of the change.
-   */
+  /** The scrollable menu passes data and type to this function and the UI and Map
+ * are notified of the change.
+ * @param type the type of change
+ * @param data the value of the change.
+ */
   public handleMenuChange(type: string, data: any): void {
     if (type === 'year') {
       this.updateYear(data);

@@ -1,4 +1,5 @@
-import { Component, AfterViewInit, ElementRef, ViewChildren, QueryList, ViewChild, Input, HostListener } from '@angular/core'; import { PlanService } from '@app/services/plan.service';
+import { Component, AfterViewInit, ElementRef, ViewChildren, QueryList, ViewChild, Input, HostListener } from '@angular/core';
+import { PlanService } from '@app/services/plan.service';
 import { Plan } from '@app/interfaces';
 import { interval, Subject } from 'rxjs';
 import { UiServiceService } from '@app/services/ui-service.service';
@@ -65,36 +66,34 @@ export class ScrollingMenuComponent implements AfterViewInit {
     this.centerBox.nativeElement.style.fontSize = this.largeFontSize;
     // The plan service will publish the data that goes into the menu.  the type passed by the
     // plan service subject must match the type of this menu to populate data.
-    this.planService.scrollingMenuSubject.subscribe(val => {
-      if (val) {
-        if (val.type === this.type) {
-          this.options = val.data;
-          this.selectedValue = val.data[0];
-          // Wait 100 ms for the ngfor to update the dom.
-          setTimeout(() => {
-            this.center = this.findCenter();  // Set the center of the visible menu window.
-            this.setOptionsData(this.options); // Create the menu options objects.
-            this.positionOptions(); // Set the top position for each element in the menu.
-            this.selectedValue = val.data[0]; // Always initialize the initial selected option to the first in the list.
-            this.selectedOption = this.optionsData[0];
-            /* If there are overflowing elements, move half of them from the bottom of the list to the top.  They are offscreen
-              but this allows for a smoother animation */
-            for (let i = 0; i < Math.floor((this.optionsData.length - this.numberVisible) / 2); i++) {
+    this.planService.scrollingMenuSubject.subscribe(value => {
+      if (value) {
+        value.forEach(val => {
+          if (val.type === this.type) {
+            this.options = val.data;
+            this.selectedValue = val.data[0];
+            // Wait 100 ms for the ngfor to update the dom.
+            setTimeout(() => {
+              this.center = this.findCenter();  // Set the center of the visible menu window.
+              this.setOptionsData(this.options); // Create the menu options objects.
+              this.positionOptions(); // Set the top position for each element in the menu.
+              this.selectedValue = val.data[0]; // Always initialize the initial selected option to the first in the list.
+              this.selectedOption = this.optionsData[0];
+              /* If there are overflowing elements, move half of them from the bottom of the list to the top.  They are offscreen
+                but this allows for a smoother animation */
+              for (let i = 0; i < Math.floor((this.optionsData.length - this.numberVisible) / 2); i++) {
                 this.switchOptions(1);
-            }
-            // Make sure the selected element is in the center of the menu.
-            this.adjustToCenter(val.data[0]);
-            this.centerSelectedValue();
-          }, 100);
-        }
+              }
+              // Make sure the selected element is in the center of the menu.
+              this.adjustToCenter(val.data[0]);
+              this.centerSelectedValue();
+            }, 100);
+          }
+
+        });
       }
     });
 
-    this.planService.planSubject.subscribe(plan => {
-      if (plan) {
-        this.planService.getScrollingMenuData(this.type);
-      }
-    });
     this.overlay.nativeElement.style.top = '0';
 
     /* EVENT LISTENERS FOR TOUCH AND MOUSE */
@@ -133,19 +132,19 @@ export class ScrollingMenuComponent implements AfterViewInit {
     // Divide the height of the size of the parent container by the number of visible elements to get hight of each menu option.
     this.dividedHeight = this.overlay.nativeElement.getBoundingClientRect().height / this.numberVisible;
     // If there are less options than the number of visible, you must duplicate the elements until it fills the area plus extra.
-      this.menuOptions.forEach((option, index) => {
-        this.optionsData.push(
-          {
-            value: options[index], // Option Value
-            element: option.nativeElement, // The HTML element for the option
-            top: this.dividedHeight * this.optionsData.length, // The CSS top value of this element
-            left: 0, // Css left value
-            opacity: 1, // CSS opacity value
-            fontSize: 999, // Font size of the particular element
-            position: index // What position is it in the menu (changes when options are moved around in the menu as its scrolled.)
-          }
-        );
-      });
+    this.menuOptions.forEach((option, index) => {
+      this.optionsData.push(
+        {
+          value: options[index], // Option Value
+          element: option.nativeElement, // The HTML element for the option
+          top: this.dividedHeight * this.optionsData.length, // The CSS top value of this element
+          left: 0, // Css left value
+          opacity: 1, // CSS opacity value
+          fontSize: 999, // Font size of the particular element
+          position: index // What position is it in the menu (changes when options are moved around in the menu as its scrolled.)
+        }
+      );
+    });
   }
 
 
@@ -161,7 +160,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
 
   private updateSelectedOption(): void {
     const centerIndex = this.getCenterIndex();
-    if (centerIndex >= 0 && (this.optionsData[centerIndex].value !== this.selectedValue) ) {
+    if (centerIndex >= 0 && (this.optionsData[centerIndex].value !== this.selectedValue)) {
       this.selectedOption = this.optionsData[centerIndex];
       this.planService.handleMenuChange(this.type, this.selectedOption.value);
       this.selectedValue = this.selectedOption.value;
@@ -207,12 +206,12 @@ export class ScrollingMenuComponent implements AfterViewInit {
         }
       }
       this.positionOptions();
-      }
+    }
     return true;
   }
 
   private centerSelectedValue(): void {
-    
+
     const distance = this.selectedOption.top + this.dividedHeight / 2 - this.center + 5;
     this.moveEachOption(-distance);
     this.positionOptions();

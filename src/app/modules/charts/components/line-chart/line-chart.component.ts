@@ -40,7 +40,6 @@ export class LineChartComponent implements AfterViewInit {
     });
 
     this.planService.scenarioSubject.subscribe(scenario => {
-      console.log(scenario);
       if (scenario) {
         this.updateScenario(scenario);
         this.checkReadyState();

@@ -41,6 +41,11 @@ export class TouchUiComponent implements AfterViewInit {
     this.scenarioTitle = 'Scenario';
     this.planSet = false;
     this.allReady = {};
+    this.allReady.layersSet = false;
+    this.allReady.planSet = false;
+    this.allReady.yearSet = false;
+    this.allReady.scenarioSet = false;
+    this.layers = [];
   }
 
   ngAfterViewInit() {
@@ -53,7 +58,7 @@ export class TouchUiComponent implements AfterViewInit {
       if (layers) {
         this.layers = layers;
         if (!this.allReady.layersSet) {
-          this.allReady.layersSet;
+          this.allReady.layersSet = true;
           this.isSetupComplete();
         }
       }

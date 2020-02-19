@@ -25,6 +25,7 @@ export class LayerButtonComponent implements OnInit {
     this.progress = 0;
     this.progressRadius = 0;
     this.on = false;
+    console.log(this);
   }
 
   ngOnInit() {
