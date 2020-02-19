@@ -21,6 +21,7 @@ export class LineChartComponent implements AfterViewInit {
 
   private planData: any;
   private allReady: any;
+  private dataFetched = false;
 
   constructor(private planService: PlanService) {
     this.allReady = {};
@@ -68,7 +69,7 @@ export class LineChartComponent implements AfterViewInit {
   }
 
   private ready(): boolean {
-    return this.allReady.planSet && this.allReady.yearSet && this.allReady.scenarioSet && this.allReady.dataSet;
+    return !this.dataFetched && this.allReady.planSet && this.allReady.yearSet && this.allReady.scenarioSet && this.allReady.dataSet;
   }
 
   fetchData() {
@@ -102,7 +103,7 @@ export class LineChartComponent implements AfterViewInit {
       });
       this.chartMax = Math.ceil(Math.max(...valueArray) / 100) * 100;
       this.createChart();
-
+      this.dataFetched = true;
   }
 
   createChart() {

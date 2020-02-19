@@ -27,6 +27,8 @@ export class PieChartComponent implements AfterViewInit {
   private planData: any;
   private allReady: any;
 
+  private dataFetched = false;
+
   constructor(private planService: PlanService) {
     this.allReady = {};
     this.allReady.planSet = false;
@@ -59,6 +61,7 @@ export class PieChartComponent implements AfterViewInit {
 
     this.planService.genDataSubject.subscribe(value => {
       if (value) {
+        console.log('updateGenData')
         this.updateData(value);
         this.checkReadyState();
       }
@@ -66,7 +69,7 @@ export class PieChartComponent implements AfterViewInit {
   }
 
   private checkReadyState(): void {
-    if (this.allReady.planSet && this.allReady.scenarioSet && this.allReady.yearSet && this.allReady.dataSet) {
+    if (!this.dataFetched && this.allReady.planSet && this.allReady.scenarioSet && this.allReady.yearSet && this.allReady.dataSet) {
       this.fetchData();
     }
   }
@@ -105,6 +108,7 @@ export class PieChartComponent implements AfterViewInit {
           });
         });
       });
+      this.dataFetched = true;
       this.createChart();
 
   }

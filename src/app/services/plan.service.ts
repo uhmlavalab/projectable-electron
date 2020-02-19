@@ -371,7 +371,7 @@ export class PlanService {
 
   /** Adds or removes the selected layer after checking it's active state. */
   public toggleLayer(layer): void {
-    const el = this.dataTable.layers.all.find(e => e.name === layer);
+    const el = this.dataTable.layers.all.find(e => e.layer.name === layer);
     if (el) {
       el.status = 1 - el.status;
       this.toggleLayerSubject.next({ layer: el.name, status: el.status });
