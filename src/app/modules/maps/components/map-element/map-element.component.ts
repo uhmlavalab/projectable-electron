@@ -44,6 +44,9 @@ export class MapElementComponent implements OnInit {
 
   ngOnInit() {
 
+    this.windowService.windowMessageSubject.subscribe(msg => {
+      this.planService.handleMessage(msg);
+    });
     this.planService.planSetSubject.subscribe(plan => {
       this.allReady.planSet = plan;
       this.updateMap();
@@ -57,13 +60,13 @@ export class MapElementComponent implements OnInit {
     // Subscribe to layer toggling
     this.planService.toggleLayerSubject.subscribe(layer => {
       if (layer) {
-
         this.layers.forEach(el => {
           if (layer.layer.name === el.layer.name) {
             el.state = layer.state;
           }
         });
 
+        console.log(this.layers);
         if (layer.layer.updateFunction !== null) {
           layer.layer.updateFunction(this.planService);
         } else {

@@ -1,5 +1,4 @@
-import { Component, AfterViewInit, Input, ViewChild, ElementRef, ɵCompiler_compileModuleSync__POST_R3__ } from '@angular/core';
-import { UiServiceService } from '@app/services/ui-service.service';
+import { Component, AfterViewInit, Input, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-slider',
@@ -29,7 +28,7 @@ export class SliderComponent implements AfterViewInit {
 
   private dragging: boolean;
 
-  constructor(private uiService: UiServiceService) {
+  constructor() {
 
   }
 
@@ -58,18 +57,10 @@ export class SliderComponent implements AfterViewInit {
     }, { passive: false });
     this.slideElement.nativeElement.addEventListener('touchmove', event => {
       if (this.dragging) {
-        // this.uiService.changeYear(this.drag(event, this.slideElement));
+ 
       }
     }, { passive: false });
   }
-
-  // incrementYear() {
-  //   this.uiService.incrementYear();
-  // }
-
-  // decrementYear() {
-  //   this.uiService.decrementYear();
-  // }
 
   private startDrag(): void {
     this.dragging = true;

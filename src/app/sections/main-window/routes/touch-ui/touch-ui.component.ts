@@ -1,7 +1,5 @@
 import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
-import { Plan } from '@app/interfaces/plan';
-import { UiServiceService } from '@app/services/ui-service.service';
 import { WindowService } from '@app/modules/window';
 
 @Component({
@@ -29,10 +27,10 @@ export class TouchUiComponent implements AfterViewInit {
 
   private scenarios: any[]; // Array containing all available scenarios in the plan.
 
-  constructor(private uiService: UiServiceService, private planService: PlanService, private windowService: WindowService) {
+  constructor( private planService: PlanService, private windowService: WindowService) {
     this.setupComplete = false;
     this.test = 'testing';
-    this.year = 9999;
+    this.year = 2016;
     this.layerTitle = 'Layer Toggles';
     this.mapTitle = 'Mini Map';
     this.chartTitle = 'Chart';

@@ -1,8 +1,5 @@
 import { Component, AfterViewInit, ElementRef, ViewChildren, QueryList, ViewChild, Input, HostListener } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
-import { Plan } from '@app/interfaces';
-import { interval, Subject } from 'rxjs';
-import { UiServiceService } from '@app/services/ui-service.service';
 
 @Component({
   selector: 'app-scrolling-menu',
@@ -45,7 +42,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
   private touchId: number;
 
 
-  constructor(private el: ElementRef, private planService: PlanService, private uiService: UiServiceService) {
+  constructor(private el: ElementRef, private planService: PlanService) {
     this.optionsData = [];
     this.numberVisible = 10;
     this.speedInterval = -1;
@@ -279,7 +276,6 @@ export class ScrollingMenuComponent implements AfterViewInit {
       let mouseY = event.screenY;
       if (mouseY === undefined) {
         if (this.touchId !== undefined) {
-          console.log(event.touches);
           mouseY = event.touches[this.touchId].screenY;
         }
       }

@@ -1,5 +1,4 @@
 import { Component, AfterViewInit, ViewChild, ElementRef, ViewChildren, QueryList } from '@angular/core';
-import { UiServiceService } from '@app/services/ui-service.service';
 import { PlanService } from '@app/services/plan.service';
 
 @Component({

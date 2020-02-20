@@ -113,7 +113,6 @@ export class PieChartComponent implements AfterViewInit {
   }
 
   createChart() {
-    console.log(JSON.stringify(this.allReady));
     const data = this.data.generation[this.scenario.name].data;
     data.datasets[0].data = this.data.generation[this.scenario.name].yearlyData[this.year];
     this.createPieChart(data);

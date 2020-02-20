@@ -159,15 +159,19 @@ export class PlanService {
         this.dataTable.data.capacity = capData;
         this.capDataSubject.next(capData);
       });
+
       this.getGenerationData().then(genData => {
         this.dataTable.data.generation = genData;
         this.dataTable.data.tech = this.getTechData(genData);
         this.genDataSubject.next(genData);
+        this.technologySubject.next(this.dataTable.data.tech);
       });
+
       this.getCurtailmentData().then(curData => {
         this.dataTable.data.curtailment = curData;
         this.curDataSubject.next(curData);
       });
+
       return true;
     } catch (error) {
       console.log(error);
@@ -176,7 +180,7 @@ export class PlanService {
     }
   }
 
-  public getTechData(data): any {
+  private getTechData(data): any {
     const technologies = [];
     Object.keys(data[this.dataTable.scenario.name]).forEach(tech => {
       technologies.push({ name: tech, color: chartColors[tech] });
@@ -226,7 +230,7 @@ export class PlanService {
   }
 
   /** Gets Generation Data */
-  public getGenerationData(): Promise<any> {
+  private getGenerationData(): Promise<any> {
     return new Promise((resolve, error) => {
       const generationData = {};
       d3.csv(this.dataTable.data.generationPath, data => {
@@ -249,7 +253,7 @@ export class PlanService {
   }
 
   /** Gets Curtailment Data */
-  public getCurtailmentData(): Promise<any> {
+  private getCurtailmentData(): Promise<any> {
     const curtailmentData = {};
     return new Promise((resolve, error) => {
       d3.csv(this.dataTable.data.curtailmentPath, (data) => {
@@ -272,7 +276,7 @@ export class PlanService {
   }
 
   /** Gets Capacity Data */
-  public getCapacityData(): Promise<any> {
+  private getCapacityData(): Promise<any> {
     return new Promise((resolve, error) => {
       const capacityData = {};
       console.log(this.dataTable.data.capacityPath);
@@ -345,7 +349,6 @@ export class PlanService {
     if (this.yearIsValid(year) && this.dataTable.year.current !== year) {
       this.dataTable.year.current = year;
       this.yearSubject.next(year);
-      this.windowService.sendMessage({ year });
     }
   }
 
@@ -364,13 +367,12 @@ export class PlanService {
         this.scenarioSubject.next(scenario);
         this.yearSubject.next(this.dataTable.year.current);
         this.soundsService.playTick();
-        this.windowService.sendMessage({ scenario: scenarioName });
       }
     }
   }
 
   /** Adds or removes the selected layer after checking it's active state. */
-  public toggleLayer(layer): void {
+  public toggleLayer(layer: string): void {
     let el = null;
     this.dataTable.layers.all.forEach(e => {
       if (e.layer.name === layer) {
@@ -379,9 +381,7 @@ export class PlanService {
     });
     if (el) {
       el.state = 1 - el.state;
-      console.log(el.state);
       this.toggleLayerSubject.next(el);
-      this.windowService.sendMessage({ layer: el.name });
       el.state === 0 ? this.soundsService.playDown() : this.soundsService.playUp();
     }
   }
@@ -445,8 +445,26 @@ export class PlanService {
   public handleMenuChange(type: string, data: any): void {
     if (type === 'year') {
       this.updateYear(data);
+      this.windowService.sendMessage({ type: 'year change',  message: data });
     } else if (type === 'scenario') {
       this.updateScenario(this.dataTable.scenario.all.find(el => el.displayName === data));
+      this.windowService.sendMessage({ type: 'scenario change', message: data });
     }
+  }
+
+  public handleMessage(msg: any): boolean {
+    if (msg.type === 'year change') {
+      this.updateYear(msg.message);
+    } else if (msg.type === 'scenario change') {
+      this.updateScenario(this.dataTable.scenario.all.find(el => el.displayName === msg.message));
+    } else if (msg.type === 'toggle layer') {
+      this.toggleLayer(msg.message);
+    }
+    return true;
+  }
+
+  public handleLayerButtonClick(layerName: string) {
+    this.toggleLayer(layerName);
+    this.windowService.sendMessage({type: 'toggle layer', message: layerName });
   }
 }

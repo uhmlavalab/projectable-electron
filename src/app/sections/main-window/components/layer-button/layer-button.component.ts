@@ -1,8 +1,6 @@
 import { Component, OnInit, Input, HostListener, ElementRef } from '@angular/core';
-import { UiServiceService } from '@app/services/ui-service.service';
 import { PlanService } from '@app/services/plan.service';
 import { NgCircleProgressModule } from 'ng-circle-progress';
-import { TimeInterval } from 'rxjs';
 
 @Component({
   selector: 'app-layer-button',
@@ -20,7 +18,7 @@ export class LayerButtonComponent implements OnInit {
   private progressRadius: number;
   private on: boolean;
 
-  constructor(private uiService: UiServiceService, private el: ElementRef, private planService: PlanService) {
+  constructor(private el: ElementRef, private planService: PlanService) {
     this.animationInterval = -1;
     this.progress = 0;
     this.progressRadius = 0;
@@ -45,9 +43,9 @@ export class LayerButtonComponent implements OnInit {
     if (this.progress >= 100) {
       this.progress = 0;
       this.on = false;
-      this.uiService.sendMessage({ type: 'layer-update', data: this.layerName, newMsg: 'true' });
-      this.planService.toggleLayer(this.layerName);
+      this.planService.handleLayerButtonClick(this.layerName);
     }
+    
     // Start the effect
     if (this.animationInterval < 0) {
       this.animationInterval = setInterval(() => {
@@ -55,8 +53,7 @@ export class LayerButtonComponent implements OnInit {
         if (this.progress >= 100) {
           if (this.on === false) {
             this.on = true;
-            this.uiService.sendMessage({ type: 'layer-update', data: this.layerName, newMsg: 'true' });
-            this.planService.toggleLayer(this.layerName);
+            this.planService.handleLayerButtonClick(this.layerName);
           }
           this.stopAnimation(this.animationInterval);
         }
