@@ -204,7 +204,7 @@ export class PlanService {
   public getCapacityTotalForCurrentYear(technologies: string[]): number {
     let capacityTotal = 0;
     technologies.forEach(tech => {
-      this.dataTable.data.capactiy[this.dataTable.scenario.name][tech].forEach(el => {
+      this.dataTable.data.capacity[this.dataTable.scenario.name][tech].forEach(el => {
         if (el.year === this.dataTable.year.current) {
           capacityTotal += el.value;
         }
@@ -371,12 +371,18 @@ export class PlanService {
 
   /** Adds or removes the selected layer after checking it's active state. */
   public toggleLayer(layer): void {
-    const el = this.dataTable.layers.all.find(e => e.layer.name === layer);
+    let el = null;
+    this.dataTable.layers.all.forEach(e => {
+      if (e.layer.name === layer) {
+        el = e;
+      }
+    });
     if (el) {
-      el.status = 1 - el.status;
-      this.toggleLayerSubject.next({ layer: el.name, status: el.status });
+      el.state = 1 - el.state;
+      console.log(el.state);
+      this.toggleLayerSubject.next(el);
       this.windowService.sendMessage({ layer: el.name });
-      el.status === 0 ? this.soundsService.playDown() : this.soundsService.playUp();
+      el.state === 0 ? this.soundsService.playDown() : this.soundsService.playUp();
     }
   }
 
@@ -403,10 +409,10 @@ export class PlanService {
   }
 
   private publishScrollingMenuData(): void {
-      this.scrollingMenuSubject.next([
-        {type: 'year', data: this.getYears()},
-        {type: 'scenario', data: this.getScenarioNames()}
-      ]);
+    this.scrollingMenuSubject.next([
+      { type: 'year', data: this.getYears() },
+      { type: 'scenario', data: this.getScenarioNames() }
+    ]);
   }
 
   private getYears(): number[] {

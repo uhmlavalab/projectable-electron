@@ -50,7 +50,6 @@ export class MapElementComponent implements OnInit {
     });
     this.planService.layersSubject.subscribe(layers => {
       this.layers = layers;
-      console.log(layers);
       this.allReady.layersSet = true;
       this.updateMap();
     });
@@ -58,8 +57,15 @@ export class MapElementComponent implements OnInit {
     // Subscribe to layer toggling
     this.planService.toggleLayerSubject.subscribe(layer => {
       if (layer) {
-        if (layer.updateFunction !== null) {
-          layer.updateFunction(this.planService);
+
+        this.layers.forEach(el => {
+          if (layer.layer.name === el.layer.name) {
+            el.state = layer.state;
+          }
+        });
+
+        if (layer.layer.updateFunction !== null) {
+          layer.layer.updateFunction(this.planService);
         } else {
           this.defaultFill(layer);
         }
@@ -68,7 +74,6 @@ export class MapElementComponent implements OnInit {
 
     this.planService.yearSubject.subscribe(year => {
       if (year) {
-        console.log(year);
         this.updateYear(year);
       }
     });
@@ -92,10 +97,10 @@ export class MapElementComponent implements OnInit {
       .attr('height', this.height);
 
     this.layers.forEach(layer => {
-      if (layer.filePath === null) {
+      if (layer.layer.filePath === null) {
         return;
       }
-      d3.json(`${layer.filePath}`, (error, geoData) => {
+      d3.json(`${layer.layer.filePath}`, (error, geoData) => {
         const bounds = [this.projection(this.rasterBounds[0]), this.projection(this.rasterBounds[1])];
         const scale = 1 / Math.max((bounds[1][0] - bounds[0][0]) / this.width, (bounds[1][1] - bounds[0][1]) / this.height);
         const transform = [
@@ -116,10 +121,10 @@ export class MapElementComponent implements OnInit {
           .attr('d', path)
           .attr('class', layer.name)
           .each(function (d) {
-            layer.parcels.push({ path: this, properties: (d.hasOwnProperty(`properties`)) ? d[`properties`] : null } as Parcel);
+            layer.layer.parcels.push({ path: this, properties: (d.hasOwnProperty(`properties`)) ? d[`properties`] : null } as Parcel);
           }).call(() => {
-            if (layer.setupFunction !== null) {
-              layer.setupFunction(this.planService);
+            if (layer.layer.setupFunction !== null) {
+              layer.layer.setupFunction(this.planService);
             } else {
               this.defaultFill(layer);
             }
@@ -129,13 +134,13 @@ export class MapElementComponent implements OnInit {
     this.drawn = true;
   }
 
-  defaultFill(layer: MapLayer) {
-    layer.parcels.forEach(el => {
+  defaultFill(layer) {
+    layer.layer.parcels.forEach(el => {
       d3.select(el.path)
-        .style('fill', layer.fillColor)
-        .style('opacity', layer.active ? 0.85 : 0.0)
-        .style('stroke', layer.borderColor)
-        .style('stroke-width', layer.borderWidth + 'px');
+        .style('fill', layer.layer.fillColor)
+        .style('opacity', layer.state === 1 ? 0.85 : 0.0)
+        .style('stroke', layer.layer.borderColor)
+        .style('stroke-width', layer.layer.borderWidth + 'px');
     });
   }
 
@@ -152,10 +157,9 @@ export class MapElementComponent implements OnInit {
   }
 
   private updateMap(): void {
-    console.log(JSON.stringify(this.allReady));
     if (this.ready() && this.drawn) {
       this.layers.forEach(layer => {
-        if (layer.updateFunction !== null && layer.active) {
+        if (layer.updateFunction !== null && layer.state === 1) {
           layer.updateFunction(this.planService);
         }
       });

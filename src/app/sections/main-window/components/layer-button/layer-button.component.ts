@@ -25,7 +25,6 @@ export class LayerButtonComponent implements OnInit {
     this.progress = 0;
     this.progressRadius = 0;
     this.on = false;
-    console.log(this);
   }
 
   ngOnInit() {
@@ -61,7 +60,7 @@ export class LayerButtonComponent implements OnInit {
           }
           this.stopAnimation(this.animationInterval);
         }
-      }, 5);
+      }, 2);
     } else {
       this.stopAnimation(this.animationInterval);
     }

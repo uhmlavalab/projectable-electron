@@ -61,7 +61,6 @@ export class PieChartComponent implements AfterViewInit {
 
     this.planService.genDataSubject.subscribe(value => {
       if (value) {
-        console.log('updateGenData')
         this.updateData(value);
         this.checkReadyState();
       }
