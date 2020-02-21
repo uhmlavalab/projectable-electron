@@ -105,10 +105,10 @@ export const HecoPlan: Plan = {
               .style('stroke-width', (this.borderWidth * parcel.properties.Voltage_kV) + 'px');
           });
         },
-        updateFunction(planService: PlanService) {
+        updateFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('opacity', this.active ? 0.85 : 0.0);
+              .style('opacity', state ? 0.85 : 0.0);
           });
         },
       },
@@ -141,10 +141,10 @@ export const HecoPlan: Plan = {
               .style('stroke-width', this.borderWidth + 'px');
           });
         },
-        updateFunction(planService: PlanService) {
+        updateFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('opacity', this.active ? 0.85 : 0.0);
+              .style('opacity', state ? 0.85 : 0.0);
           });
         },
       },
@@ -222,18 +222,18 @@ export const HecoPlan: Plan = {
             }
           });
         },
-        updateFunction(planService: PlanService) {
+        updateFunction(planService: PlanService, state: number) {
           let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']) - 99;
           this.parcels.forEach(parcel => {
             if (windTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('opacity', (this.active) ? 0.85 : 0.0);
+                .style('opacity', state ? 0.85 : 0.0);
               windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('opacity', (this.active) ? 0.85 : 0.0);
+                .style('opacity', state === 1 ? 0.85 : 0.0);
             }
           });
         },
@@ -274,7 +274,7 @@ export const HecoPlan: Plan = {
             }
           });
         },
-        updateFunction(planService: PlanService) {
+        updateFunction(planService: PlanService, state: number) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
@@ -282,12 +282,12 @@ export const HecoPlan: Plan = {
             if (solarTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('opacity', (this.active) ? 0.85 : 0.0);
+                .style('opacity', state === 1 ? 0.85 : 0.0);
               solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('opacity', (this.active) ? 0.85 : 0.0);
+                .style('opacity', state === 1 ? 0.85 : 0.0);
             }
           });
         },
@@ -322,10 +322,10 @@ export const HecoPlan: Plan = {
               .style('stroke-width', this.borderWidth + 'px');
           });
         },
-        updateFunction(planService: PlanService) {
+        updateFunction(planService: PlanService, state: number) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('opacity', this.active ? 0.85 : 0.0);
+              .style('opacity', state === 1 ? 0.85 : 0.0);
           });
         },
       },
@@ -372,7 +372,7 @@ export const HecoPlan: Plan = {
             }
           });
         },
-        updateFunction(planService: PlanService) {
+        updateFunction(planService: PlanService, state: number) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
@@ -392,7 +392,7 @@ export const HecoPlan: Plan = {
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('opacity', (this.active) ? 0.85 : 0.0);
+                .style('opacity', state === 1 ? 0.85 : 0.0);
             }
           });
         },
@@ -494,7 +494,7 @@ export const HecoPlan: Plan = {
             });
           });
         },
-        updateFunction(planService: PlanService) {
+        updateFunction(planService: PlanService, state:number) {
           this.parcels.forEach(parcel => {
             const id = parcel.properties.Building_F.toString().split('_')[1];
             const year = (planService.getCurrentYear()).toString();
@@ -515,7 +515,7 @@ export const HecoPlan: Plan = {
                 };
                 d3.select(parcel.path)
                   .style('fill', color)
-                  .style('opacity', (this.active) ? 1.00 : 0.0);
+                  .style('opacity', state === 1 ? 1.00 : 0.0);
               }
             }
           });

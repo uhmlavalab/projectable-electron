@@ -64,14 +64,12 @@ export class MapElementComponent implements OnInit {
           if (layer.layer.name === el.layer.name) {
             el.state = layer.state;
           }
+          if (el.layer.updateFunction !== null) {
+            el.layer.updateFunction(this.planService, el.state);
+          } else {
+            this.defaultFill(el.layer, el.state);
+          }
         });
-
-        console.log(this.layers);
-        if (layer.layer.updateFunction !== null) {
-          layer.layer.updateFunction(this.planService);
-        } else {
-          this.defaultFill(layer);
-        }
       }
     });
 
@@ -127,9 +125,9 @@ export class MapElementComponent implements OnInit {
             layer.layer.parcels.push({ path: this, properties: (d.hasOwnProperty(`properties`)) ? d[`properties`] : null } as Parcel);
           }).call(() => {
             if (layer.layer.setupFunction !== null) {
-              layer.layer.setupFunction(this.planService);
+              layer.layer.setupFunction(this.planService, layer.state);
             } else {
-              this.defaultFill(layer);
+              this.defaultFill(layer.layer, layer.state);
             }
           });
       });
@@ -137,13 +135,13 @@ export class MapElementComponent implements OnInit {
     this.drawn = true;
   }
 
-  defaultFill(layer) {
-    layer.layer.parcels.forEach(el => {
+  defaultFill(layer, state) {
+    layer.parcels.forEach(el => {
       d3.select(el.path)
-        .style('fill', layer.layer.fillColor)
-        .style('opacity', layer.state === 1 ? 0.85 : 0.0)
-        .style('stroke', layer.layer.borderColor)
-        .style('stroke-width', layer.layer.borderWidth + 'px');
+        .style('fill', layer.fillColor)
+        .style('opacity', state === 1 ? 0.85 : 0.0)
+        .style('stroke', layer.borderColor)
+        .style('stroke-width', layer.borderWidth + 'px');
     });
   }
 
@@ -162,8 +160,8 @@ export class MapElementComponent implements OnInit {
   private updateMap(): void {
     if (this.ready() && this.drawn) {
       this.layers.forEach(layer => {
-        if (layer.updateFunction !== null && layer.state === 1) {
-          layer.updateFunction(this.planService);
+        if (layer.layer.updateFunction !== null && layer.state === 1) {
+          layer.layer.updateFunction(this.planService, layer.state);
         }
       });
     } else if (this.ready() && !this.drawn) {
