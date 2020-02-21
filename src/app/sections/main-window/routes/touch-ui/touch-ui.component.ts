@@ -47,9 +47,10 @@ export class TouchUiComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // Checks for new messages on a selected time interval.  The faster the interval, less lag between windows.
-    this.windowService.windowMessageSubject.subscribe(message => {
-      console.log(message);
+
+    
+    this.windowService.windowMessageSubject.subscribe(msg => {
+      this.planService.handleMessage(msg);
     });
 
     this.planService.layersSubject.subscribe(layers => {
@@ -95,23 +96,6 @@ export class TouchUiComponent implements AfterViewInit {
   private isSetupComplete(): void {
     if (this.allReady.planSet && this.allReady.scenarioSet && this.allReady.yearSet && this.allReady.layersSet && !this.setupComplete) {
       this.setupComplete = true;
-    }
-  }
-
-  /** When a new message is received by a component, it is decoded here
-   * @param msg the message that was received.  It is a string is must be parsed to
-   * JSON format.
-   */
-  private reviewMessage(msg: string): void {
-    const data = JSON.parse(msg);
-    // If there is a new message, the newMsg value will be true.  Otherwise it is 'false'.
-    if (data.newMsg === 'true') {
-      if (data.type === 'plan') {  // Only called when the map is changed.
-        this.planService.startTheMap(data.data);
-      } else if (data.type === 'year') {
-        this.year = data.data;
-      }
-      //this.uiService.clearMessages(); // Always set newMsg to 'false' after reading it.
     }
   }
 

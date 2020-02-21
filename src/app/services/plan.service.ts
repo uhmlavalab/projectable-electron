@@ -319,7 +319,9 @@ export class PlanService {
     try {
       if (this.dataTable.year.current < this.dataTable.year.max) {
         this.dataTable.year.current++;
-        this.soundsService.playClick();
+        if (this.windowService.isMain()) {
+          this.soundsService.playClick();
+        }
         this.yearSubject.next(this.dataTable.year.current);
         // MESSAGE
       }
@@ -333,7 +335,9 @@ export class PlanService {
     try {
       if (this.dataTable.year.current > this.dataTable.year.min) {
         this.dataTable.year.current--;
-        this.soundsService.playClick();
+        if (this.windowService.isMain()) {
+          this.soundsService.playClick();
+        }
         // MESSAGE
       }
       this.yearSubject.next(this.dataTable.year.current);
@@ -349,6 +353,9 @@ export class PlanService {
     if (this.yearIsValid(year) && this.dataTable.year.current !== year) {
       this.dataTable.year.current = year;
       this.yearSubject.next(year);
+      if (this.windowService.isMain()) {
+        this.soundsService.playClick();
+      }
     }
   }
 
@@ -358,7 +365,7 @@ export class PlanService {
 
   public updateScenario(scenarioName: string): void {
     if (scenarioName !== this.dataTable.scenario.name) {
-      const scenario = this.dataTable.scenarios.all.find(s => s.name === scenarioName);
+      const scenario = this.dataTable.scenario.all.find(s => s.name === scenarioName);
       if (scenario) {
         const index = this.dataTable.scenario.all.indexOf(scenario);
         this.dataTable.scenario.currentIndex = index;
@@ -366,7 +373,9 @@ export class PlanService {
         this.dataTable.scenario.display = scenario.displayName;
         this.scenarioSubject.next(scenario);
         this.yearSubject.next(this.dataTable.year.current);
-        this.soundsService.playTick();
+        if (this.windowService.isMain()) {
+          this.soundsService.playTick();
+        }
       }
     }
   }
@@ -382,7 +391,9 @@ export class PlanService {
     if (el) {
       el.state = 1 - el.state;
       this.toggleLayerSubject.next(el);
-      el.state === 0 ? this.soundsService.playDown() : this.soundsService.playUp();
+      if (this.windowService.isMain()) {
+        el.state === 0 ? this.soundsService.playDown() : this.soundsService.playUp();
+      }
     }
   }
 
@@ -447,7 +458,8 @@ export class PlanService {
       this.updateYear(data);
       this.windowService.sendMessage({ type: 'year change',  message: data });
     } else if (type === 'scenario') {
-      this.updateScenario(this.dataTable.scenario.all.find(el => el.displayName === data));
+      const scen = this.dataTable.scenario.all.find(el => el.displayName === data);
+      this.updateScenario(scen.name);
       this.windowService.sendMessage({ type: 'scenario change', message: data });
     }
   }

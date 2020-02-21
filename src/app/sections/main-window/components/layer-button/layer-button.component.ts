@@ -17,76 +17,105 @@ export class LayerButtonComponent implements OnInit {
   private progress: number;
   private progressRadius: number;
   private on: boolean;
+  private delay: boolean;
 
   constructor(private el: ElementRef, private planService: PlanService) {
     this.animationInterval = -1;
     this.progress = 0;
     this.progressRadius = 0;
     this.on = false;
+    this.delay = false;
   }
 
   ngOnInit() {
     this.progressRadius = this.el.nativeElement.getBoundingClientRect().height / 2;
   }
 
-
-  /** When these toggles are touched, they show a loading up animation */
-  @HostListener('touchstart') onTouchStart(event: TouchEvent) {
-    this.toggleButtons();
-  }
-
-  @HostListener('mousedown') onMouseDown(event: Event) {
-    this.toggleButtons();
-  }
-
   private toggleButtons(): void {
-    if (this.progress >= 100) {
-      this.progress = 0;
-      this.on = false;
-      this.planService.handleLayerButtonClick(this.layerName);
-    }
-    
-    // Start the effect
     if (this.animationInterval < 0) {
       this.animationInterval = setInterval(() => {
         this.progress++;
         if (this.progress >= 100) {
-          if (this.on === false) {
-            this.on = true;
-            this.planService.handleLayerButtonClick(this.layerName);
-          }
-          this.stopAnimation(this.animationInterval);
+          this.on = true;
+          this.planService.handleLayerButtonClick(this.layerName);
+          this.stopAnimation();
         }
-      }, 2);
+      }, 5);
+      return;
     } else {
-      this.stopAnimation(this.animationInterval);
+      this.stopAnimation();
     }
   }
 
-  private stopAnimation(intervalId): void {
-    clearInterval(intervalId);
-    this.animationInterval = -1;
+  private stopAnimation(): void {
+    if (this.animationInterval > -1) {
+      clearInterval(this.animationInterval);
+      this.animationInterval = -1;
+    }
   }
 
   private reverseAnimate(): void {
     this.animationInterval = setInterval(() => {
-      if (this.progress > 0) {
+      if (this.progress > -2) {
         this.progress--;
       } else {
-        this.stopAnimation(this.animationInterval);
+        this.stopAnimation();
       }
     }, 5);
   }
 
-  /** If the animation isnt finished, it will end prematurely if the touch is ended. */
-  @HostListener('touchend') onTouchEnd() {
-    if (!this.on) {
-      this.stopAnimation(this.animationInterval);
-      if (this.progress > 0) {
-        this.reverseAnimate();
+
+  /** When these toggles are touched, they show a loading up animation */
+  @HostListener('touchstart') onTouchStart(event: TouchEvent) {
+    if (this.on) {
+      this.progress = 0;
+      this.on = false;
+      this.planService.handleLayerButtonClick(this.layerName);
+      this.delay = true;
+      setTimeout( () => {
+        this.delay = false;
+      }, 100);
+    } else {
+      if (this.animationInterval > -1) {
+        this.stopAnimation();
+        this.toggleButtons();
+      } else if (!this.delay) {
+        this.toggleButtons();
       }
     }
   }
+
+  @HostListener('mousedown') onMouseDown(event: Event) {
+    if (this.on) {
+      this.progress = 0;
+      this.on = false;
+      this.planService.handleLayerButtonClick(this.layerName);
+      this.delay = true;
+      setTimeout( () => {
+        this.delay = false;
+      }, 100);
+    } else {
+      if (!this.delay) {
+        this.toggleButtons();
+      }
+    }
+  }
+
+  /** If the animation isnt finished, it will end prematurely if the touch is ended. */
+  @HostListener('touchend') onTouchEnd() {
+      this.stopAnimation();
+      if (this.progress > 0 && !this.on) {
+        this.reverseAnimate();
+      }
+  }
+
+  /** If the animation isnt finished, it will end prematurely if the touch is ended. */
+  @HostListener('mouseup') onMouseUp() {
+    this.stopAnimation();
+    if (this.progress > 0 && !this.on) {
+      this.reverseAnimate();
+    }
+}
 }
 
 

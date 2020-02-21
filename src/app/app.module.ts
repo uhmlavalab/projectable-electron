@@ -12,7 +12,6 @@ import { AppComponent } from './app.component';
 // Services
 import { ContentDeliveryService } from './services/content-delivery.service';
 import { PlanService } from './services/plan.service';
-import { TouchService } from './services/touch.service';
 
 @NgModule({
   declarations: [
@@ -26,8 +25,7 @@ import { TouchService } from './services/touch.service';
   ],
   providers: [
     ContentDeliveryService,
-    PlanService,
-    TouchService
+    PlanService
   ],
   bootstrap: [AppComponent]
 })

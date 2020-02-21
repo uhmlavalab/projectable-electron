@@ -1,6 +1,5 @@
 import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
-import { TouchService } from '@app/services/touch.service';
 import { Router } from '@angular/router';
 import { WindowService } from '@app/modules/window';
 import { Subscription } from 'rxjs';
@@ -23,7 +22,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
 
   private messageSub = new Subscription();
 
-  constructor(private planService: PlanService, private touchService: TouchService, private windowService: WindowService) {
+  constructor(private planService: PlanService, private windowService: WindowService) {
     this.currentYear = 9999;
   }
 
@@ -33,9 +32,9 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     this.positionTopChart();
     this.positionBottomChart();
 
-    this.messageSub = this.windowService.windowMessageSubject.subscribe(message => {
-      console.log('review messsage ', message)
-      this.reviewMessage(message);
+  
+    this.windowService.windowMessageSubject.subscribe(msg => {
+      this.planService.handleMessage(msg);
     });
 
     // Subscribe to scenario Changes.
@@ -56,18 +55,6 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     this.messageSub.unsubscribe();
   }
 
-  private reviewMessage(msg): void {
-    const data = msg;
-    if (Object.keys(msg).indexOf('layer') != -1) {
-      this.planService.toggleLayer(data.layer);
-    }
-    if (Object.keys(msg).indexOf('year') != -1) {
-      this.planService.updateYear(msg.year);
-    } if (Object.keys(msg).indexOf('scenario') != -1) {
-      this.planService.updateScenario(msg.scenario);
-    }
-
-  }
 
   private positionMap(): void {
     try {

@@ -3,4 +3,4 @@
 </div>
 
 <div class="options-touch-overlay" #touchOverlay></div>
-<div class="center-box" #centerBox>{{selectedValue}}</div>
+<div class="center-box" [style.display]="this.scrolling ? 'block' : 'none'"  #centerBox>{{selectedValue}}</div>

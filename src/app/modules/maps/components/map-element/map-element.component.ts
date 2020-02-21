@@ -43,10 +43,6 @@ export class MapElementComponent implements OnInit {
   }
 
   ngOnInit() {
-
-    this.windowService.windowMessageSubject.subscribe(msg => {
-      this.planService.handleMessage(msg);
-    });
     this.planService.planSetSubject.subscribe(plan => {
       this.allReady.planSet = plan;
       this.updateMap();
