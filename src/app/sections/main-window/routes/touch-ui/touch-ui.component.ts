@@ -24,11 +24,13 @@ export class TouchUiComponent implements AfterViewInit {
   private planSet: boolean;
   private setupComplete: boolean;
   private allReady: any;
+  private showSettingsModal: boolean;
 
   private scenarios: any[]; // Array containing all available scenarios in the plan.
 
   constructor( private planService: PlanService, private windowService: WindowService) {
     this.setupComplete = false;
+    this.showSettingsModal = false;
     this.test = 'testing';
     this.year = 2016;
     this.layerTitle = 'Layer Toggles';
@@ -98,5 +100,10 @@ export class TouchUiComponent implements AfterViewInit {
       this.setupComplete = true;
     }
   }
+
+  private handleSettingsButtonClick(): void {
+    this.showSettingsModal = !this.showSettingsModal;
+  }
+
 
 }
