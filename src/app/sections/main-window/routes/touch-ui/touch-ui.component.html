@@ -54,3 +54,4 @@
 <div class="settings-button" (click)="handleSettingsButtonClick()">
   <img src="../../../../../assets/images/gear-icon.png" #settingsButton>
 </div>
+<app-settings-modal [style.display]="this.showSettingsModal ? 'block' : 'none'"></app-settings-modal>
