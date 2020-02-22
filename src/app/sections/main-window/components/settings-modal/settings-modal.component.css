@@ -1,0 +1,23 @@
+:host {
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    outline: 1px solid white;
+    z-index: 1000000;
+    color: white;
+}
+
+.map-mover {
+    height: 10vw;
+    width: 10vw;
+    outline: 1px solid green;
+    position: absolute;
+    left: 20vw;
+}
+
+.chart-mover {
+    height: 10vw;
+    width: 10vw;
+    outline: 1px solid yellow;
+    position: absolute;
+}
