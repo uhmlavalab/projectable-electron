@@ -48,7 +48,7 @@ export class TouchUiComponent implements AfterViewInit {
 
   ngAfterViewInit() {
 
-    
+
     this.windowService.windowMessageSubject.subscribe(msg => {
       this.planService.handleMessage(msg);
     });
