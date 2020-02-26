@@ -9,15 +9,24 @@ import { PlanService } from '@app/services/plan.service';
 export class YearDisplayComponent implements OnInit {
 
   year: number;
-
+  private percentRenewable: number;
   constructor(private planService: PlanService) {
-    this.year = 9999;
   }
 
   ngOnInit() {
     this.planService.yearSubject.subscribe(year => {
       if (year) {
         this.year = year;
+      } else {
+        this.year = 9999;
+      }
+    });
+
+    this.planService.precentRenewableByYearSubject.subscribe(percent => {
+      if (percent) {
+        this.percentRenewable = percent;
+      } else {
+        this.percentRenewable = 0;
       }
     });
   }

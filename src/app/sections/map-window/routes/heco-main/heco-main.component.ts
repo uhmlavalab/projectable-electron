@@ -50,6 +50,21 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
         this.currentYear = year;
       }
     });
+
+    this.planService.positionSubject.subscribe(data => {
+      if (data) {
+        let e = this.mapElement.nativeElement;
+        if (data.id === 'pie') {
+          e =this.pieChart.nativeElement;
+        } else if (data.id === 'line') {
+          e = this.lineChart.nativeElement;
+        }
+  
+        const rect = e.getBoundingClientRect();
+        e.style.left = `${data.x - rect.width / 2}px`;
+        e.style.top = `${data.y - rect.height / 2}px`;
+      }
+    });
   }
   ngOnDestroy() {
     this.messageSub.unsubscribe();

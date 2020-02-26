@@ -1,5 +1,6 @@
-import { Component, AfterViewInit, Input, ViewChild, ElementRef, QueryList, ViewChildren, ChangeDetectorRef } from '@angular/core';
+import { Component, AfterViewInit, Input, ViewChild, ElementRef, QueryList, ViewChildren, ChangeDetectorRef, HostListener } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
+import { addListener } from 'cluster';
 
 @Component({
   selector: 'app-year-bar',
@@ -16,6 +17,7 @@ export class YearBarComponent implements AfterViewInit {
   private scenario: any;
   private allReady: any;
   private set: boolean;
+  private total: number;
 
   constructor(private planService: PlanService, private ref: ChangeDetectorRef) {
     this.year = 2016;
@@ -25,6 +27,7 @@ export class YearBarComponent implements AfterViewInit {
     this.allReady.scenarioSet = false;
     this.allReady.techArraySet = false;
     this.set = false;
+    this.total = 0;
   }
 
   ngAfterViewInit() {
@@ -80,6 +83,7 @@ export class YearBarComponent implements AfterViewInit {
   private setBarLength(): void {
     const sizes = [];
     let total = 0;
+    let values = 0;
     let fossil = 0;
     Object.keys(this.inputData[this.scenario.name]).forEach(tech => {
       this.inputData[this.scenario.name][tech].forEach(year => {
@@ -94,9 +98,21 @@ export class YearBarComponent implements AfterViewInit {
         if (sizes[index].name !== 'Fossil') {
           e.nativeElement.style.width = `${Math.round(sizes[index].value / total * 99)}%`;
           e.nativeElement.style.backgroundColor = this.techArray[index].color;
+          values += sizes[index].value;
         }
       });
+      this.total = Math.round(values/total * 100);
+      this.planService.updateTotal(this.total, this.data);
     }, 10);
   }
 
+  @HostListener('click', ['$event.target'])
+  onClick() {
+    this.planService.updateYear(this.data);
+   }
+
+   @HostListener('touchStart', ['$event.target'])
+   onTouchStart() {
+     this.planService.updateYear(this.data);
+    }
 }

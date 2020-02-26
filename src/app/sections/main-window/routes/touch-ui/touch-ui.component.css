@@ -39,6 +39,10 @@ app-border-line {
     text-align: center;
 }
 
+.pie {
+    padding-left: 18%;
+    padding-top: 5%;
+}
 /* The Center Container contains the mini map and the year controls */
 .center-container {
     width: 50%;
@@ -76,6 +80,12 @@ app-border-line {
     height: 100%;
     display: inline-block;
     overflow: hidden;
+    text-align: center;
+}
+
+.scenario-menu {
+    position: absolute;
+    left: 10%;
 }
 
 .center-container>.middle>.middle {
@@ -83,6 +93,7 @@ app-border-line {
     height: 100%;
     display: inline-block;
     vertical-align: top;
+    padding-top: 4%;
 }
 
 .center-container>.middle>.right{
@@ -90,6 +101,7 @@ app-border-line {
     height: 100%;
     display: inline-block;
     overflow: hidden;
+    text-align: center;
 }
 
 

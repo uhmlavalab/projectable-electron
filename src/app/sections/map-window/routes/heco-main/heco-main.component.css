@@ -3,3 +3,7 @@
     left: 9%;
     top: 1%;
 }
+
+.chart { 
+    position: absolute;
+}

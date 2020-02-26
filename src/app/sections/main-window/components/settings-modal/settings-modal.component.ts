@@ -1,4 +1,5 @@
 import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { PlanService } from '@app/services/plan.service';
 
 @Component({
   selector: 'app-settings-modal',
@@ -14,7 +15,7 @@ export class SettingsModalComponent implements AfterViewInit {
   private dragging: boolean;
   private touchId: number;
 
-  constructor() {
+  constructor(private planService: PlanService) {
     this.dragging = false;
     this.touchId = -1;
   }
@@ -73,12 +74,12 @@ export class SettingsModalComponent implements AfterViewInit {
         mouseX = event.touches[this.touchId].screenX;
       }
 
-      console.log(mouseX, mouseY);
-
       if (mouseY && mouseX) {
         el.nativeElement.style.top = `${mouseY - 200}px`;
         el.nativeElement.style.left = `${mouseX - 200}px`;
       }
+
+      this.planService.positionMapElements(identifier, mouseX, mouseY);
 
     } catch (error) {
       console.log(error);

@@ -34,7 +34,9 @@ export class PlanService {
   public genDataSubject = new BehaviorSubject<any>(null);
   public curDataSubject = new BehaviorSubject<any>(null);
   public technologySubject = new BehaviorSubject<any>(null);
+  public precentRenewableByYearSubject = new BehaviorSubject<number>(null);
 
+  public positionSubject = new BehaviorSubject<any>(null);
   private dataTable: any;
 
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
@@ -56,9 +58,11 @@ export class PlanService {
       year: {
         all: [],
         current: 0,
+        currentRenewablePercent: 0,
         max: 0,
         min: 0,
       },
+      renewableTotals: [],
       scenario: {
         all: [],
         current: null,
@@ -323,6 +327,7 @@ export class PlanService {
           this.soundsService.playClick();
         }
         this.yearSubject.next(this.dataTable.year.current);
+        this.precentRenewableByYearSubject.next(this.setCurrentPercent(this.dataTable.year.current));
         // MESSAGE
       }
     } catch (error) {
@@ -341,6 +346,7 @@ export class PlanService {
         // MESSAGE
       }
       this.yearSubject.next(this.dataTable.year.current);
+      this.precentRenewableByYearSubject.next(this.setCurrentPercent(this.dataTable.year.current));
     } catch (error) {
       console.log('failed to decrement current year');
     }
@@ -349,23 +355,37 @@ export class PlanService {
   /** Sets the year to a specific value
    * @param year the year to set
    */
-  public updateYear(year): void {
+  public updateYear(val): void {
+    let year = val;
+    if (typeof(year) === 'string') {
+      year = parseInt(year, 10);
+    }
     if (this.yearIsValid(year) && this.dataTable.year.current !== year) {
       this.dataTable.year.current = year;
       this.yearSubject.next(year);
+      this.precentRenewableByYearSubject.next(this.setCurrentPercent(year));
       if (this.windowService.isMain()) {
         this.soundsService.playClick();
+        this.windowService.sendMessage({ type: 'year change',  message: year });
       }
     }
   }
 
+  private setCurrentPercent(year: number): number {
+    this.dataTable.renewableTotals.forEach(e => {
+      if (e.year == year) {
+        this.dataTable.year.currentRenewablePercent = e.total;
+      }
+    });
+    return this.dataTable.year.currentRenewablePercent;
+  }
   private yearIsValid(year: number): boolean {
     return year >= this.dataTable.year.min && year <= this.dataTable.year.max;
   }
 
   public updateScenario(scenarioName: string): void {
     if (scenarioName !== this.dataTable.scenario.name) {
-      const scenario = this.dataTable.scenario.all.find(s => s.name === scenarioName);
+      const scenario = this.dataTable.scenario.all.find(s => s.name == scenarioName);
       if (scenario) {
         const index = this.dataTable.scenario.all.indexOf(scenario);
         this.dataTable.scenario.currentIndex = index;
@@ -373,6 +393,7 @@ export class PlanService {
         this.dataTable.scenario.display = scenario.displayName;
         this.scenarioSubject.next(scenario);
         this.yearSubject.next(this.dataTable.year.current);
+        this.precentRenewableByYearSubject.next(this.setCurrentPercent(this.dataTable.year.current));
         if (this.windowService.isMain()) {
           this.soundsService.playTick();
         }
@@ -456,11 +477,10 @@ export class PlanService {
   public handleMenuChange(type: string, data: any): void {
     if (type === 'year') {
       this.updateYear(data);
-      this.windowService.sendMessage({ type: 'year change',  message: data });
     } else if (type === 'scenario') {
       const scen = this.dataTable.scenario.all.find(el => el.displayName === data);
       this.updateScenario(scen.name);
-      this.windowService.sendMessage({ type: 'scenario change', message: data });
+      this.windowService.sendMessage({ type: 'scenario change', message: scen.name });
     }
   }
 
@@ -468,9 +488,11 @@ export class PlanService {
     if (msg.type === 'year change') {
       this.updateYear(msg.message);
     } else if (msg.type === 'scenario change') {
-      this.updateScenario(this.dataTable.scenario.all.find(el => el.displayName === msg.message));
+      this.updateScenario(this.dataTable.scenario.all.find(el => el.name === msg.message).name);
     } else if (msg.type === 'toggle layer') {
       this.toggleLayer(msg.message);
+    } else if (msg.type === 'position elements' && !this.windowService.isMain()) {
+      this.positionSubject.next(msg.message);
     }
     return true;
   }
@@ -478,5 +500,22 @@ export class PlanService {
   public handleLayerButtonClick(layerName: string) {
     this.toggleLayer(layerName);
     this.windowService.sendMessage({type: 'toggle layer', message: layerName });
+  }
+
+  public positionMapElements(id: string, x: number, y: number) {
+    const msg = {
+      id: id,
+      x: x,
+      y: y
+    };
+    this.windowService.sendMessage({type: 'position elements', message: msg});
+  }
+
+  public updateTotal(total: number, year: number): void {
+    this.dataTable.renewableTotals.push({year: year, total: total});
+  }
+
+  public finishedYearBarSetup(): void {
+    this.precentRenewableByYearSubject.next(this.setCurrentPercent(this.dataTable.year.current));
   }
 }

@@ -7,7 +7,16 @@
     border-radius: 50%;
     left: 30%;
     margin-top: 15%;
+    text-align: center;
+    font-size: 15px;
+    padding-top: 34px;
+}
 
+.year {
+    font-size: 20px;
+}
+.content-wrapper > div {
+    margin-top: 8px;
 }
 .border-line {
     width: 80%;
@@ -32,6 +41,7 @@ p {
     width: 150px;
     height: 150px;
     position: absolute;
+    z-index: 10000;
 }
 
 .year-bar {

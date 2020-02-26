@@ -23,6 +23,7 @@
 .menu-option {
     position: absolute;
     left: 32px;
+    transition: opacity 0.4s linear;
 }
 
 .center-box {

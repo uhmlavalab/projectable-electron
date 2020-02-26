@@ -42,6 +42,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
   private touchId: number;
   private scrolling: boolean;
 
+  private setupComplete: boolean;
 
   constructor(private el: ElementRef, private planService: PlanService) {
     this.optionsData = [];
@@ -59,6 +60,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
     this.dividedHeight = 0;
     this.selectedValue = '0';
     this.scrolling = true;
+    this.setupComplete = false;
   }
 
   ngAfterViewInit() {
@@ -71,7 +73,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
           if (val.type === this.type) {
             this.options = val.data;
             if (this.options.length < this.numberVisible) {
-              this.scrolling= false;
+              this.scrolling = false;
             }
             this.selectedValue = val.data[0];
             // Wait 100 ms for the ngfor to update the dom.
@@ -89,9 +91,20 @@ export class ScrollingMenuComponent implements AfterViewInit {
               // Make sure the selected element is in the center of the menu.
               this.adjustToCenter(val.data[0]);
               this.centerSelectedValue();
+              this.setupComplete = true;
             }, 100);
           }
         });
+      }
+    });
+
+    // 
+    this.planService.yearSubject.subscribe(year => {
+      if (year && this.setupComplete) {
+        if (this.type === 'year' && (this.selectedOption.value !== year)) {
+          this.findSelectedOption(year);
+          this.autoRotateTo();
+        }
       }
     });
 
@@ -101,6 +114,8 @@ export class ScrollingMenuComponent implements AfterViewInit {
     this.overlay.nativeElement.addEventListener('mousedown', () => {
       if (this.scrolling) {
         this.startDrag(event);
+      } else {
+        this.changeActive(event);
       }
     });
     this.overlay.nativeElement.addEventListener('mouseup', () => {
@@ -114,7 +129,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
       }
     });
     this.overlay.nativeElement.addEventListener('mousemove', event => {
-      if (this.scrolling &&this.dragging) {
+      if (this.scrolling && this.dragging) {
         this.drag(event);
       }
     });
@@ -139,6 +154,13 @@ export class ScrollingMenuComponent implements AfterViewInit {
 
   }
 
+  private findSelectedOption(year: number) {
+    this.optionsData.forEach(e => {
+      if (e.value == year) {
+        this.selectedOption = e;
+      }
+    });
+  }
   /**  This function creates an array of objects that hold the data for each of the
    * menu options in the menu.
    * @param options The array holding the list of menu option values.
@@ -148,13 +170,20 @@ export class ScrollingMenuComponent implements AfterViewInit {
     this.dividedHeight = this.overlay.nativeElement.getBoundingClientRect().height / this.numberVisible;
     // If there are less options than the number of visible, you must duplicate the elements until it fills the area plus extra.
     this.menuOptions.forEach((option, index) => {
+      let opacity = 1;
+      if (index > 0 && !this.scrolling) {
+        opacity = 0.4;
+      } else if (index === 0 && !this.scrolling) {
+        option.nativeElement.style.textDecoration = "underline";
+      }
+      option.nativeElement.style.opacity = opacity;
       this.optionsData.push(
         {
           value: options[index], // Option Value
           element: option.nativeElement, // The HTML element for the option
           top: this.dividedHeight * this.optionsData.length, // The CSS top value of this element
           left: 0, // Css left value
-          opacity: 1, // CSS opacity value
+          opacity: opacity, // CSS opacity value
           fontSize: 999, // Font size of the particular element
           position: index // What position is it in the menu (changes when options are moved around in the menu as its scrolled.)
         }
@@ -166,20 +195,26 @@ export class ScrollingMenuComponent implements AfterViewInit {
     this.touchId = -1;
     this.setTouchId(event.touches);
     let mouseY = event.screenY;
-      if (mouseY === undefined) {
-        if (this.touchId !== undefined) {
-          mouseY = event.touches[this.touchId].screenY;
-        }
+    if (mouseY === undefined) {
+      if (this.touchId !== undefined) {
+        mouseY = event.touches[this.touchId].screenY;
       }
+    }
 
-      if (mouseY) {
-        this.optionsData.forEach(e => {
-          if (mouseY > e.element.getBoundingClientRect().top && mouseY < e.element.getBoundingClientRect().top+ this.dividedHeight) {
-            this.selectedOption = e;
-            this.planService.handleMenuChange(this.type, this.selectedOption.value);
-          }
-        });
-      }
+    if (mouseY) {
+      this.optionsData.forEach(e => {
+        if (mouseY > e.element.getBoundingClientRect().top && mouseY < e.element.getBoundingClientRect().top + this.dividedHeight) {
+          this.selectedOption = e;
+          this.planService.handleMenuChange(this.type, this.selectedOption.value);
+          e.opacity = 1;
+          e.element.style.textDecoration = "underline";
+        } else {
+          e.opacity = 0.6;
+          e.element.style.textDecoration = "none";
+        }
+        e.element.style.opacity = e.opacity;
+      });
+    }
   }
 
 
@@ -202,11 +237,20 @@ export class ScrollingMenuComponent implements AfterViewInit {
     }
   }
 
+  private checkSelectedOption(): number {
+    const centerIndex = this.getCenterIndex();
+    if (centerIndex >= 0) {
+      return this.optionsData[centerIndex].value;
+    } else {
+      return 0;
+    }
+  }
+
   private findCenter(): number {
-  
+
     if (this.scrolling) {
       return this.centerBox.nativeElement.getBoundingClientRect().height / 2 +
-      this.centerBox.nativeElement.getBoundingClientRect().top - this.container.nativeElement.getBoundingClientRect().top;
+        this.centerBox.nativeElement.getBoundingClientRect().top - this.container.nativeElement.getBoundingClientRect().top;
     } else {
       return this.container.nativeElement.getBoundingClientRect().height / 2;
     }
@@ -306,8 +350,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
   private setTouchId(touchlist): void {
     if (this.touchId === -1 && touchlist) {
       Object.values(touchlist).forEach((touch: Touch) => {
-        console.log(touch.target, this.overlay.nativeElement);
-        if (touch.target === this.overlay.nativeElement) {  
+        if (touch.target === this.overlay.nativeElement) {
           this.touchId = touch.identifier;
         }
       });
@@ -325,7 +368,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
       }
       if (mouseY) {
         this.positionHistory.push({ pos: mouseY, time: new Date().getTime() });
-        if (this.positionHistory.length > 3) {
+        if (this.positionHistory.length > 1) {
           const sum = this.getSum();
           this.moveEachOption(Math.round(sum));
           this.positionOptions();
@@ -341,6 +384,28 @@ export class ScrollingMenuComponent implements AfterViewInit {
       console.log('Error Dragging Menu object');
     } finally {
       return 0;
+    }
+  }
+
+  private autoRotateTo() {
+    if (this.intervalRunning) {
+      clearInterval(this.speedInterval);
+      this.intervalRunning = false;
+      this.autoRotateTo();
+    } else {
+      this.intervalRunning = true;
+      this.speedInterval = setInterval(() => {
+        if (this.checkSelectedOption() != this.selectedOption.value) {
+          this.moveEachOption(5);
+          this.positionOptions();
+          this.runningTotal = this.checkRunningTotal(5);
+        } else {
+          clearInterval(this.speedInterval);
+          this.intervalRunning = false;
+          this.selectedValue = this.selectedOption.value;
+          this.centerSelectedValue();
+        }
+      }, 4);
     }
   }
 

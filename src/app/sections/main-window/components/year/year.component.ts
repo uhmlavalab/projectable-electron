@@ -16,9 +16,10 @@ export class YearComponent implements AfterViewInit {
   private years: number[];
   private barLength: number;
   private genData: any;
+  private percentRenewable: number;
+  private scenario: string;
 
   constructor(private planService: PlanService) {
-    this.year = 999;
     this.years = [];
     this.barLength = 40;
     this.genData = null;
@@ -30,6 +31,16 @@ export class YearComponent implements AfterViewInit {
     this.planService.yearSubject.subscribe(year => {
       if (year) {
         this.year = year;
+      } else {
+        this.year = 9999;
+      }
+    });
+
+    this.planService.precentRenewableByYearSubject.subscribe(percent => {
+      if (percent) {
+        this.percentRenewable = percent;
+      } else {
+        this.percentRenewable = 0;
       }
     });
 
@@ -41,11 +52,19 @@ export class YearComponent implements AfterViewInit {
         }, 100);
       }
     });
+
+    this.planService.scenarioSubject.subscribe(scenario => {
+      if (scenario) {
+        this.scenario = scenario.displayName;
+      } else {
+        this.scenario = 'not set';
+      }
+    })
   }
 
   private positionYearWrapper(): void {
     const top = this.wrapperElement.nativeElement.getBoundingClientRect().top - this.yearWrapperElement.nativeElement.getBoundingClientRect().top;
-    const left = this.wrapperElement.nativeElement.getBoundingClientRect().left- this.yearWrapperElement.nativeElement.getBoundingClientRect().left;
+    const left = this.wrapperElement.nativeElement.getBoundingClientRect().left - this.yearWrapperElement.nativeElement.getBoundingClientRect().left;
 
     this.yearWrapperElement.nativeElement.style.left = `${left + this.yearWrapperElement.nativeElement.getBoundingClientRect().width / 2 - this.barLength / 2 + 1}px`;
     this.yearWrapperElement.nativeElement.style.top = `${top + this.yearWrapperElement.nativeElement.getBoundingClientRect().height / 2 - 4.5}px`;
@@ -64,6 +83,6 @@ export class YearComponent implements AfterViewInit {
       e.nativeElement.style.transform = `rotate(${currentPosition}deg) translate(${height + this.barLength / 2}px)`;
       currentPosition += angle;
     });
-
+    this.planService.finishedYearBarSetup();
   }
 }
