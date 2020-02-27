@@ -368,7 +368,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
       }
       if (mouseY) {
         this.positionHistory.push({ pos: mouseY, time: new Date().getTime() });
-        if (this.positionHistory.length > 1) {
+        if (this.positionHistory.length > 2) {
           const sum = this.getSum();
           this.moveEachOption(Math.round(sum));
           this.positionOptions();
