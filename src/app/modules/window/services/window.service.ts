@@ -12,9 +12,11 @@ export class WindowService {
 
   windowName: string;
   windowMessageSubject = new Subject<any>();
+  fileData: string[];
 
   constructor(private router: Router, private ngZone: NgZone) {
     this.windowName = '';
+    this.fileData = [];
     ipcRenderer.on('window-is-set', (event, message) => {
       console.log(message)
       if (message.windowName === 'main') {
@@ -92,10 +94,13 @@ export class WindowService {
   public loadFile(fileUrl: string) {
     ipcRenderer.send('loadFile', fileUrl);
     ipcRenderer.on('fileLoaded', (event, message) => { 
-      console.log(JSON.parse(message));
+      this.fileData.push(JSON.parse(message));
       ipcRenderer.removeListener('fileLoaded', () => { });
      }
     );
+  }
 
+  public getFileData(): void {
+    this.sendMessage({type: 'file information', message: this.fileData});
   }
 }

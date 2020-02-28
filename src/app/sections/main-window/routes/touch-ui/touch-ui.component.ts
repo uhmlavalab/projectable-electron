@@ -93,6 +93,7 @@ export class TouchUiComponent implements AfterViewInit {
         }
       }
     });
+    this.windowService.getFileData();
   }
 
   private isSetupComplete(): void {

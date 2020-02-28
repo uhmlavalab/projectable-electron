@@ -493,6 +493,8 @@ export class PlanService {
       this.toggleLayer(msg.message);
     } else if (msg.type === 'position elements' && !this.windowService.isMain()) {
       this.positionSubject.next(msg.message);
+    } else if (msg.type === 'file information') {
+      console.log(msg.message);
     }
     return true;
   }

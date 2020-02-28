@@ -15,15 +15,12 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
   @ViewChild('pieChart', { static: false, read: ElementRef }) pieChart; // The custom Map component.
   @ViewChild('lineChart', { static: false, read: ElementRef }) lineChart; // The custom Map component.
 
-  private uiWindow: any;
-  private currentYear: number;          // Current Year
-  private currentScenario: string;      // Current scenario.
-  private messageCheckInterval: any;    // How often to check the local storage for messages (in Milliseconds.)
+  private positionData: any;
 
   private messageSub = new Subscription();
 
   constructor(private planService: PlanService, private windowService: WindowService) {
-    this.currentYear = 9999;
+    this.positionData = {};
   }
 
   ngAfterViewInit() {
@@ -35,20 +32,6 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
   
     this.windowService.windowMessageSubject.subscribe(msg => {
       this.planService.handleMessage(msg);
-    });
-
-    // Subscribe to scenario Changes.
-    this.planService.scenarioSubject.subscribe(scenario => {
-      if (scenario) {
-        this.currentScenario = scenario.displayName;
-      }
-    });
-
-    // Subscribe to changes in the year.
-    this.planService.yearSubject.subscribe(year => {
-      if (year) {
-        this.currentYear = year;
-      }
     });
 
     this.planService.positionSubject.subscribe(data => {
@@ -63,13 +46,14 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
         const rect = e.getBoundingClientRect();
         e.style.left = `${data.x - rect.width / 2}px`;
         e.style.top = `${data.y - rect.height / 2}px`;
+        this.positionData[data.id] = {x: data.x - rect.width / 2, y: data.y - rect.height / 2};
       }
+      console.log(this.positionData);
     });
   }
   ngOnDestroy() {
     this.messageSub.unsubscribe();
   }
-
 
   private positionMap(): void {
     try {
