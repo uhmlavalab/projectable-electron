@@ -48,8 +48,8 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
         e.style.top = `${data.y - rect.height / 2}px`;
         this.positionData[data.id] = {x: data.x - rect.width / 2, y: data.y - rect.height / 2};
       }
-      console.log(this.positionData);
     });
+    this.planService.updatePositionData(this.positionData);
   }
   ngOnDestroy() {
     this.messageSub.unsubscribe();
@@ -94,4 +94,5 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       console.log('Error. Failed to find the element to position. ');
     }
   }
+
 }

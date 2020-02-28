@@ -103,4 +103,16 @@ export class WindowService {
   public getFileData(): void {
     this.sendMessage({type: 'file information', message: this.fileData});
   }
+
+  public getCssFileData(): any {
+    let data = null;
+    this.fileData.forEach(f => {
+      const dataSet = JSON.parse(f);
+      console.log(dataSet)
+;      if (dataSet.file === 'cssData') {
+        data = dataSet;
+      }
+    });
+    return data;
+  }
 }

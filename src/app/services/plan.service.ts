@@ -37,6 +37,7 @@ export class PlanService {
   public precentRenewableByYearSubject = new BehaviorSubject<number>(null);
 
   public positionSubject = new BehaviorSubject<any>(null);
+  public closeModalSubject = new BehaviorSubject<any>(null);
   private dataTable: any;
 
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
@@ -92,7 +93,8 @@ export class PlanService {
         capacity: null,
         curtailment: null,
         tech: null
-      }
+      },
+      positionData: {}
     };
 
     this.plans = Plans;
@@ -495,6 +497,8 @@ export class PlanService {
       this.positionSubject.next(msg.message);
     } else if (msg.type === 'file information') {
       console.log(msg.message);
+    } else if (msg.type === 'update cssData file') {
+     this.storeCssData();
     }
     return true;
   }
@@ -519,5 +523,36 @@ export class PlanService {
 
   public finishedYearBarSetup(): void {
     this.precentRenewableByYearSubject.next(this.setCurrentPercent(this.dataTable.year.current));
+  }
+
+  public closePositionModal(save: boolean) {
+    const msg = {saveData: save};
+    if (save) {
+      this.windowService.sendMessage({type: 'update cssData file', message: msg});
+    }
+    this.closeModalSubject.next(msg);
+  }
+
+  public updatePositionData(data) {
+    this.dataTable.positionData = data;
+  }
+  private storeCssData(): void {
+    let jsonData = this.windowService.getCssFileData();
+    if (this.dataTable.positionData.line) {
+      jsonData.css.charts.line.left = `${this.dataTable.positionData.line.x}px`;
+      jsonData.css.charts.line.top = `${this.dataTable.positionData.line.y}px`;
+    }
+
+    if (this.dataTable.positionData.pie) {
+      jsonData.css.charts.pie.left = `${this.dataTable.positionData.pie.x}px`;
+      jsonData.css.charts.pie.top = `${this.dataTable.positionData.pie.y}px`;
+    }
+
+    if (this.dataTable.positionData.map) {
+      jsonData.css.map.left = `${this.dataTable.positionData.map.x}px`;
+      jsonData.css.map.top = `${this.dataTable.positionData.map.y}px`;
+    }
+
+    console.log(jsonData);
   }
 }

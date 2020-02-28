@@ -2,6 +2,6 @@
 <div class="chart-mover" #pieMover><p>I'm a pie chart</p></div>
 <div class="chart-mover" #lineMover><p>I'm a line chart</p></div>
 <div class="button-wrapper">
-    <div class="button" #saveButton>Save Changes</div>
-    <div class="button" #cancelButton>Cancel Changes</div>
+    <div class="button" (click)="handleClick(true)" #saveButton>Save Changes</div>
+    <div class="button" (click)="handleClick(false)" #cancelButton>Cancel Changes</div>
 </div>
