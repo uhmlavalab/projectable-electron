@@ -117,7 +117,7 @@ export const HecoPlan: Plan = {
         displayName: 'Government Lands',
         active: false,
         included: true,
-        iconPath: 'assets/plans/oahu-heco/images/icons/GOVERMENT.png',
+        iconPath: 'assets/plans/oahu-heco/images/icons/GOVERNMENT.png',
         secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/layer-images/dod.jpg',
         secondScreenText: 'This layer shows land owned by different levels of government including Federal, State, County, and DHHL.',
         fillColor: mapLayerColors.Dod.fill,
