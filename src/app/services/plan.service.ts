@@ -40,6 +40,9 @@ export class PlanService {
   public closeModalSubject = new BehaviorSubject<any>(null);
   private dataTable: any;
 
+  private CSS: any; // Holds the css data for the positioning of the charts and map objects.
+  public cssSubject = new BehaviorSubject<any>(null);
+
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
     this.dataTable = {
       state: 0,
@@ -496,7 +499,11 @@ export class PlanService {
     } else if (msg.type === 'position elements' && !this.windowService.isMain()) {
       this.positionSubject.next(msg.message);
     } else if (msg.type === 'file information') {
-      console.log(msg.message);
+      msg.message.forEach(d => {
+        if (d.file === 'cssData') {
+          this.setCSS(d.css);
+        }
+      })
     } else if (msg.type === 'update cssData file') {
      this.storeCssData();
     }
@@ -536,23 +543,28 @@ export class PlanService {
   public updatePositionData(data) {
     this.dataTable.positionData = data;
   }
+
+  private setCSS(css: any) {
+    this.CSS = css;
+    this.cssSubject.next(this.CSS);
+  }
   private storeCssData(): void {
-    let jsonData = this.windowService.getCssFileData();
+    
     if (this.dataTable.positionData.line) {
-      jsonData.css.charts.line.left = `${this.dataTable.positionData.line.x}px`;
-      jsonData.css.charts.line.top = `${this.dataTable.positionData.line.y}px`;
+      this.CSS.charts.line.left = `${this.dataTable.positionData.line.x}px`;
+      this.CSS.charts.line.top = `${this.dataTable.positionData.line.y}px`;
     }
 
     if (this.dataTable.positionData.pie) {
-      jsonData.css.charts.pie.left = `${this.dataTable.positionData.pie.x}px`;
-      jsonData.css.charts.pie.top = `${this.dataTable.positionData.pie.y}px`;
+      this.CSS.charts.pie.left = `${this.dataTable.positionData.pie.x}px`;
+      this.CSS.charts.pie.top = `${this.dataTable.positionData.pie.y}px`;
     }
 
     if (this.dataTable.positionData.map) {
-      jsonData.css.map.left = `${this.dataTable.positionData.map.x}px`;
-      jsonData.css.map.top = `${this.dataTable.positionData.map.y}px`;
+      this.CSS.map.left = `${this.dataTable.positionData.map.x}px`;
+      this.CSS.map.top = `${this.dataTable.positionData.map.y}px`;
     }
 
-    console.log(jsonData);
+    this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify(this.CSS) });
   }
 }

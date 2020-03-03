@@ -17,47 +17,6 @@ export class PlanSelectionComponent implements OnInit {
   plans: Plan[];
 
   constructor(private windowService: WindowService, private planService: PlanService, private router: Router, private activeRoute: ActivatedRoute, private ngZone: NgZone, private contentDeliveryService: ContentDeliveryService) {
-    //  const jsonfile = {
-    //   file: 'cssData', 
-    //   css: {
-    //   map: {
-    //     left: '3vw',
-    //     top: '1vh'
-    //   },
-    //   legend: {
-    //     display: 'none',
-    //     defaultLayout: 'vertical',
-    //     grid: {
-    //       left: '28vw',
-    //       top: '2vh',
-    //       width: '26vw'
-    //     },
-    //     vertical: {
-    //       left: '26vw',
-    //       top: '3vh',
-    //       width: '10vw'
-    //     }
-    //   },
-    //   title: {
-    //     left: '10vw',
-    //     top: '2vh'
-    //   },
-    //   scenario: {
-    //     left: '6vw',
-    //     top: '8vh'
-    //   },
-    //   charts: {
-    //     pie: {
-    //       left: '5vw',
-    //       top: '66vh'
-    //     },
-    //     line: {
-    //       left: '50vw',
-    //       top: '1vh'
-    //     }
-    //   }
-    // }};
-    // this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify(jsonfile) });
     this.windowService.loadFile('cssData.json');
    }
 

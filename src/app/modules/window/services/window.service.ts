@@ -108,8 +108,7 @@ export class WindowService {
     let data = null;
     this.fileData.forEach(f => {
       const dataSet = JSON.parse(f);
-      console.log(dataSet)
-;      if (dataSet.file === 'cssData') {
+      if (dataSet.file === 'cssData') {
         data = dataSet;
       }
     });
