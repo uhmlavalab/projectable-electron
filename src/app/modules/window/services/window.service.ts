@@ -54,13 +54,13 @@ export class WindowService {
   private mapWindowMessage(event: Electron.IpcRendererEvent, data: any) {
     this.resetCheck(data.reset);
     this.windowMessageSubject.next(data);
-    console.log(data);
+    //console.log(data);
   }
 
   private mainWindowMessage(event: Electron.IpcRendererEvent, data: any) {
     this.resetCheck(data.reset);
     this.windowMessageSubject.next(data);
-    console.log(data);
+    //console.log(data);
   }
 
   public sendMessage(data: any) {
@@ -92,7 +92,7 @@ export class WindowService {
   public loadFile(fileUrl: string) {
     ipcRenderer.send('loadFile', fileUrl);
     ipcRenderer.on('fileLoaded', (event, message) => { 
-      console.log(JSON.parse(message));
+     // console.log(JSON.parse(message));
       ipcRenderer.removeListener('fileLoaded', () => { });
      }
     );
