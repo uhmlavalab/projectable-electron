@@ -550,6 +550,7 @@ export class PlanService {
   }
   private storeCssData(): void {
     
+    console.log(this.CSS);
     if (this.dataTable.positionData.line) {
       this.CSS.charts.line.left = `${this.dataTable.positionData.line.x}px`;
       this.CSS.charts.line.top = `${this.dataTable.positionData.line.y}px`;
@@ -564,7 +565,7 @@ export class PlanService {
       this.CSS.map.left = `${this.dataTable.positionData.map.x}px`;
       this.CSS.map.top = `${this.dataTable.positionData.map.y}px`;
     }
-
-    this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify(this.CSS) });
+    const msg = JSON.stringify({file: "cssData", css: this.CSS});
+    this.windowService.saveFile({ filename: 'cssData.json', file: msg});
   }
 }
