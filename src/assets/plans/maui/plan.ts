@@ -32,44 +32,7 @@ export const MauiPlan: Plan = {
     curtailmentPath: 'assets/plans/oahu/data/curtailment.csv',
     colors: chartColors
   },
-  css: {
-    map: {
-      left: '24.5vw',
-      top: '4vh'
-    },
-    legend: {
-      display: 'block',
-      defaultLayout: 'grid',
-      grid: {
-        left: '47vw',
-        top: '8vh',
-        width: '23vw'
-      },
-      vertical: {
-        left: '26vw',
-        top: '3vh',
-        width: '10vw'
-      }
-    },
-    title: {
-      left: '88vw',
-      top: '90vh'
-    },
-    scenario: {
-      left: '27vw',
-      top: '2vh'
-    },
-    charts: {
-      pie: {
-        left: '30vw',
-        top: '65vh'
-      },
-      line: {
-        left: 'calc(100vw - 325px)',
-        top: '0vh'
-      }
-    }
-  },
+
   map: {
     scale: 0.258,
     miniMapScale: 0.1,

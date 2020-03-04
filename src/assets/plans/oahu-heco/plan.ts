@@ -29,44 +29,6 @@ export const HecoPlan: Plan = {
       displayName: 'E3 Gen Mod'
     }
   ],
-  css: {
-    map: {
-      left: '3vw',
-      top: '1vh'
-    },
-    legend: {
-      display: 'none',
-      defaultLayout: 'vertical',
-      grid: {
-        left: '28vw',
-        top: '2vh',
-        width: '26vw'
-      },
-      vertical: {
-        left: '26vw',
-        top: '3vh',
-        width: '10vw'
-      }
-    },
-    title: {
-      left: '10vw',
-      top: '2vh'
-    },
-    scenario: {
-      left: '6vw',
-      top: '8vh'
-    },
-    charts: {
-      pie: {
-        left: '5vw',
-        top: '66vh'
-      },
-      line: {
-        left: '50vw',
-        top: '1vh'
-      }
-    }
-  },
   data: {
     capacityPath: 'assets/plans/oahu-heco/data/capacity.csv',
     generationPath: 'assets/plans/oahu-heco/data/generation.csv',

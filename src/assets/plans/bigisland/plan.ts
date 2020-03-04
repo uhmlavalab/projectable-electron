@@ -32,45 +32,6 @@ export const BigIslandPlan: Plan = {
     curtailmentPath: 'assets/plans/oahu/data/curtailment.csv',
     colors: chartColors
   },
-  css: {
-    map: {
-      left: '24.5vw',
-      top: '5vh'
-    },
-    legend: {
-      display: 'block',
-      defaultLayout: 'grid',
-      grid: {
-        left: '27vw',
-        top: '15vh',
-        width: '21vw'
-      },
-      vertical: {
-        left: '25vw',
-        top: '11vh',
-        width: '10vw'
-      }
-    },
-    title: {
-      left: '64vw',
-      top: '82vh'
-    },
-    scenario: {
-      left: '27vw',
-      top: '6vh'
-    },
-    charts: {
-      pie: {
-        left: '27vw',
-        top: '61vh'
-      },
-      line: {
-        left: 'calc(100vw - 325px)',
-        top: '0vh'
-      }
-
-    }
-  },
   map: {
     scale: 0.26,
     miniMapScale: 0.1,
