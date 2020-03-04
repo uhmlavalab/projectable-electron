@@ -37,7 +37,11 @@ export class PlanService {
   public precentRenewableByYearSubject = new BehaviorSubject<number>(null);
 
   public positionSubject = new BehaviorSubject<any>(null);
+  public closeModalSubject = new BehaviorSubject<any>(null);
   private dataTable: any;
+
+  private CSS: any; // Holds the css data for the positioning of the charts and map objects.
+  public cssSubject = new BehaviorSubject<any>(null);
 
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
     this.dataTable = {
@@ -92,7 +96,8 @@ export class PlanService {
         capacity: null,
         curtailment: null,
         tech: null
-      }
+      },
+      positionData: {}
     };
 
     this.plans = Plans;
@@ -493,6 +498,14 @@ export class PlanService {
       this.toggleLayer(msg.message);
     } else if (msg.type === 'position elements' && !this.windowService.isMain()) {
       this.positionSubject.next(msg.message);
+    } else if (msg.type === 'file information') {
+      msg.message.forEach(d => {
+        if (d.file === 'cssData') {
+          this.setCSS(d.css);
+        }
+      })
+    } else if (msg.type === 'update cssData file') {
+     this.storeCssData();
     }
     return true;
   }
@@ -517,5 +530,42 @@ export class PlanService {
 
   public finishedYearBarSetup(): void {
     this.precentRenewableByYearSubject.next(this.setCurrentPercent(this.dataTable.year.current));
+  }
+
+  public closePositionModal(save: boolean) {
+    const msg = {saveData: save};
+    if (save) {
+      this.windowService.sendMessage({type: 'update cssData file', message: msg});
+    }
+    this.closeModalSubject.next(msg);
+  }
+
+  public updatePositionData(data) {
+    this.dataTable.positionData = data;
+  }
+
+  private setCSS(css: any) {
+    this.CSS = css;
+    this.cssSubject.next(this.CSS);
+  }
+  private storeCssData(): void {
+    
+    console.log(this.CSS);
+    if (this.dataTable.positionData.line) {
+      this.CSS.charts.line.left = `${this.dataTable.positionData.line.x}px`;
+      this.CSS.charts.line.top = `${this.dataTable.positionData.line.y}px`;
+    }
+
+    if (this.dataTable.positionData.pie) {
+      this.CSS.charts.pie.left = `${this.dataTable.positionData.pie.x}px`;
+      this.CSS.charts.pie.top = `${this.dataTable.positionData.pie.y}px`;
+    }
+
+    if (this.dataTable.positionData.map) {
+      this.CSS.map.left = `${this.dataTable.positionData.map.x}px`;
+      this.CSS.map.top = `${this.dataTable.positionData.map.y}px`;
+    }
+    const msg = JSON.stringify({file: "cssData", css: this.CSS});
+    this.windowService.saveFile({ filename: 'cssData.json', file: msg});
   }
 }

@@ -93,6 +93,13 @@ export class TouchUiComponent implements AfterViewInit {
         }
       }
     });
+    this.windowService.getFileData();
+
+    this.planService.closeModalSubject.subscribe(value => {
+      if (value) {
+        this.handleSettingsButtonClick();
+      }
+    });
   }
 
   private isSetupComplete(): void {
