@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen, ipcMain, Display } from 'electron';
+import { app, BrowserWindow, screen, ipcMain, Display, ipcRenderer } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
@@ -102,7 +102,7 @@ function setupWindow(display: Display): BrowserWindow {
     y: 0 + display.bounds.y,
     width: display.workAreaSize.width * display.scaleFactor,
     height: display.workAreaSize.height * display.scaleFactor,
-    fullscreen: true,
+    fullscreen: false,
     frame: false,
     webPreferences: {
       nodeIntegration: true,

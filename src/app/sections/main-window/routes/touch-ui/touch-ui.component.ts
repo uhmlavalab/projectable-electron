@@ -50,7 +50,6 @@ export class TouchUiComponent implements AfterViewInit {
 
   ngAfterViewInit() {
 
-
     this.windowService.windowMessageSubject.subscribe(msg => {
       this.planService.handleMessage(msg);
     });
@@ -93,6 +92,7 @@ export class TouchUiComponent implements AfterViewInit {
         }
       }
     });
+
     this.windowService.getFileData();
 
     this.planService.closeModalSubject.subscribe(value => {
@@ -111,6 +111,5 @@ export class TouchUiComponent implements AfterViewInit {
   private handleSettingsButtonClick(): void {
     this.showSettingsModal = !this.showSettingsModal;
   }
-
 
 }

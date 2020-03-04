@@ -151,7 +151,6 @@ export class ScrollingMenuComponent implements AfterViewInit {
         this.drag(event);
       }
     }, { passive: false });
-
   }
 
   private findSelectedOption(year: number) {

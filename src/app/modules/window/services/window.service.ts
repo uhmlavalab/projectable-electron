@@ -18,15 +18,12 @@ export class WindowService {
     this.windowName = '';
     this.fileData = [];
     ipcRenderer.on('window-is-set', (event, message) => {
-      console.log(message)
       if (message.windowName === 'main') {
         this.setAsMainWindow();
       } else if (message.windowName == 'map') {
         this.setAsMapWindow();
       }
     });
-
-
   }
 
   public setAsMainWindow() {
@@ -66,6 +63,7 @@ export class WindowService {
   }
 
   public sendMessage(data: any) {
+    console.log(this.windowName, data);
     if (this.windowName == 'map') {
       ipcRenderer.send('message-to-main-window', data);
     } else if (this.windowName == 'main') {

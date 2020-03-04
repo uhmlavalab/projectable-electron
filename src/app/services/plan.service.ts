@@ -490,11 +490,13 @@ export class PlanService {
   }
 
   public handleMessage(msg: any): boolean {
+    console.log(this.windowService.isMain(), msg);
     if (msg.type === 'year change') {
       this.updateYear(msg.message);
     } else if (msg.type === 'scenario change') {
       this.updateScenario(this.dataTable.scenario.all.find(el => el.name === msg.message).name);
     } else if (msg.type === 'toggle layer') {
+
       this.toggleLayer(msg.message);
     } else if (msg.type === 'position elements' && !this.windowService.isMain()) {
       this.positionSubject.next(msg.message);
@@ -549,8 +551,7 @@ export class PlanService {
     this.cssSubject.next(this.CSS);
   }
   private storeCssData(): void {
-    
-    console.log(this.CSS);
+
     if (this.dataTable.positionData.line) {
       this.CSS.charts.line.left = `${this.dataTable.positionData.line.x}px`;
       this.CSS.charts.line.top = `${this.dataTable.positionData.line.y}px`;

@@ -55,7 +55,6 @@ export class MapElementComponent implements OnInit {
 
     // Subscribe to layer toggling
     this.planService.toggleLayerSubject.subscribe(layer => {
-      console.log('subject');
       if (layer) {
         this.layers.forEach(el => {
           if (layer.layer.name === el.layer.name) {
