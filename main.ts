@@ -85,14 +85,7 @@ function createWindows() {
   });
 
   ipcMain.on('saveFile', (evt, msg) => functions.saveFile(mainWindow, msg));
-  ipcMain.on('loadFile', (evt, msg) => {
-    if (mapWindow && mapWindow.webContents === evt.sender) {
-      functions.loadFile(mapWindow, msg);
-    } else if (mainWindow && mainWindow.webContents === evt.sender) {
-      functions.loadFile(mainWindow, msg);
-    }
-   
-  });
+  ipcMain.on('loadFile', (evt, msg) => functions.loadFile(mainWindow, msg));
   ipcMain.on('close', () => closeProgram());
 }
 

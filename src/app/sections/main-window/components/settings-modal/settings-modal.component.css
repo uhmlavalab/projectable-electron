@@ -24,20 +24,3 @@
     outline: 1px solid yellow;
     position: absolute;
 }
-
-.button-wrapper {
-    position: absolute;
-    top: 90%;
-    left: 2%;
-    width: 40%;
-    text-align: center;
-}
-
-.button {
-    position: relative;
-    display: inline-block;
-    width: 30%;
-    padding: 2%;
-    margin: 0 3% 0 3%;
-    border: 1px solid purple;
-}

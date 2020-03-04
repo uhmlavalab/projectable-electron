@@ -103,8 +103,4 @@ export class SettingsModalComponent implements AfterViewInit {
       });
     }
   }
-
-  private handleClick(save: boolean): void {
-    this.planService.closePositionModal(save);
-  }
 }

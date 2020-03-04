@@ -14,6 +14,44 @@ export interface Plan {
   route: string;
   pucks: boolean;
   touch: boolean;
+  css: {
+    map: {
+      top: string;
+      left: string;
+    }
+    legend: {
+      display: string;
+      defaultLayout: string;
+      grid: {
+        top: string;
+        left: string;
+        width: string;
+      },
+      vertical: {
+        top: string;
+        left: string;
+        width: string;
+      }
+    }
+    title: {
+      top: string;
+      left: string;
+    }
+    scenario: {
+      top: string;
+      left: string;
+    }
+    charts: {
+      pie: {
+        top: string;
+        left: string;
+      }
+      line: {
+        top: string;
+        left: string;
+      }
+    }
+  }
   data: {
     capacityPath: string;
     generationPath: string;
