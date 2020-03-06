@@ -20,12 +20,49 @@ p {
   position: absolute;
 }
 
+.block-container {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-color: transparent; 
+}
 .rotating-block {
   position: absolute;
-  color: white;
-  width: 5px;
-  height: 2px;
+  background-color: black;
+  width: 4px;
+  height: 10px;
   z-index: 2;
+  left: calc(50% - 2px);
+  top: -10px;
 }
 
+.rotating-block-2 {
+  position: absolute;
+  background-color: black;
+  width: 4px;
+  height: 10px;
+  z-index: 2;
+  left: calc(50% - 2px);
+  top: calc(100%);
+}
+
+.rotating-block-3 {
+  position: absolute;
+  background-color: black;
+  width: 10px;
+  height: 4px;
+  z-index: 2;
+  left: calc(100%);
+  top: calc(50% - 2px);
+}
+
+.rotating-block-4 {
+  position: absolute;
+  background-color:black;
+  width: 10px;
+  height: 4px;
+  z-index: 2;
+  left: -10px;
+  top: calc(50% - 2px);
+}
 
