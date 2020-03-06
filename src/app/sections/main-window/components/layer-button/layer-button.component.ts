@@ -35,6 +35,10 @@ export class LayerButtonComponent implements OnInit {
     this.progressRadius = this.el.nativeElement.getBoundingClientRect().height / 2;
   }
 
+  private handleClick(): void {
+    this.planService.handleLayerButtonInfoClick(this.layerName);
+  }
+
   private toggleButtonOn(): void {
     if (this.animationInterval < 0) {
       this.animationInterval = setInterval(() => {
@@ -42,6 +46,7 @@ export class LayerButtonComponent implements OnInit {
         if (this.progress >= 100) {
           this.on = true;
           this.planService.handleLayerButtonClick(this.layerName);
+          this.planService.handleLayerButtonInfoClick(this.layerName);
           this.stopAnimation();
         }
       }, 5);

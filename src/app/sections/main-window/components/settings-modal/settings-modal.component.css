@@ -11,16 +11,16 @@
 }
 
 .map-mover {
-    height: 10vw;
-    width: 10vw;
+    height: 200px;
+    width: 200px;
     outline: 1px solid green;
     position: absolute;
     left: 20vw;
 }
 
 .chart-mover {
-    height: 10vw;
-    width: 10vw;
+    height: 200px;
+    width: 200px;
     outline: 1px solid yellow;
     position: absolute;
 }

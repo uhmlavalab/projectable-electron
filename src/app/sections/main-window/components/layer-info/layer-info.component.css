@@ -1,0 +1,17 @@
+
+.left {
+    width: 40%;
+    float: left;
+    padding-right: 12px;
+}
+
+img { width: 100%;}
+
+.title { 
+    width: 100%;
+    text-align: center;
+}
+
+.right {
+    font-size: 12px;
+}

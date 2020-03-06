@@ -27,6 +27,7 @@ import { YearComponent } from './components/year/year.component';
 import { YearBarComponent } from './components/year/components/year-bar/year-bar.component';
 import { YearDisplayComponent } from './components/year-display/year-display.component';
 import { SettingsModalComponent } from './components/settings-modal/settings-modal.component';
+import { LayerInfoComponent } from './components/layer-info/layer-info.component';
 
 
 @NgModule({
@@ -42,7 +43,8 @@ import { SettingsModalComponent } from './components/settings-modal/settings-mod
     YearBarComponent,
     YearComponent,
     YearDisplayComponent,
-    SettingsModalComponent
+    SettingsModalComponent,
+    LayerInfoComponent
   ],
   imports: [
     CommonModule,

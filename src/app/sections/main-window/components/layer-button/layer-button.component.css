@@ -19,3 +19,13 @@ p {
   top: -22%;
   position: absolute;
 }
+
+.rotating-block {
+  position: absolute;
+  color: white;
+  width: 5px;
+  height: 2px;
+  z-index: 2;
+}
+
+

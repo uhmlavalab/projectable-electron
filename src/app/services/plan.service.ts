@@ -18,6 +18,7 @@ export class PlanService {
   public planSetSubject = new BehaviorSubject<boolean>(null); // Tells components when the plan is set.
   public toggleLayerSubject = new BehaviorSubject<any>(null);      // Pubisher for when a layer is toggled
   public layersSubject = new BehaviorSubject<any[]>(null);
+  public layerInfoSubject = new BehaviorSubject<any>(null);
   public scrollingMenuSubject = new BehaviorSubject<any>(null);
   // Array Holding All Plans
   public planSubject = new BehaviorSubject<Plan>(null);     // Plan Publisher
@@ -362,7 +363,7 @@ export class PlanService {
    */
   public updateYear(val): void {
     let year = val;
-    if (typeof(year) === 'string') {
+    if (typeof (year) === 'string') {
       year = parseInt(year, 10);
     }
     if (this.yearIsValid(year) && this.dataTable.year.current !== year) {
@@ -371,7 +372,7 @@ export class PlanService {
       this.precentRenewableByYearSubject.next(this.setCurrentPercent(year));
       if (this.windowService.isMain()) {
         this.soundsService.playClick();
-        this.windowService.sendMessage({ type: 'year change',  message: year });
+        this.windowService.sendMessage({ type: 'year change', message: year });
       }
     }
   }
@@ -418,7 +419,7 @@ export class PlanService {
       el.state = 1 - el.state;
       this.toggleLayerSubject.next(el);
       if (this.windowService.isMain()) {
-        el.state === 0 ? this.soundsService.playDown() : this.soundsService.playUp();
+        el.state === 1 ? this.soundsService.playOn(el.layer.name) : this.soundsService.playOff(el.layer.name);
       }
     }
   }
@@ -490,7 +491,6 @@ export class PlanService {
   }
 
   public handleMessage(msg: any): boolean {
-    console.log(this.windowService.isMain(), msg);
     if (msg.type === 'year change') {
       this.updateYear(msg.message);
     } else if (msg.type === 'scenario change') {
@@ -507,14 +507,27 @@ export class PlanService {
         }
       })
     } else if (msg.type === 'update cssData file') {
-     this.storeCssData();
+      this.storeCssData();
     }
     return true;
   }
 
   public handleLayerButtonClick(layerName: string) {
     this.toggleLayer(layerName);
-    this.windowService.sendMessage({type: 'toggle layer', message: layerName });
+    this.windowService.sendMessage({ type: 'toggle layer', message: layerName });
+  }
+
+  public handleLayerButtonInfoClick(layerName: string) {
+    console.log(layerName);
+    let el = null;
+    this.dataTable.layers.all.forEach(e => {
+      if (e.layer.name === layerName) {
+        el = e;
+      }
+    });
+    if (el) {
+      this.layerInfoSubject.next(el);
+    }
   }
 
   public positionMapElements(id: string, x: number, y: number) {
@@ -523,11 +536,11 @@ export class PlanService {
       x: x,
       y: y
     };
-    this.windowService.sendMessage({type: 'position elements', message: msg});
+    this.windowService.sendMessage({ type: 'position elements', message: msg });
   }
 
   public updateTotal(total: number, year: number): void {
-    this.dataTable.renewableTotals.push({year: year, total: total});
+    this.dataTable.renewableTotals.push({ year: year, total: total });
   }
 
   public finishedYearBarSetup(): void {
@@ -535,9 +548,9 @@ export class PlanService {
   }
 
   public closePositionModal(save: boolean) {
-    const msg = {saveData: save};
+    const msg = { saveData: save };
     if (save) {
-      this.windowService.sendMessage({type: 'update cssData file', message: msg});
+      this.windowService.sendMessage({ type: 'update cssData file', message: msg });
     }
     this.closeModalSubject.next(msg);
   }
@@ -566,7 +579,7 @@ export class PlanService {
       this.CSS.map.left = `${this.dataTable.positionData.map.x}px`;
       this.CSS.map.top = `${this.dataTable.positionData.map.y}px`;
     }
-    const msg = JSON.stringify({file: "cssData", css: this.CSS});
-    this.windowService.saveFile({ filename: 'cssData.json', file: msg});
+    const msg = JSON.stringify({ file: "cssData", css: this.CSS });
+    this.windowService.saveFile({ filename: 'cssData.json', file: msg });
   }
 }

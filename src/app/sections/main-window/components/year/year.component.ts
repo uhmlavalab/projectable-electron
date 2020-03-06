@@ -49,7 +49,7 @@ export class YearComponent implements AfterViewInit {
         this.years = years;
         setTimeout(() => {
           this.positionElements();
-        }, 100);
+        }, 300);
       }
     });
 

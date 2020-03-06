@@ -1,4 +1,4 @@
-<div>
+<div (click)="handleClick()">
   <img src={{layerIcon}}>
   <p>{{layerDisplayName}}</p>
 </div>
@@ -6,3 +6,4 @@
   [innerStrokeWidth]="0" [outerStrokeColor]="color" [innerStrokeColor]="'transparent'" [animation]="false"
   [animationDuration]="animationDuration" [showTitle]=false [showUnits]=false [showSubtitle]=false #progressBar>
 </circle-progress>
+<div class="rotating-block" #block></div>

@@ -63,7 +63,6 @@ export class WindowService {
   }
 
   public sendMessage(data: any) {
-    console.log(this.windowName, data);
     if (this.windowName == 'map') {
       ipcRenderer.send('message-to-main-window', data);
     } else if (this.windowName == 'main') {
@@ -103,13 +102,6 @@ export class WindowService {
   }
 
   public getCssFileData(): any {
-    let data = null;
-    this.fileData.forEach(f => {
-      const dataSet = JSON.parse(f);
-      if (dataSet.file === 'cssData') {
-        data = dataSet;
-      }
-    });
-    return data;
+    return this.fileData[0];
   }
 }

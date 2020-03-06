@@ -134,7 +134,7 @@ export const HecoPlan: Plan = {
         included: true,
         iconPath: 'assets/plans/oahu-heco/images/icons/RENEW.png',
         secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/layer-images/existing_re.jpg',
-        secondScreenText: 'This layer represents the renewable energy sources on Oahu as of 2016',
+        secondScreenText: 'This layer represents the renewable energy sources on Oahu as of 2016.',
         fillColor: mapLayerColors.Existing_RE.fill,
         borderColor: mapLayerColors.Existing_RE.border,
         borderWidth: 1,
