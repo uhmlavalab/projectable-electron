@@ -61,6 +61,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
     this.selectedValue = '0';
     this.scrolling = true;
     this.setupComplete = false;
+    this.touchId = -1;
   }
 
   ngAfterViewInit() {
@@ -362,7 +363,14 @@ export class ScrollingMenuComponent implements AfterViewInit {
       let mouseY = event.screenY;
       if (mouseY === undefined) {
         if (this.touchId !== undefined) {
-          mouseY = event.touches[this.touchId].screenY;
+          console.log(event.touches);
+          let touch = null;
+          Object.values(event.touches).forEach((t: Touch) => {
+            if (t.identifier === this.touchId) {
+              touch = t;
+            }
+          });
+          mouseY = touch.screenY;
         }
       }
       if (mouseY) {
@@ -377,7 +385,6 @@ export class ScrollingMenuComponent implements AfterViewInit {
           this.updateSelectedOption();
         }
       }
-
     } catch (error) {
       console.log(error);
       console.log('Error Dragging Menu object');
