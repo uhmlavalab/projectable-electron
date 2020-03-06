@@ -10,6 +10,7 @@ import { WindowService } from '@app/modules/window';
 export class TouchUiComponent implements AfterViewInit {
 
   @ViewChild('year', { static: false, read: ElementRef }) yearElement: ElementRef;
+  @ViewChild('ttip', { static: false, read: ElementRef }) toolTip: ElementRef;
 
   private test: string;
   private layers: any[];
@@ -27,6 +28,8 @@ export class TouchUiComponent implements AfterViewInit {
   private showSettingsModal: boolean;
 
   private scenarios: any[]; // Array containing all available scenarios in the plan.
+
+  private tooltip: any;
 
   constructor( private planService: PlanService, private windowService: WindowService) {
     this.setupComplete = false;
@@ -46,6 +49,9 @@ export class TouchUiComponent implements AfterViewInit {
     this.allReady.yearSet = false;
     this.allReady.scenarioSet = false;
     this.layers = [];
+    this.tooltip= {};
+    this.tooltip.currentlySelected = 'none';
+    this.tooltip.displaying = false;
   }
 
   ngAfterViewInit() {
@@ -100,6 +106,12 @@ export class TouchUiComponent implements AfterViewInit {
         this.handleSettingsButtonClick();
       }
     });
+
+    this.planService.tooltipSubject.subscribe(value => {
+      if (value) {
+        this.positionTooltip(value.x, value.y);
+      }
+    });
   }
 
   private isSetupComplete(): void {
@@ -112,4 +124,18 @@ export class TouchUiComponent implements AfterViewInit {
     this.showSettingsModal = !this.showSettingsModal;
   }
 
+  private handleTooltipClick(event, id): void {
+    if (this.tooltip.currentlySelected === id) {
+      this.tooltip.displaying = !this.tooltip.displaying;
+    } else {
+      this.tooltip.currentlySelected = id;
+      this.tooltip.displaying = true;
+    }
+    this.planService.handleToolTipEvent(event, id);
+  }
+
+  private positionTooltip(x: number, y: number): void {
+    this.toolTip.nativeElement.style.left = `${x - 20}px`;
+    this.toolTip.nativeElement.style.top = `${y - 12}px`;
+  }
 }

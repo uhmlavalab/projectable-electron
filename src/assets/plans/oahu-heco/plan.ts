@@ -202,7 +202,7 @@ export const HecoPlan: Plan = {
       },
       {
         name: 'solar',
-        displayName: 'Solar',
+        displayName: 'Solar Energy',
         active: false,
         included: true,
         iconPath: 'assets/plans/oahu-heco/images/icons/SOLAR.png',
@@ -256,7 +256,7 @@ export const HecoPlan: Plan = {
       },
       {
         name: 'agriculture',
-        displayName: 'Ag Lands',
+        displayName: 'Agricultural Lands',
         active: false,
         included: true,
         iconPath: 'assets/plans/oahu-heco/images/icons/AG.png',
@@ -293,7 +293,7 @@ export const HecoPlan: Plan = {
       },
       {
         name: 'ial',
-        displayName: 'IAL',
+        displayName: 'Important Agricultural Lands',
         active: false,
         included: true,
         iconPath: 'assets/plans/oahu-heco/images/icons/IAL.png',

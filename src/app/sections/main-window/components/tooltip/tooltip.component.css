@@ -1,0 +1,36 @@
+:host {
+    font-size: 12px;
+}
+
+.header-wrapper {
+    height: 20px;
+    position: relative;
+    width: 100%;
+    padding: 10px;
+}
+
+.header-wrapper>.icon {
+    width: 15%;
+    display: inline-block;
+}
+
+.header-wrapper>.title {
+    width: 82%;
+    display: inline-block;
+}
+
+.text {
+    width:96%;
+    padding: 2%;
+}
+
+.instructions {
+    width: 100%;
+    text-align: center;
+}
+
+img {
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+}

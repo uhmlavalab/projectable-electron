@@ -363,7 +363,6 @@ export class ScrollingMenuComponent implements AfterViewInit {
       let mouseY = event.screenY;
       if (mouseY === undefined) {
         if (this.touchId !== undefined) {
-          console.log(event.touches);
           let touch = null;
           Object.values(event.touches).forEach((t: Touch) => {
             if (t.identifier === this.touchId) {

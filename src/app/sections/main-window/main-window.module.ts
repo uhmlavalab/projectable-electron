@@ -28,6 +28,7 @@ import { YearBarComponent } from './components/year/components/year-bar/year-bar
 import { YearDisplayComponent } from './components/year-display/year-display.component';
 import { SettingsModalComponent } from './components/settings-modal/settings-modal.component';
 import { LayerInfoComponent } from './components/layer-info/layer-info.component';
+import { TooltipComponent } from './components/tooltip/tooltip.component';
 
 
 @NgModule({
@@ -44,7 +45,8 @@ import { LayerInfoComponent } from './components/layer-info/layer-info.component
     YearComponent,
     YearDisplayComponent,
     SettingsModalComponent,
-    LayerInfoComponent
+    LayerInfoComponent,
+    TooltipComponent
   ],
   imports: [
     CommonModule,

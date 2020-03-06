@@ -44,6 +44,8 @@ export class PlanService {
   private CSS: any; // Holds the css data for the positioning of the charts and map objects.
   public cssSubject = new BehaviorSubject<any>(null);
 
+  public tooltipSubject = new BehaviorSubject<any>(null);
+
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
     this.dataTable = {
       state: 0,
@@ -581,5 +583,11 @@ export class PlanService {
     }
     const msg = JSON.stringify({ file: "cssData", css: this.CSS });
     this.windowService.saveFile({ filename: 'cssData.json', file: msg });
+  }
+
+  public handleToolTipEvent(event, id: string): void {
+    const x = event.screenX;
+    const y = event.screenY;
+    this.tooltipSubject.next({x: x, y: y, id: id});
   }
 }
