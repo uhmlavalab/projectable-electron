@@ -93,7 +93,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
               this.adjustToCenter(val.data[0]);
               this.centerSelectedValue();
               this.setupComplete = true;
-            }, 300);
+            }, 500);
           }
         });
       }

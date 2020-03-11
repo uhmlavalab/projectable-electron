@@ -16,14 +16,15 @@ import { HecoMainComponent } from './routes/heco-main/heco-main.component';
 
 // Layout
 import { MapWindowLayoutComponent } from './layout/map-window-layout.component';
-
+import { YearDataDisplayComponent } from './components/year-data-display/year-data-display.component';
 
 
 @NgModule({
   declarations: [
     MapWindowLayoutComponent,
     WaitingScreenComponent,
-    HecoMainComponent
+    HecoMainComponent,
+    YearDataDisplayComponent
   ],
   imports: [
     CommonModule,

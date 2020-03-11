@@ -84,6 +84,13 @@ app-border-line {
     text-align: center;
 }
 
+.center-container>.middle>.left> h3 {
+    left: 14%;
+    top: 20%;
+    position: absolute;
+    z-index: 9999;
+}
+
 .scenario-menu {
     position: absolute;
     left: 10%;
@@ -222,19 +229,23 @@ app-border-line {
     top: 1%;
 }
 
+.right-container>.top>.tooltip {
+    left: 15%;
+}
+
 .middle>.left>.tooltip {
     left: 10%;
-    top: 27%;
+    top: 25%;
 }
 
 .middle>.middle>.tooltip {
-    left: 32%;
-    top: 10%;
+    left: 42%;
+    top: 38%;
 }
 
 .middle>.right>.tooltip {
-    left: 90%;
-    top: -6%;
+    left: 92%;
+    top: 47%;
 }
 
 .right>.top>.tooltip {

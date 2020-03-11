@@ -291,7 +291,6 @@ export class PlanService {
   private getCapacityData(): Promise<any> {
     return new Promise((resolve, error) => {
       const capacityData = {};
-      console.log(this.dataTable.data.capacityPath);
       d3.csv(this.dataTable.data.capacityPath, data => {
         data.forEach(element => {
           const year = element.year;
@@ -364,10 +363,7 @@ export class PlanService {
    * @param year the year to set
    */
   public updateYear(val): void {
-    let year = val;
-    if (typeof (year) === 'string') {
-      year = parseInt(year, 10);
-    }
+    const year = Number(val);
     if (this.yearIsValid(year) && this.dataTable.year.current !== year) {
       this.dataTable.year.current = year;
       this.yearSubject.next(year);
@@ -379,6 +375,10 @@ export class PlanService {
     }
   }
 
+  private yearIsValid(year: number): boolean {
+    return year >= this.dataTable.year.min && year <= this.dataTable.year.max;
+  }
+
   private setCurrentPercent(year: number): number {
     this.dataTable.renewableTotals.forEach(e => {
       if (e.year == year) {
@@ -386,9 +386,6 @@ export class PlanService {
       }
     });
     return this.dataTable.year.currentRenewablePercent;
-  }
-  private yearIsValid(year: number): boolean {
-    return year >= this.dataTable.year.min && year <= this.dataTable.year.max;
   }
 
   public updateScenario(scenarioName: string): void {
@@ -469,7 +466,7 @@ export class PlanService {
     return arr;
   }
 
-  public getCurrentYear(): number {
+  public getCurrentYear(): any {
     return this.dataTable.year;
   }
 
@@ -520,7 +517,6 @@ export class PlanService {
   }
 
   public handleLayerButtonInfoClick(layerName: string) {
-    console.log(layerName);
     let el = null;
     this.dataTable.layers.all.forEach(e => {
       if (e.layer.name === layerName) {
@@ -588,6 +584,6 @@ export class PlanService {
   public handleToolTipEvent(event, id: string): void {
     const x = event.screenX;
     const y = event.screenY;
-    this.tooltipSubject.next({x: x, y: y, id: id});
+    this.tooltipSubject.next({ x: x, y: y, id: id });
   }
 }

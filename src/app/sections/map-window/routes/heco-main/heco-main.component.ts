@@ -14,6 +14,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
   @ViewChild('map', { static: false, read: ElementRef }) mapElement;
   @ViewChild('pieChart', { static: false, read: ElementRef }) pieChart; // The custom Map component.
   @ViewChild('lineChart', { static: false, read: ElementRef }) lineChart; // The custom Map component.
+  @ViewChild('yearData', {static: false, read: ElementRef}) yearData;
 
   private positionData: any;
 
@@ -55,6 +56,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
           this.positionMap(cssData.map);
           this.positionLineChart(cssData.charts.line);
           this.positionPieChart(cssData.charts.pie);
+          this.positionYearData(cssData.mapYearData);
         }
       }
     });
@@ -93,6 +95,18 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       e.style.top = css.top;
     } catch (error) {
       console.log('Error. Failed to find the element to position. ');
+    }
+  }
+
+  private positionYearData(css: any): void {
+    try {
+      //Select map element from viewchild
+      console.log(css);
+      const e = this.yearData.nativeElement;
+      e.style.left = css.left;
+      e.style.top = css.top;
+    } catch (error) {
+      console.log('Error.  Failed to find year data element to position.');
     }
   }
 

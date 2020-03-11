@@ -7,3 +7,8 @@
 .chart { 
     position: absolute;
 }
+
+.year-data {
+    position: absolute;
+    color: white;
+}

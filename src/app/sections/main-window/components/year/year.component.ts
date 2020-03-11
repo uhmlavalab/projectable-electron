@@ -49,7 +49,7 @@ export class YearComponent implements AfterViewInit {
         this.years = years;
         setTimeout(() => {
           this.positionElements();
-        }, 300);
+        }, 500);
       }
     });
 
@@ -59,7 +59,7 @@ export class YearComponent implements AfterViewInit {
       } else {
         this.scenario = 'not set';
       }
-    })
+    });
   }
 
   private positionYearWrapper(): void {

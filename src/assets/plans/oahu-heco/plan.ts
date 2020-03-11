@@ -342,14 +342,14 @@ export const HecoPlan: Plan = {
             if (parcel.properties.IAL === "Y") {
               d3.select(parcel.path)
                 .style('fill', 'black')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('opacity', (state === 1) ? 0.85 : 0.0)
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
             }
             else if (solarTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('opacity', (this.active) ? 0.85 : 0.0);
+                .style('opacity', (state === 1) ? 0.85 : 0.0);
               solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
             } else {
               d3.select(parcel.path)
@@ -432,7 +432,7 @@ export const HecoPlan: Plan = {
             });
             this.parcels.forEach(parcel => {
               const id = parcel.properties.Building_F.toString().split('_')[1];
-              const year = (planService.getCurrentYear()).toString();
+              const year = (planService.getCurrentYear().current).toString();
               if (Number(year) >= 2018) {
                 if (this.capData.hasOwnProperty(id)) {
                   const value = this.capData[id][year];
@@ -459,7 +459,7 @@ export const HecoPlan: Plan = {
         updateFunction(planService: PlanService, state:number) {
           this.parcels.forEach(parcel => {
             const id = parcel.properties.Building_F.toString().split('_')[1];
-            const year = (planService.getCurrentYear()).toString();
+            const year = (planService.getCurrentYear().current).toString();
             if (Number(year) >= 2018) {
               if (this.capData.hasOwnProperty(id)) {
                 const value = this.capData[id][year];
