@@ -6,12 +6,18 @@
   font-family: 'Dalton Maag - Elevon OneG';
   src: url('assets/fonts/Dalton Maag - Elevon OneG.ttf')  format('truetype');
 }
+
+:root {
+  --main-text-color: rgb(209, 235, 236);
+  --menu-blue: rgb(156, 210, 207);
+}
 body {
   font-family: 'Dalton Maag - Elevon OneG', Arial, sans-serif;
   width: 100%;
   height: 100%;
   overflow: hidden;
   background-color: black;
+  color: var(--main-text-color);
 }
 .hidden {
   display: none;

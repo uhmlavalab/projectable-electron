@@ -1,7 +1,3 @@
-:host {
-    color: white;
-}
-
 .background-image {
     width: 100%;
     height: 100%;
@@ -12,7 +8,6 @@
 }
 /* Styles for the UI section Titles */
 .section-title {
-    color: white;
     font-size: 18px;
     width: 100%;
     text-align: center;
@@ -259,4 +254,5 @@ app-border-line {
     width: 250px;
     background-color: black;
     outline: 2px solid white;
+    outline-color: var(--main-text-color);
 }

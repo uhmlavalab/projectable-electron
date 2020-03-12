@@ -3,6 +3,7 @@
     width: 100%;
     overflow: hidden;
     text-align: center;
+    color: var(--menu-blue);
 }
 .options-container {
     height: 100%;
@@ -29,6 +30,7 @@
 .center-box {
     position: absolute;
     border: 1px solid white;
+    border-color: var(--menu-blue);
     height: 30px;
     width: 120px;
     top: calc(50% - 18px);
@@ -36,7 +38,6 @@
     background-color: black;
     font-size: 24px;
     padding-top: 6px;
-    color: white;
     opacity: 1;
     font-weight: bolder;
 }
