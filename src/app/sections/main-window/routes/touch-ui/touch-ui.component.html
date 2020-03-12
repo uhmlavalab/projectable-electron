@@ -3,13 +3,13 @@
 <!-- This section contains the charts-->
 <div class="left-container">
   <div class="chart pie">
-    <img src="../../../../../assets/images/tooltip.png" class="tooltip" (click)="handleTooltipClick($event, 'Generation Chart')">
+    <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Generation Chart')">
     <app-pie-chart></app-pie-chart>
     
     <!-- <app-progress-ring></app-progress-ring> -->
   </div>
   <div class="chart line">
-    <img src="../../../../../assets/images/tooltip.png" class="tooltip" (click)="handleTooltipClick($event, 'Capacity Chart')">
+    <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Capacity Chart')">
     <app-line-chart></app-line-chart>
   </div>
 </div>
@@ -17,24 +17,24 @@
 <!-- Center column.  Largest column, contains mini map and the year controls -->
 <div class="center-container">
   <div class="top">
-    <img src="../../../../../assets/images/tooltip.png" class="tooltip" (click)="handleTooltipClick($event, 'Mini Map')">
-    <div class="section-title">{{mapTitle}}</div>
+    <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Mini Map')">
+    <div class="section-title">{{sectionTitles.map}}</div>
     <!-- <app-map-element class="map-container" cdkDrag #map>
     </app-map-element> -->
   </div>
   <div class="middle">
     <div class="left">
-      <img src="../../../../../assets/images/tooltip.png" class="tooltip" (click)="handleTooltipClick($event, 'Scenario Selector')">
-      <h3>Scenario</h3>
+      <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Scenario Selector')">
+      <h3>{{sectionTitles.scenario}}</h3>
       <app-scrolling-menu class="scenario-menu" type="scenario" largeFontSize="14px"></app-scrolling-menu>
     </div>
     <div class="middle">
-      <img src="../../../../../assets/images/tooltip.png" class="tooltip" (click)="handleTooltipClick($event, 'Renewable Energy Console')">
+      <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Renewable Energy Console')">
       <!-- Graphic that shows the year -->
       <app-year class="year-container" #year></app-year>
     </div>
     <div class="right">
-      <img src="../../../../../assets/images/tooltip.png" class="tooltip" (click)="handleTooltipClick($event, 'Year Selector')">
+      <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Year Selector')">
       <app-scrolling-menu type="year" largeFontSize="24px"></app-scrolling-menu>
     </div>
   </div>
@@ -42,10 +42,10 @@
 <!-- right column has two rows. -->
 <div class="right-container">
   <div class="top">
-    <img src="../../../../../assets/images/tooltip.png" class="tooltip" (click)="handleTooltipClick($event, 'Layer Toggles')">
+    <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Layer Toggles')">
     <!-- Layer Buttons for turning on and off the layers. -->
     <div class="layer-button-container" #layerButtonContainer>
-      <div class="section-title">{{layerTitle}}</div>
+      <div class="section-title">{{sectionTitles.layer}}</div>
       <!-- Wrapper forces the buttons to be 1 to 1 ratio -->
       <div class="buttons-container">
         <div class="layer-button-wrapper" *ngFor="let layer of layers">
@@ -60,7 +60,7 @@
   </div>
 </div>
 <div class="settings-button" (click)="handleSettingsButtonClick()">
-  <img src="../../../../../assets/images/gear-icon.png" #settingsButton>
+  <img src="{{settingsIconPath}}" #settingsButton>
 </div>
 <app-settings-modal [style.display]="this.showSettingsModal ? 'block' : 'none'"></app-settings-modal>
 <div class="tooltip-container" [style.display]="this.tooltip.displaying ? 'block' : 'none'" #ttip>

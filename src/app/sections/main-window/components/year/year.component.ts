@@ -6,23 +6,24 @@ import { PlanService } from '@app/services/plan.service';
   templateUrl: './year.component.html',
   styleUrls: ['./year.component.css']
 })
+
+/** This component is the center graphic.  It has a vizualization of the renewable energy percentage by year in a circle around
+ * the center text display.
+ */
 export class YearComponent implements AfterViewInit {
 
-  @ViewChild('wrapper', { static: false }) wrapperElement: ElementRef;
-  @ViewChild('yearWrapper', { static: false }) yearWrapperElement: ElementRef;
-  @ViewChildren('yearBar', { read: ElementRef }) yearBars: QueryList<ElementRef>
+  @ViewChild('wrapper', { static: false }) wrapperElement: ElementRef;             // A wrapper around the text elements in the center.
+  @ViewChild('yearWrapper', { static: false }) yearWrapperElement: ElementRef;     // A wrapper around the year bars.
+  @ViewChildren('yearBar', { read: ElementRef }) yearBars: QueryList<ElementRef>;  // QueryList containing the year bars.
 
-  private year: number;
-  private years: number[];
-  private barLength: number;
-  private genData: any;
-  private percentRenewable: number;
-  private scenario: string;
+  private displayData: {year: number; percentRenewable: number; scenario: string; };  // All Display Data
+  private years: number[];           // Array for all possible years. (used to populate year-bar components.)
+  private barLength: number;         // Length of the year bar.
 
   constructor(private planService: PlanService) {
     this.years = [];
     this.barLength = 40;
-    this.genData = null;
+    this.displayData = {year: 9999, percentRenewable: 0, scenario: ''};
   }
 
   ngAfterViewInit() {
@@ -30,38 +31,34 @@ export class YearComponent implements AfterViewInit {
 
     this.planService.yearSubject.subscribe(year => {
       if (year) {
-        this.year = year;
-      } else {
-        this.year = 9999;
+        this.displayData.year = year;
       }
     });
 
     this.planService.precentRenewableByYearSubject.subscribe(percent => {
       if (percent) {
-        this.percentRenewable = percent;
-      } else {
-        this.percentRenewable = 0;
-      }
-    });
-
-    this.planService.yearsSubject.subscribe(years => {
-      if (years) {
-        this.years = years;
-        setTimeout(() => {
-          this.positionElements();
-        }, 500);
+        this.displayData.percentRenewable = percent;
       }
     });
 
     this.planService.scenarioSubject.subscribe(scenario => {
       if (scenario) {
-        this.scenario = scenario.displayName;
-      } else {
-        this.scenario = 'not set';
+        this.displayData.scenario = scenario.displayName;
+      }
+    });
+
+
+    this.planService.yearsSubject.subscribe(years => {
+      if (years) {
+        this.years = years;  // Sets years.  It is used to populate the year-bars.
+        setTimeout(() => {
+          this.positionElements();
+        }, 500);
       }
     });
   }
 
+  /** Moves the year wrapper to the proper location. */
   private positionYearWrapper(): void {
     const top = this.wrapperElement.nativeElement.getBoundingClientRect().top - this.yearWrapperElement.nativeElement.getBoundingClientRect().top;
     const left = this.wrapperElement.nativeElement.getBoundingClientRect().left - this.yearWrapperElement.nativeElement.getBoundingClientRect().left;
@@ -83,6 +80,6 @@ export class YearComponent implements AfterViewInit {
       e.nativeElement.style.transform = `rotate(${currentPosition}deg) translate(${height + this.barLength / 2}px)`;
       currentPosition += angle;
     });
-    this.planService.finishedYearBarSetup();
+    this.planService.finishedYearBarSetup(); // Set the data in the plan Service.
   }
 }

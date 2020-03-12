@@ -1,6 +1,8 @@
 import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
 import { WindowService } from '@app/modules/window';
+import { Layer } from 'leaflet';
+import { Scenario } from '@app/interfaces';
 
 @Component({
   selector: 'app-touch-ui',
@@ -12,54 +14,32 @@ export class TouchUiComponent implements AfterViewInit {
   @ViewChild('year', { static: false, read: ElementRef }) yearElement: ElementRef;
   @ViewChild('ttip', { static: false, read: ElementRef }) toolTip: ElementRef;
 
-  private test: string;
-  private layers: any[];
-  private messageCheckInterval: any;
-  private year: number;
-  private layerTitle: string;
-  private mapTitle: string;
-  private chartTitle: string;
-  private layerInfoTitle: string;
-  private yearTitle: string;
-  private scenarioTitle: string;
-  private planSet: boolean;
-  private setupComplete: boolean;
-  private allReady: any;
-  private showSettingsModal: boolean;
-
-  private scenarios: any[]; // Array containing all available scenarios in the plan.
-
-  private tooltip: any;
+  private layers: Layer[];              // Array containing all Layers (used to populate toggle buttons).
+  private sectionTitles: {layer: string; map: string; scenario: string; };  // Used to label HTML elements.
+  private tooltip: { displaying: boolean, path: string; currentlySelected: string; }; // Tooltip data
+  private setupComplete: boolean;      // True when all necessary elements are published by the plan service.
+  private allReady: {layersSet: boolean; planSet: boolean; yearSet: boolean; scenarioSet: boolean; };  // Necessary elements.
+  private settingsIconPath: string;    // Path to the settings icon.
+  private showSettingsModal: boolean;  // True, show the reposition modal, false hide it.
 
   constructor( private planService: PlanService, private windowService: WindowService) {
     this.setupComplete = false;
     this.showSettingsModal = false;
-    this.test = 'testing';
-    this.year = 2016;
-    this.layerTitle = 'Layer Toggles';
-    this.mapTitle = 'Mini Map';
-    this.chartTitle = 'Chart';
-    this.layerInfoTitle = 'Layer Info';
-    this.yearTitle = 'Year';
-    this.scenarioTitle = 'Scenario';
-    this.planSet = false;
-    this.allReady = {};
-    this.allReady.layersSet = false;
-    this.allReady.planSet = false;
-    this.allReady.yearSet = false;
-    this.allReady.scenarioSet = false;
+    this.sectionTitles = {layer: 'Layer Toggles', map: 'Mini Map', scenario: 'Scenario'};
+    this.allReady = {layersSet: false, planSet: false, yearSet: false, scenarioSet: false};
     this.layers = [];
-    this.tooltip= {};
-    this.tooltip.currentlySelected = 'none';
-    this.tooltip.displaying = false;
+    this.tooltip = { displaying: false, path: '../../../../../assets/images/tooltip.png',  currentlySelected: 'none'};
+    this.settingsIconPath = '../../../../../assets/images/gear-icon.png';
   }
 
   ngAfterViewInit() {
 
+    // Since this is the lowest level component of the touch interface, this receives the messages from the map.
     this.windowService.windowMessageSubject.subscribe(msg => {
       this.planService.handleMessage(msg);
     });
 
+    // Stores the layers to populate the layer toggle buttons.
     this.planService.layersSubject.subscribe(layers => {
       if (layers) {
         this.layers = layers;
@@ -70,9 +50,9 @@ export class TouchUiComponent implements AfterViewInit {
       }
     });
 
+    // Makes sure the year has been set in the plan service.
     this.planService.yearSubject.subscribe(year => {
       if (year) {
-        this.year = year;
         if (!this.allReady.yearSet) {
           this.allReady.yearSet = true;
           this.isSetupComplete();
@@ -80,9 +60,9 @@ export class TouchUiComponent implements AfterViewInit {
       }
     });
 
+    // Only checks to see that this is set.  Doesnt store any data.
     this.planService.scenarioListSubject.subscribe(scenario => {
       if (scenario) {
-        this.scenarios = scenario;
         if (!this.allReady.scenarioSet) {
           this.allReady.scenarioSet = true;
           this.isSetupComplete();
@@ -90,6 +70,7 @@ export class TouchUiComponent implements AfterViewInit {
       }
     });
 
+    // Notifies when the plan is ready to go.
     this.planService.planSetSubject.subscribe(value => {
       if (value) {
         if (!this.allReady.planSet) {
@@ -99,14 +80,16 @@ export class TouchUiComponent implements AfterViewInit {
       }
     });
 
-    this.windowService.getFileData();
+    this.windowService.getFileData();  // Nptifies the window service to get the data from any files and publish it.
 
+    // Subscribes to a bariable that tells whether to open or close the modal.
     this.planService.closeModalSubject.subscribe(value => {
       if (value) {
         this.handleSettingsButtonClick();
       }
     });
 
+    // When user clicks on a tooltip, the location of the tooltip is received here and the element is moved.
     this.planService.tooltipSubject.subscribe(value => {
       if (value) {
         this.positionTooltip(value.x, value.y);
@@ -114,17 +97,23 @@ export class TouchUiComponent implements AfterViewInit {
     });
   }
 
+  /** Checks to see if the setup is completed.  If it is, the setup Complete variable is set to true. */
   private isSetupComplete(): void {
     if (this.allReady.planSet && this.allReady.scenarioSet && this.allReady.yearSet && this.allReady.layersSet && !this.setupComplete) {
       this.setupComplete = true;
     }
   }
 
+  /** opens and closes the settings (positioning) modal. */
   private handleSettingsButtonClick(): void {
     this.showSettingsModal = !this.showSettingsModal;
   }
 
-  private handleTooltipClick(event, id): void {
+  /** When a tooltip is clicked, the position and identifying string are passed here and the correct action is taken by the plan service.
+   * @param event the touch or click event.  (gets the x and y position to reposition the tooltip.)
+   * @param id the string identifying which tooltip was clicked.
+   */
+  private handleTooltipClick(event, id: string): void {
     if (this.tooltip.currentlySelected === id) {
       this.tooltip.displaying = !this.tooltip.displaying;
     } else {
@@ -134,6 +123,10 @@ export class TouchUiComponent implements AfterViewInit {
     this.planService.handleToolTipEvent(event, id);
   }
 
+  /** Positions the tooltip where the user clicked. Small amounts of padding are added to try to keep the icon from overlapping the outline.
+   * @param x the x position in pixels.
+   * @param y the y position in pixels.
+   */
   private positionTooltip(x: number, y: number): void {
     this.toolTip.nativeElement.style.left = `${x - 20}px`;
     this.toolTip.nativeElement.style.top = `${y - 12}px`;

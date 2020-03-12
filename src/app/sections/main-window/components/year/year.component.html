@@ -2,7 +2,7 @@
   <app-year-bar *ngFor="let year of years" class="year-bar" data={{year}} #yearBar></app-year-bar>
 </div>
 <div class="content-wrapper" #wrapper>
-  <div class="year">{{year}}</div>
-    <div class="percent">{{percentRenewable}}% Renewable</div>
-    <div class="scenario">{{scenario}}</div>
+  <div class="year">{{displayData.year}}</div>
+    <div class="percent">{{displayData.percentRenewable}}% Renewable</div>
+    <div class="scenario">{{displayData.scenario}}</div>
 </div>
