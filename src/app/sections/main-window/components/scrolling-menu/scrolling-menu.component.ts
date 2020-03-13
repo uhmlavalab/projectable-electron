@@ -31,7 +31,8 @@ export class ScrollingMenuComponent implements AfterViewInit {
   private speedDecayRate: number;
   private speedInterval: any;
   private repeatRate: number;
-  private intervalRunning: boolean; // Sentinal that detects if there is an interval associated with this menu.  Prevents losing track of any intervals.
+   // Sentinal that detects if there is an interval associated with this menu.  Prevents losing track of any intervals.
+  private intervalRunning: boolean;
   private center: number; // Holds the value of the center of the visible menu div.
 
   private dividedHeight: number;
@@ -99,7 +100,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
       }
     });
 
-    // 
+    //
     this.planService.yearSubject.subscribe(year => {
       if (year && this.setupComplete) {
         if (this.type === 'year' && (this.selectedOption.value !== year)) {
@@ -112,14 +113,14 @@ export class ScrollingMenuComponent implements AfterViewInit {
     this.overlay.nativeElement.style.top = '0';
 
     /* EVENT LISTENERS FOR TOUCH AND MOUSE */
-    this.overlay.nativeElement.addEventListener('mousedown', () => {
+    this.overlay.nativeElement.addEventListener('mousedown', event => {
       if (this.scrolling) {
         this.startDrag(event);
       } else {
         this.changeActive(event);
       }
     });
-    this.overlay.nativeElement.addEventListener('mouseup', () => {
+    this.overlay.nativeElement.addEventListener('mouseup', event => {
       if (this.scrolling) {
         this.stopDragging();
       }
@@ -174,7 +175,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
       if (index > 0 && !this.scrolling) {
         opacity = 0.4;
       } else if (index === 0 && !this.scrolling) {
-        option.nativeElement.style.textDecoration = "underline";
+        option.nativeElement.style.textDecoration = 'underline';
       }
       option.nativeElement.style.opacity = opacity;
       this.optionsData.push(
@@ -207,10 +208,10 @@ export class ScrollingMenuComponent implements AfterViewInit {
           this.selectedOption = e;
           this.planService.handleMenuChange(this.type, this.selectedOption.value);
           e.opacity = 1;
-          e.element.style.textDecoration = "underline";
+          e.element.style.textDecoration = 'underline';
         } else {
           e.opacity = 0.6;
-          e.element.style.textDecoration = "none";
+          e.element.style.textDecoration = 'none';
         }
         e.element.style.opacity = e.opacity;
       });

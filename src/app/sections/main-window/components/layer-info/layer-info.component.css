@@ -1,3 +1,7 @@
+.content-wrapper {
+    padding: 2%;
+    width: 100%;
+}
 
 .left {
     width: 40%;
@@ -14,4 +18,29 @@ img { width: 100%;}
 
 .right {
     font-size: 12px;
+}
+
+.button-wrapper {
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    font: var(--menu-blue);
+    font-weight: 600;
+}
+
+.button-wrapper>.button {
+    width: 40%;
+    display: inline-block;
+    margin: -2% 2% 1% 2%;
+    outline: 1px solid white;
+    outline-color: var(--menu-blue);
+    padding: 3% 2% 3% 2%;
+    margin-top: -1%;
+    transition: background-color .4s linear, color .4s linear;
+}
+
+.deets {
+    background-color: var(--menu-blue);
+    color: black;
+    text-decoration: underline;
 }

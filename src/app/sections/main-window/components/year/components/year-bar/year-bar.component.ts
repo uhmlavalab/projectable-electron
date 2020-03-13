@@ -10,7 +10,8 @@ import { addListener } from 'cluster';
 export class YearBarComponent implements AfterViewInit {
 
   @Input() data: number;
-  @ViewChildren('rectangle', { read: ElementRef }) rects: QueryList<ElementRef>
+  @ViewChildren('rectangle', { read: ElementRef }) rects: QueryList<ElementRef>;
+  
   private year: number;
   private techArray: any[];
   private inputData: any;
