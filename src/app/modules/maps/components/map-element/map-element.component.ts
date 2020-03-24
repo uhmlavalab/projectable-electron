@@ -71,7 +71,9 @@ export class MapElementComponent implements OnInit {
 
     this.planService.yearSubject.subscribe(year => {
       if (year) {
-        this.updateYear(year);
+        if (!this.windowService.isMain()) {
+          this.updateYear(year);
+        }
       }
     });
   }
