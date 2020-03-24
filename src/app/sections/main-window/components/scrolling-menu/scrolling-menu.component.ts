@@ -21,12 +21,9 @@ export class ScrollingMenuComponent implements AfterViewInit {
   private options: any[]; // Array holding all menu options.
   private numberVisible: number; // How many options are visible at one time on the screen.  The rest are hidden.
   private dragging: boolean; // True if elements are being dragged.  False if not.
-
   private optionsData: any[];
-
   private positionHistory: any[];
   private runningTotal: number;
-
   private speed: number;
   private speedDecayRate: number;
   private speedInterval: any;
@@ -34,35 +31,31 @@ export class ScrollingMenuComponent implements AfterViewInit {
    // Sentinal that detects if there is an interval associated with this menu.  Prevents losing track of any intervals.
   private intervalRunning: boolean;
   private center: number; // Holds the value of the center of the visible menu div.
-
   private dividedHeight: number;
-
   private selectedOption: any;
   private selectedValue: any;
-
   private touchId: number;
   private scrolling: boolean;
-
   private setupComplete: boolean;
 
   constructor(private el: ElementRef, private planService: PlanService) {
-    this.optionsData = [];
-    this.numberVisible = 10;
-    this.speedInterval = -1;
-    this.intervalRunning = false;
-    this.options = [];
-    this.dragging = false;
-    this.positionHistory = [];
-    this.runningTotal = 0;
-    this.speed = 0;
-    this.speedDecayRate = 0.90;
-    this.repeatRate = 33;
-    this.selectedOption = null;
-    this.dividedHeight = 0;
-    this.selectedValue = '0';
-    this.scrolling = true;
-    this.setupComplete = false;
-    this.touchId = -1;
+    this.optionsData = [];        // Array of objects that contain the data for each menu option
+    this.numberVisible = 10;      // The number of elements that should be visible on the screen.  (alters spacing.)
+    this.speedInterval = -1;      // Holds the interval id for the animation of the menu when it is slowing down.
+    this.intervalRunning = false; // If there is an animation running, this will be true.
+    this.options = [];            // Array of strings used to populate the html elements.
+    this.dragging = false;        // True when dragging.
+    this.positionHistory = [];    // Array holding the finger position and time that it was calculated.
+    this.runningTotal = 0;        // Holds the total distance the finger has traveled.
+    this.speed = 0;               // Holds the speed that the figner was moving.
+    this.speedDecayRate = 0.90;   // Rate at which the speed will be decated when the menu is slowing down.
+    this.repeatRate = 33;         // Interval rate
+    this.selectedOption = null;   // The option that is currently in the center.
+    this.dividedHeight = 0;       // The height of a single menu option.
+    this.selectedValue = '0';     // String value of the selected option
+    this.scrolling = true;        // True if the menu is scrolling.
+    this.setupComplete = false;   // True once all data is ready.
+    this.touchId = -1;            // Holds the id of the touch event.
   }
 
   ngAfterViewInit() {
@@ -162,6 +155,79 @@ export class ScrollingMenuComponent implements AfterViewInit {
       }
     });
   }
+
+  /** Starts the drag process.
+   * @param event the touch/mouse event.
+   */
+  private startDrag(event): void {
+    if (this.intervalRunning) {               // Check to make sure no animations are running
+      clearInterval(this.speedInterval);      // If there is an interval, clear it.
+      this.intervalRunning = false;
+    } else {
+      this.setTouchId(event.touches);         // Set the touch id of the event.
+      this.dragging = true;
+    }
+  }
+
+  /** End the dragging process when a finger or mouse is lifted. */
+  private stopDragging(): void {
+    this.dragging = false;
+    if (Math.abs(this.speed) > 1) {           // If the finger speed was more than 1 when lifted.  Animate.
+      if (!this.intervalRunning) {
+        this.intervalRunning = true;
+        this.speedInterval = setInterval(() => {
+          this.decaySpeed();
+        }, this.repeatRate);
+      }
+    } else {                        // No animation necessary.  Stop scrolling and see what is in the center.
+      this.positionHistory = [];
+      this.speed = 0;
+      this.touchId = -1;
+      this.updateSelectedOption();
+      this.centerSelectedValue();
+    }
+  }
+
+  /** The method that handles the actual drag of the HTML elements.
+   * @param event the touch/mouse event that is controlling the drag.
+   */
+  private drag(event): void {
+    try {
+      // Capture Y position of mouse or touch
+      let mouseY = event.screenY;
+      if (mouseY === undefined) {
+        if (this.touchId !== undefined) {
+          let touch = null;
+          Object.values(event.touches).forEach((t: Touch) => {
+            if (t.identifier === this.touchId) {
+              touch = t;
+            }
+          });
+          mouseY = touch.screenY;
+        }
+      }
+      if (mouseY) {
+        // Store position and time of touch for each update the browser does.  (time is used for speed)
+        this.positionHistory.push({ pos: mouseY, time: new Date().getTime() });
+        if (this.positionHistory.length > 2) {
+          const sum = this.getSum(); // Sum adds together the last 3 positions for smoother movement.
+          this.moveEachOption(Math.round(sum));  // Update element positions.
+          this.positionOptions();    // Move the elemnts
+          this.getSpeed();           // Always get the current finger speed in case the touch ends.
+          this.positionHistory = []; // Alwyas clear all touch positions.
+          /* Running total keeps track of the TOTAL distance moved so that when it is larger than the height of a
+          menu option the bottom element is moved to the top or vice versa */
+          this.runningTotal = this.checkRunningTotal(sum);
+          this.updateSelectedOption(); // Check to see if there is a new center value.
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      console.log('Error Dragging Menu object');
+    }
+  }
+
+
   /**  This function creates an array of objects that hold the data for each of the
    * menu options in the menu.
    * @param options The array holding the list of menu option values.
@@ -192,11 +258,15 @@ export class ScrollingMenuComponent implements AfterViewInit {
     });
   }
 
+  /** If the menu is static (ie. the scenarios) then change active is called on a touch event.  It will determine the new
+   * value that is selected.
+   * @param event the touch/mouse event.
+   */
   private changeActive(event): void {
-    this.touchId = -1;
-    this.setTouchId(event.touches);
-    let mouseY = event.screenY;
-    if (mouseY === undefined) {
+    this.touchId = -1;                  // Clear the current touch event.
+    this.setTouchId(event.touches);     // Set the new touch event id.
+    let mouseY = event.screenY;         // If it is a mouse event, mouseY will be set.
+    if (mouseY === undefined) {         // If not, find the touch event and set it to mouseY.
       if (this.touchId !== undefined) {
         mouseY = event.touches[this.touchId].screenY;
       }
@@ -204,6 +274,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
 
     if (mouseY) {
       this.optionsData.forEach(e => {
+        // Do a boundary check to determine which button was clicked.
         if (mouseY > e.element.getBoundingClientRect().top && mouseY < e.element.getBoundingClientRect().top + this.dividedHeight) {
           this.selectedOption = e;
           this.planService.handleMenuChange(this.type, this.selectedOption.value);
@@ -218,6 +289,18 @@ export class ScrollingMenuComponent implements AfterViewInit {
     }
   }
 
+  /** We need to keep track of the center of the window.  The menu options are selected when they are moved to the center in the scrolling
+   * menu.  If the menu is static, this function is used to place the menu options in the center of the visible window.
+   * @return the center of the visible window in pixels.
+   */
+  private findCenter(): number {
+    if (this.scrolling) {
+      return this.centerBox.nativeElement.getBoundingClientRect().height / 2 +
+        this.centerBox.nativeElement.getBoundingClientRect().top - this.container.nativeElement.getBoundingClientRect().top;
+    } else {
+      return this.container.nativeElement.getBoundingClientRect().height / 2;
+    }
+  }
 
   /** Calculates the space needed for each element based on the number of elements and the
    * size of the container.  Then positions the elements accordingly.
@@ -229,79 +312,20 @@ export class ScrollingMenuComponent implements AfterViewInit {
     });
   }
 
+  /** Finds out which option is in the center of the visible window and updates the variables accordingly. */
   private updateSelectedOption(): void {
-    const centerIndex = this.getCenterIndex();
+    const centerIndex = this.getCenterIndex();  // Gets the index of the array that is in the center of the window.
+    // Make certain the index is valid and the value at this index is different than the current value.
     if (centerIndex >= 0 && (this.optionsData[centerIndex].value !== this.selectedValue)) {
-      this.selectedOption = this.optionsData[centerIndex];
-      this.planService.handleMenuChange(this.type, this.selectedOption.value);
-      this.selectedValue = this.selectedOption.value;
+      this.selectedOption = this.optionsData[centerIndex];                        // Update the selected option
+      this.planService.handleMenuChange(this.type, this.selectedOption.value);    // Notify plan service of the change.
+      this.selectedValue = this.selectedOption.value;                             // Update the selected value (only holds the string value)
     }
   }
 
-  private checkSelectedOption(): number {
-    const centerIndex = this.getCenterIndex();
-    if (centerIndex >= 0) {
-      return this.optionsData[centerIndex].value;
-    } else {
-      return 0;
-    }
-  }
-
-  private findCenter(): number {
-
-    if (this.scrolling) {
-      return this.centerBox.nativeElement.getBoundingClientRect().height / 2 +
-        this.centerBox.nativeElement.getBoundingClientRect().top - this.container.nativeElement.getBoundingClientRect().top;
-    } else {
-      return this.container.nativeElement.getBoundingClientRect().height / 2;
-    }
-  }
-
-
-  private adjustToCenter(value: any): boolean {
-    let firstIndex = -1;
-    this.optionsData.forEach((item, index) => {
-      if (item.value === value && firstIndex === -1) {
-        firstIndex = index;
-      }
-    });
-    if (firstIndex === -1) {
-      return false;
-    } else {
-      const centerIndex = this.getCenterIndex();
-      if (centerIndex > 0) {
-        const difference = firstIndex - centerIndex;
-        if (difference > 0) {
-          for (let i = difference + 1; i > 0; i--) {
-            this.switchOptions(-1);
-            this.moveEachOption(-this.dividedHeight);
-          }
-        } else if (difference < 0) {
-          for (let i = 0; i < Math.abs(difference); i++) {
-            this.switchOptions(1);
-            this.moveEachOption(this.dividedHeight);
-          }
-        }
-      } else {
-        const currentTop = this.optionsData[Math.floor(this.optionsData.length / 2)].top;
-        this.moveEachOption(this.center - currentTop - this.dividedHeight / 2);
-        for (let i = 0; i < Math.floor(this.options.length / 2); i++) {
-          this.switchOptions(1);
-          this.moveEachOption(this.dividedHeight);
-        }
-      }
-      this.positionOptions();
-    }
-    return true;
-  }
-
-  private centerSelectedValue(): void {
-
-    const distance = this.selectedOption.top + this.dividedHeight / 2 - this.center + 5;
-    this.moveEachOption(-distance);
-    this.positionOptions();
-  }
-
+  /** Finds which index of the options array is in the center of the visible window.
+   * @return the array index of optionsData that is center.
+   */
   private getCenterIndex(): number {
     let val = -1;
     this.optionsData.forEach((e, index) => {
@@ -312,6 +336,10 @@ export class ScrollingMenuComponent implements AfterViewInit {
     return val;
   }
 
+  /** Does a boundary check on the menu option html element to determine if it is in the center of the visible window
+   * @e the HTML element for the menu option.
+   * @return true if element is the center element, false if it is not.
+   */
   isCenter(e): boolean {
     if (this.center > e.top && this.center < e.top + this.dividedHeight) {
       return true;
@@ -320,92 +348,97 @@ export class ScrollingMenuComponent implements AfterViewInit {
     }
   }
 
-  private startDrag(event): void {
-    if (this.intervalRunning) {
-      clearInterval(this.speedInterval);
-      this.intervalRunning = false;
-    } else {
-      this.setTouchId(event.touches);
-      this.dragging = true;
-    }
-  }
-
-  private stopDragging(): void {
-    this.dragging = false;
-    if (Math.abs(this.speed) > 1) {
-      if (!this.intervalRunning) {
-        this.intervalRunning = true;
-        this.speedInterval = setInterval(() => {
-          this.decaySpeed();
-        }, this.repeatRate);
+  /** When the component first loads, the menu items must be arranged so that the first option is in the center of the
+   * window and the other elements are moved to their correct locations.  It must first find the index of the menu option
+   * to place in the center, then adjust everything else accordingly.
+   * @param value the value of the element that sould be located in the center.
+  */
+  private adjustToCenter(value: any): boolean {
+    let firstIndex = -1;                                  // Initialize the first Index to -1
+    this.optionsData.forEach((item, index) => {           // Find the correct index of the value that was passed to function.
+      if (item.value === value && firstIndex === -1) {
+        firstIndex = index;
       }
+    });
+    if (firstIndex === -1) {
+      return false;                                       // Abort if no matching value was found.
     } else {
-      this.positionHistory = [];
-      this.speed = 0;
-      this.touchId = -1;
-      this.updateSelectedOption();
-      this.centerSelectedValue();
+      const centerIndex = this.getCenterIndex();          // Find the current center index.
+      if (centerIndex > 0) {
+        const difference = firstIndex - centerIndex;      // The difference shows how many elements need to be moved.
+        if (difference > 0) {
+          for (let i = difference + 1; i > 0; i--) {
+            this.switchOptions(-1);                       // SwitchOptions moves the bottom to the top or vice versa.
+            this.moveEachOption(-this.dividedHeight);     // Move each element by the height of one menu option.
+          }
+        } else if (difference < 0) {
+          for (let i = 0; i < Math.abs(difference); i++) {
+            this.switchOptions(1);
+            this.moveEachOption(this.dividedHeight);
+          }
+        }
+      } else {  // If the center index is < 0
+        const currentTop = this.optionsData[Math.floor(this.optionsData.length / 2)].top;
+        this.moveEachOption(this.center - currentTop - this.dividedHeight / 2);
+        for (let i = 0; i < Math.floor(this.options.length / 2); i++) {
+          this.switchOptions(1);
+          this.moveEachOption(this.dividedHeight);
+        }
+      }
+      this.positionOptions();  // Move all of the elements to their correct positions as calculated above.
     }
+    return true;
   }
 
+  /** The component will always ensure that the selected value is directly in the center of the window
+   * when the user stops dragging.  IF it is slightly off, this will move it the rest of the way.
+  */
+  private centerSelectedValue(): void {
+    const distance = this.selectedOption.top + this.dividedHeight / 2 - this.center + 5;   // Find the distance from cetner.
+    this.moveEachOption(-distance);   // Update all positions.
+    this.positionOptions();           // Execute the move.
+  }
+
+  /** Adds or subtracts a number of pixels from the css top value of each element in the menu.  It does not actually muve
+   * the elements on the screen, it just updates their object.  PositionElements() does the actual movement based on the value
+   * that is set here.
+   * @param distance the number of pixels to move each element.
+   */
+  private moveEachOption(distance: number): void {
+    this.optionsData.forEach(e => {
+      e.top = e.top + distance;
+    });
+  }
+  /** Stores the touch id that is used for the drag.  This is useful because there can be many touches on
+   * the table at the same time and with this value we dont have to find the correct touch each time there is a change.
+   * @param touchlist the list of all current touches.
+   */
   private setTouchId(touchlist): void {
     if (this.touchId === -1 && touchlist) {
       Object.values(touchlist).forEach((touch: Touch) => {
-        if (touch.target === this.overlay.nativeElement) {
+        if (touch.target === this.overlay.nativeElement) {  // Check if there is a finger on the overlay element.
           this.touchId = touch.identifier;
         }
       });
     }
   }
 
-  private drag(event): number {
-    try {
-      // Capture Y position of mouse or touch
-      let mouseY = event.screenY;
-      if (mouseY === undefined) {
-        if (this.touchId !== undefined) {
-          let touch = null;
-          Object.values(event.touches).forEach((t: Touch) => {
-            if (t.identifier === this.touchId) {
-              touch = t;
-            }
-          });
-          mouseY = touch.screenY;
-        }
-      }
-      if (mouseY) {
-        this.positionHistory.push({ pos: mouseY, time: new Date().getTime() });
-        if (this.positionHistory.length > 2) {
-          const sum = this.getSum();
-          this.moveEachOption(Math.round(sum));
-          this.positionOptions();
-          this.getSpeed();
-          this.positionHistory = [];
-          this.runningTotal = this.checkRunningTotal(sum);
-          this.updateSelectedOption();
-        }
-      }
-    } catch (error) {
-      console.log(error);
-      console.log('Error Dragging Menu object');
-    } finally {
-      return 0;
-    }
-  }
-
-  private autoRotateTo() {
-    if (this.intervalRunning) {
+  /** When the application changes the year from another element, the scrolling menu will adjust itself accordingly.  It will
+   * animate the scroll until it reaches the correct element.  It always scrolls in the same direction.
+   */
+  private autoRotateTo(): void {
+    if (this.intervalRunning) {              // If there is an animation running, stop it and call the the function again.
       clearInterval(this.speedInterval);
       this.intervalRunning = false;
       this.autoRotateTo();
     } else {
       this.intervalRunning = true;
       this.speedInterval = setInterval(() => {
-        if (this.checkSelectedOption() != this.selectedOption.value) {
-          this.moveEachOption(5);
+        if (this.optionsData[this.getCenterIndex()].value != this.selectedOption.value) {
+          this.moveEachOption(5);            // Move each element 5 pixels at a time.
           this.positionOptions();
           this.runningTotal = this.checkRunningTotal(5);
-        } else {
+        } else {  // When the correct element is in the center, stop the animation and update the correct values.
           clearInterval(this.speedInterval);
           this.intervalRunning = false;
           this.selectedValue = this.selectedOption.value;
@@ -415,6 +448,10 @@ export class ScrollingMenuComponent implements AfterViewInit {
     }
   }
 
+  /** The running total is the total distance that the options have moved.  Once it is larger than the height of a single
+   * menu option, the bottom option is moved to the top or vice versa.
+   * @param sum the distance that was just mvoed.
+   * @number the current running total. */
   private checkRunningTotal(sum: number): number {
     const total = sum + this.runningTotal;
     if (Math.abs(total) > this.dividedHeight) {
@@ -427,13 +464,9 @@ export class ScrollingMenuComponent implements AfterViewInit {
     }
   }
 
-  private moveEachOption(distance: number): void {
-    this.optionsData.forEach(e => {
-      e.top = e.top + distance;
-    });
-  }
-
-
+  /** Moves the bottom element to the top or the top element to the bottom of the menu.  This is how the menu seems to scroll infinitely.
+   * @param sign determines which element should switch places
+   */
   private switchOptions(sign: number): void {
 
     let tempPosition = 0; // Stores the top value for either the first or last element.
@@ -468,6 +501,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
     tempElement.element.style.top = `${top}px`;
   }
 
+  /** Loops through the position history and adds up the values. */
   private getSum(): number {
     let sum = 0;
     this.positionHistory.forEach((point, index) => {
@@ -478,12 +512,16 @@ export class ScrollingMenuComponent implements AfterViewInit {
     return sum;
   }
 
+  /** Calculates the speed that the finger is moveing.  The sum is the distance traveled by the finger and it is divided by the time */
   private getSpeed(): void {
     const sum = this.getSum();
     const speed = sum / (this.positionHistory[this.positionHistory.length - 1].time - this.positionHistory[0].time);
     this.speed = Math.floor(speed * this.repeatRate);
   }
 
+  /** When a finger is lifted, the menu will continue to scroll if the finger was moving fast enough.  This function simulates
+   * friction and will slow the menu and eventually stop it.
+   */
   private decaySpeed(): void {
     if (Math.abs(this.speed) < 3 || this.speed === 0) {
       this.intervalRunning = false;
@@ -502,6 +540,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
     }
   }
 
+  // If the window resizes, update the center of the window.
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.center = this.findCenter();

@@ -16,7 +16,7 @@ export class ScenarioButtonComponent implements OnInit {
   ngOnInit() {
   }
 
-  private handleClick():void {
+  private handleClick(): void {
      this.planService.updateScenario(this.scenarioName);
   }
 

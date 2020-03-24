@@ -7,11 +7,14 @@ import { WindowService } from '@app/modules/window';
   templateUrl: './settings-modal.component.html',
   styleUrls: ['./settings-modal.component.css']
 })
+/** This is a modal that pops up when the user clicks on the settings icon.  It allows the user to position elements
+ * on the map from the touch interface and save them to a file.
+ */
 export class SettingsModalComponent implements AfterViewInit {
 
-  @ViewChild('mapMover', { static: false }) mapElement;
-  @ViewChild('pieMover', { static: false }) pieElement;
-  @ViewChild('lineMover', { static: false }) lineElement;
+  @ViewChild('mapMover', { static: false }) mapElement;     // The map component
+  @ViewChild('pieMover', { static: false }) pieElement;     // The pie chart component.
+  @ViewChild('lineMover', { static: false }) lineElement;   // The line chart component.
 
   private dragging: boolean;
   private touchId: number;
@@ -70,30 +73,33 @@ export class SettingsModalComponent implements AfterViewInit {
     }, { passive: false });
   }
 
+  /** Begins the dragging process.
+   * @param touches the touchlist provided by the browser.
+   * @param el the element that is being positioned.
+   */
   private startDrag(touches, el): void {
     this.dragging = true;
-    this.setTouchId(touches, el);
+    this.setTouchId(touches, el); // Set the id of the finger that is dragging.
   }
 
+  /** Drags an element on the screen and passes the position values to the other window.
+   * @param event the touch/mouse event.
+   * @param el the element that is beign dragged.
+   * @param identifier a string that will identify which element is being moved when the map is messaged.
+   */
   private drag(event, el, identifier): number {
     try {
-      let mouseY = null;
-      let mouseX = null;
-      
-      const rect = el.nativeElement.getBoundingClientRect();
-
+      let mouseY = null;  // Y position of the touch/mouse
+      let mouseX = null;  // X position of the touch/mouse
       if (this.touchId >= 0) {
         mouseY = event.touches[this.touchId].screenY;
         mouseX = event.touches[this.touchId].screenX;
       }
-
       if (mouseY && mouseX) {
         el.nativeElement.style.top = `${mouseY - 100}px`;
         el.nativeElement.style.left = `${mouseX - 100}px`;
       }
-
-      this.planService.positionMapElements(identifier, mouseX, mouseY);
-
+      this.planService.positionMapElements(identifier, mouseX, mouseY); // Notify plan service of changes.
     } catch (error) {
       console.log(error);
       console.log('Error Dragging Menu object');
@@ -119,7 +125,7 @@ export class SettingsModalComponent implements AfterViewInit {
 
   private positionMap(css: any): void {
     try {
-      //Select map element from viewchild
+      // Select map element from viewchild
       const e = this.mapElement.nativeElement;
       e.style.left = css.left;
       e.style.top = css.top;
@@ -130,7 +136,7 @@ export class SettingsModalComponent implements AfterViewInit {
 
   private positionLineChart(css: any): void {
     try {
-      //Select map element from viewchild
+      // Select map element from viewchild
       const e = this.lineElement.nativeElement;
       e.style.left = css.left;
       e.style.top = css.top;
@@ -141,7 +147,7 @@ export class SettingsModalComponent implements AfterViewInit {
 
   private positionPieChart(css: any): void {
     try {
-      //Select map element from viewchild
+      // Select map element from viewchild
       const e = this.pieElement.nativeElement;
       e.style.left = css.left;
       e.style.top = css.top;
