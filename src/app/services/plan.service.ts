@@ -87,7 +87,6 @@ export class PlanService {
       },
       positionData: {}
     };
-
     this.plans = Plans;
   }
 
@@ -578,4 +577,5 @@ export class PlanService {
   public printDataTable(): void {
     console.log(JSON.stringify(this.dataTable));
   }
+
 }

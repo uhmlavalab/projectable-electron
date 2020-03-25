@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
 
 @Component({
@@ -12,27 +12,32 @@ export class YearDataDisplayComponent implements OnInit {
   percentRenewable: number;
   scenario: string;
 
-  constructor(private planService: PlanService) {
+  constructor(private planService: PlanService, private cdr: ChangeDetectorRef) {
     this.year = 0;
     this.percentRenewable = 0;
     this.scenario = 'not set';
-   }
+  }
 
   ngOnInit() {
     this.planService.yearSubject.subscribe(year => {
-      if (year) {  
+      if (year) {
         this.year = year;
       } else {
         this.year = 9999;
       }
+      this.cdr.detectChanges();
+      this.displayData();
     });
 
     this.planService.precentRenewableByYearSubject.subscribe(percent => {
+      console.log(percent);
       if (percent) {
         this.percentRenewable = percent;
       } else {
         this.percentRenewable = 0;
       }
+      this.cdr.detectChanges();
+      this.displayData();
     });
 
     this.planService.scenarioSubject.subscribe(scenario => {
@@ -40,7 +45,13 @@ export class YearDataDisplayComponent implements OnInit {
         this.scenario = scenario.displayName;
       } else {
         this.scenario = 'not set';
+        this.cdr.detectChanges();
       }
     });
+    this.displayData();
+  }
+
+  public displayData() {
+    console.log(this.year, this.percentRenewable, this.scenario);
   }
 }
