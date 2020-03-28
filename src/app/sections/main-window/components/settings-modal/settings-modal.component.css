@@ -3,17 +3,20 @@
     height: 92%;
     background-color: black;
     outline: 1px solid white;
+    outline-color: var(--menu-blue);
     z-index: 1000000;
-    color: white;
+    color: var(--main-text-color);
     position: absolute;
     left: 4%;
     top: 4%;
+    text-align: center;
 }
 
 .map-mover {
     height: 200px;
     width: 200px;
-    outline: 1px solid green;
+    border: 1px solid green;
+    border-color: var(--menu-blue);
     position: absolute;
     left: 20vw;
 }
@@ -21,7 +24,8 @@
 .chart-mover {
     height: 200px;
     width: 200px;
-    outline: 1px solid yellow;
+    border: 1px solid yellow;
+    border-color: var(--menu-blue);
     position: absolute;
 }
 
@@ -40,4 +44,30 @@
     padding: 2%;
     margin: 0 3% 0 3%;
     border: 1px solid purple;
+    cursor: pointer;
+}
+
+.options {
+    width: 80%;
+    margin-left: 2%;
+    font-size: 14px;
+    text-align: center;
+    padding: 4% 2% 4% 2%;
+}
+
+.pie {
+    border-radius: 50%;
+}
+
+.pie>p {
+    margin-top: 41px;
+}
+.settings-expansion-wrapper {
+    height: 200px;
+    width: 400px;
+    position: absolute;
+    left: 200px;
+    border: 1px solid white;
+    top: 0;
+    display: none;
 }

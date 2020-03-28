@@ -30,6 +30,7 @@ export class PlanService {
   public yearsSubject = new BehaviorSubject<number[]>(null);           // Publishes an array of all years.
   public precentRenewableByYearSubject = new BehaviorSubject<number>(null); // Publishes the percent renewable for a single year.
   public positionSubject = new BehaviorSubject<any>(null);             // Publishes the repositioning data from the position modal.
+  public resizeSubject = new BehaviorSubject<any>(null);               // Publishes the resizing data from the position modal.
   public closeModalSubject = new BehaviorSubject<any>(null);           // Notifies the position modal to close.
   public capDataSubject = new BehaviorSubject<any>(null);              // Publishes capacity data.
   public genDataSubject = new BehaviorSubject<any>(null);              // Publishes the generation data.
@@ -296,7 +297,7 @@ export class PlanService {
   /** Sets the year to a specific value, plays the year change sound effect and messages the map screen.
    * @param year the year to set
    */
-  public updateYear(val): void {
+  public updateYear(val, play: boolean): void {
     const year = Number(val);  // Cast the year as a number if it isnt already.
     // Check to see if the year is valid and it is actually different than the current year.
     if (year >= this.dataTable.year.min && year <= this.dataTable.year.max && this.dataTable.year.current !== year) {
@@ -304,8 +305,17 @@ export class PlanService {
       this.yearSubject.next(year);                                              // Publish new year.
       this.precentRenewableByYearSubject.next(this.setCurrentPercent(year));    // Publish current percentage data.
       if (this.windowService.isMain()) {
-        this.soundsService.playClick();                                         // Play the sound once.
+        if (play) {
+          this.soundsService.playYear(val);
+        }                                     // Play the sound once.
         this.windowService.sendMessage({ type: 'year change', message: year }); // Notify the Map screen of the year change.
+        this.windowService.sendMessage({ type: 'percent change', message: this.dataTable.year.currentRenewablePercent });
+      }
+    } else {
+      if (this.windowService.isMain()) {
+        if (play) {
+          this.soundsService.playYear(val);
+        }
       }
     }
   }
@@ -337,7 +347,7 @@ export class PlanService {
         this.yearSubject.next(this.dataTable.year.current);                  // Force app to update data by resending year.
         this.precentRenewableByYearSubject.next(this.setCurrentPercent(this.dataTable.year.current));  // Update renewable precentage.
         if (this.windowService.isMain()) {
-          this.soundsService.playTick();   // Play scenario change sound.
+          this.soundsService.playScenario(scenarioName);
         }
       }
     }
@@ -383,9 +393,9 @@ export class PlanService {
  * @param type the type of change
  * @param data the value of the change.
  */
-  public handleMenuChange(type: string, data: any): void {
+  public handleMenuChange(type: string, data: any, play: boolean): void {
     if (type === 'year') {
-      this.updateYear(data);
+      this.updateYear(data, play);
     } else if (type === 'scenario') {
       const scen = this.dataTable.scenario.all.find(el => el.displayName === data);
       this.updateScenario(scen.name);
@@ -400,13 +410,18 @@ export class PlanService {
    */
   public handleMessage(msg: any): boolean {
     if (msg.type === 'year change') {
-      this.updateYear(msg.message);
+      this.updateYear(msg.message, false);
+    } else if (msg.type === 'percent change') {
+      this.dataTable.year.currentRenewablePercent = msg.message;
+      this.precentRenewableByYearSubject.next(msg.message);
     } else if (msg.type === 'scenario change') {
       this.updateScenario(this.dataTable.scenario.all.find(el => el.name === msg.message).name);
     } else if (msg.type === 'toggle layer') {
       this.toggleLayer(msg.message);
     } else if (msg.type === 'position elements' && !this.windowService.isMain()) {
       this.positionSubject.next(msg.message);
+    } else if (msg.type === 'resize') {
+      this.resizeSubject.next(msg.message);
     } else if (msg.type === 'file information') {
       msg.message.forEach(d => {
         if (d.file === 'cssData') {
@@ -424,7 +439,8 @@ export class PlanService {
    */
   public handleLayerButtonClick(layerName: string): void {
     this.toggleLayer(layerName);
-    this.windowService.sendMessage({ type: 'toggle layer', message: layerName });
+    const msg = { type: 'toggle layer', message: layerName };
+    this.windowService.sendMessage(msg);
   }
 
   public handleLayerButtonInfoClick(layerName: string) {
@@ -446,7 +462,7 @@ export class PlanService {
    * @param y the absolute y position in pixels.
    * */
   public positionMapElements(id: string, x: number, y: number) {
-    this.windowService.sendMessage({type: 'position elements', message: {id: id, x: x, y: y}});
+    this.windowService.sendMessage({ type: 'position elements', message: { id: id, x: x, y: y } });
   }
 
   /** When the renewable totals are calculated y the year-bar component, the data is sent here to be stored in the datatable.
@@ -504,7 +520,7 @@ export class PlanService {
       this.CSS.map.left = `${this.dataTable.positionData.map.x}px`;
       this.CSS.map.top = `${this.dataTable.positionData.map.y}px`;
     }
-    this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS })});
+    this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) });
   }
 
   /** When toolTips are clicked, this function notifies the tooltop element which data to display.
@@ -559,6 +575,15 @@ export class PlanService {
     });
     return technologies;
   }
+
+  /** When a slider is moved, the distance from the left is calculated and fed to this funciton.  All
+   * sliders begin at 50%.
+   * @param percentFromLeft this is a percentage that the center of the slider is from the left of the bar.
+   * @param id a string that identifies the slider.  ie. Map resize, etc.
+   */
+  public handleSliderChange(percentFromLeft: number, id: string) {
+        this.windowService.sendMessage({ type: 'resize', message: {percent: percentFromLeft, id: id }});
+    }
 
   /** Returns the current year data.
    * Years array, current year, current renewable percentage for that year, min year, max year.

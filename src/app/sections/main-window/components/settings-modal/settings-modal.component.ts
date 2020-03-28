@@ -15,15 +15,24 @@ export class SettingsModalComponent implements AfterViewInit {
   @ViewChild('mapMover', { static: false }) mapElement;     // The map component
   @ViewChild('pieMover', { static: false }) pieElement;     // The pie chart component.
   @ViewChild('lineMover', { static: false }) lineElement;   // The line chart component.
+  @ViewChild('extraLine', { static: false }) extraLine;   // The line chart component.
+  @ViewChild('extraMap', { static: false }) extraMap;   // The line chart component.
+  @ViewChild('extraPie', { static: false }) extraPie;   // The line chart component.
 
   private dragging: boolean;
   private touchId: number;
   private isSet: boolean;
+  private exMap: boolean;
+  private exLine: boolean;
+  private exPie: boolean;
 
   constructor(private planService: PlanService, private windowService: WindowService) {
     this.dragging = false;
     this.touchId = -1;
     this.isSet = false;
+    this.exMap = false;
+    this.exLine = false;
+    this.exPie = false;
   }
 
   ngAfterViewInit() {
@@ -71,7 +80,25 @@ export class SettingsModalComponent implements AfterViewInit {
         this.drag(event, this.lineElement, 'line');
       }
     }, { passive: false });
+
+    this.extraMap.nativeElement.addEventListener('touchstart', () => {
+      if (this.dragging) {
+        this.stopDrag();
+      }
+    }, { passive: false });
+    this.extraLine.nativeElement.addEventListener('touchstart', () => {
+      if (this.dragging) {
+        this.stopDrag();
+      }
+    }, { passive: false });
+    this.extraPie.nativeElement.addEventListener('touchstart', () => {
+      if (this.dragging) {
+        this.stopDrag();
+      }
+    }, { passive: false });
   }
+
+
 
   /** Begins the dragging process.
    * @param touches the touchlist provided by the browser.
@@ -154,6 +181,25 @@ export class SettingsModalComponent implements AfterViewInit {
     } catch (error) {
       console.log('Error. Failed to find the element to position. ');
     }
+  }
+
+  /** Expands the settings area to add resizing options */
+  private expandMapOptions(): void {
+    this.exMap = !this.exMap;
+    const displayVal = this.exMap ? 'block' : 'none';
+    this.extraMap.nativeElement.style.display = displayVal;
+  }
+/** Expands the settings area to add resizing options */
+  private expandPieOptions(): void {
+    this.exPie = !this.exPie;
+    const displayVal = this.exPie ? 'block' : 'none';
+    this.extraPie.nativeElement.style.display = displayVal;
+  }
+/** Expands the settings area to add resizing options */
+  private expandLineOptions(): void {
+    this.exLine = !this.exLine;
+    const displayVal = this.exLine ? 'block' : 'none';
+    this.extraLine.nativeElement.style.display = displayVal;
   }
 
   private handleClick(save: boolean): void {

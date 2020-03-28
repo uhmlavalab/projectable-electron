@@ -43,6 +43,27 @@ export class MapElementComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.planService.resizeSubject.subscribe(data => {
+      if (data) {
+        let e = null;
+        const percentage = data.percent / 100 * 2;
+        if (data.id === 'resize map') {
+          e = this.mapDiv.nativeElement.children[0];
+          const image = e.children[0];
+          if (this.width === 0) {
+            this.width = e.getBoundingClientRect().width;
+            this.height = e.getBoundingClientRect().height;
+          }
+          const newWidth = this.width * percentage;
+          const newHeight = this.height * percentage;
+          e.style.width = `${newWidth}px`;
+          image.style.width = `${newWidth}px`;
+          e.style.height = `${newHeight}px`;
+          image.style.height = `${newHeight}px`;
+        }
+      }
+    });
+
     this.planService.planSetSubject.subscribe(plan => {
       this.allReady.planSet = plan;
       this.updateMap();

@@ -1,6 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 import { ipcRenderer } from 'electron';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
 
 
@@ -90,7 +90,7 @@ export class WindowService {
 
   public loadFile(fileUrl: string) {
     ipcRenderer.send('loadFile', fileUrl);
-    ipcRenderer.on('fileLoaded', (event, message) => { 
+    ipcRenderer.on('fileLoaded', (event, message) => {
       this.fileData.push(JSON.parse(message));
       ipcRenderer.removeListener('fileLoaded', () => { });
      }

@@ -30,6 +30,14 @@ export class SoundsService {
   private transOff: HTMLAudioElement;
   private windOn: HTMLAudioElement;
   private windOff: HTMLAudioElement;
+  private e3: HTMLAudioElement;
+  private e3gm: HTMLAudioElement;
+  private postApril: HTMLAudioElement;
+  private years: {year: number; audio: HTMLAudioElement}[];
+
+  private playYearOk: boolean; // when true, its ok to play the year sound.
+  private nextYearToPlay: number;
+  private lastYearPlayed: number;
 
   constructor() {
     this.introSound = new Audio();
@@ -124,6 +132,27 @@ export class SoundsService {
     this.windOff.src = '../assets/sounds/Deactivated/wind-off.mp3';
     this.windOff.load();
 
+    this.e3 = new Audio();
+    this.e3.src = '../assets/sounds/Scenarios/E3.mp3';
+    this.e3.load();
+
+    this.e3gm = new Audio();
+    this.e3gm.src = '../assets/sounds/Scenarios/E3 Gen Mod.mp3';
+    this.e3gm.load();
+
+    this.postApril = new Audio();
+    this.postApril.src = '../assets/sounds/Scenarios/Post April.mp3';
+    this.postApril.load();
+
+    this.years = [];
+    for (let i = 2016; i <= 2045; i++) {
+      const a = new Audio();
+      a.src = `../assets/sounds/Years/${i}.mp3`;
+      a.load();
+      this.years.push({year: i, audio: a});
+    }
+    
+    this.playYearOk = true;
   }
 
   /** Plays the intro music */
@@ -202,6 +231,36 @@ export class SoundsService {
       case 'ial':
         this.ialOff.play();
         break;
+    }
+  }
+
+  public playScenario(scenarioName: string) {
+    switch (scenarioName) {
+      case 'e3':
+        this.e3.play();
+        break;
+      case 'e3genmod':
+        this.e3gm.play();
+        break;
+      case 'postapril':
+        this.postApril.play();
+        break;
+    }
+  }
+
+  public playYear(year: number) {
+    this.nextYearToPlay = year;
+    if (this.playYearOk) {
+      this.lastYearPlayed = year;
+      const el = this.years.find(e => e.year == year);
+      el.audio.play();
+      this.playYearOk = false;
+      setTimeout(() => {
+        this.playYearOk = true;
+        if (this.nextYearToPlay != this.lastYearPlayed) {
+          this.playYear(this.nextYearToPlay);
+        }
+      }, 1500);
     }
   }
 }

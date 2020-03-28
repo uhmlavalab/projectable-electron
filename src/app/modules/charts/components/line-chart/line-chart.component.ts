@@ -22,6 +22,8 @@ export class LineChartComponent implements AfterViewInit {
   private planData: any;
   private allReady: any;
   private dataFetched = false;
+  private width: number;
+  private height: number;
 
   constructor(private planService: PlanService) {
     this.allReady = {};
@@ -29,9 +31,29 @@ export class LineChartComponent implements AfterViewInit {
     this.allReady.scenarioSet = false;
     this.allReady.yearSet = false;
     this.allReady.dataSet = false;
+    this.width = 0;
+    this.height = 0;
   }
 
   ngAfterViewInit() {
+
+    this.planService.resizeSubject.subscribe(data => {
+      if (data) {
+        let e = null;
+        const percentage = data.percent / 100 * 2;
+        if (data.id === 'resize line') {
+          e = this.chartDiv.nativeElement;
+          if (this.width === 0) {
+            this.width = e.getBoundingClientRect().width;
+            this.height = e.getBoundingClientRect().height;
+          }
+          const newWidth = this.width * percentage;
+          const newHeight = this.height * percentage;
+          e.style.width = `${newWidth}px`;
+          e.style.height = `${newHeight}px`;
+        }
+      }
+    });
 
     this.planService.planSetSubject.subscribe(plan => {
       if (plan) {
@@ -73,37 +95,37 @@ export class LineChartComponent implements AfterViewInit {
   }
 
   fetchData() {
-      this.data = {};
-      this.data.capacity = {};
-      const valueArray = [];
-      Object.keys(this.planData).forEach(scenario => {
-        this.data.capacity[scenario] = {};
-        this.data.capacity[scenario].labels = [];
-        this.data.capacity[scenario].datasets = [];
+    this.data = {};
+    this.data.capacity = {};
+    const valueArray = [];
+    Object.keys(this.planData).forEach(scenario => {
+      this.data.capacity[scenario] = {};
+      this.data.capacity[scenario].labels = [];
+      this.data.capacity[scenario].datasets = [];
 
-        Object.keys(this.planData[scenario]).forEach(tech => {
-          const dataset = {
-            label: tech,
-            backgroundColor: chartColors[tech],
-            borderColor: chartColors[tech],
-            pointRadius: 0,
-            fill: false,
-            data: [],
-          };
-          Object.keys(this.planData[scenario][tech]).forEach(el => {
-            const year = this.planData[scenario][tech][el].year;
-            const value = this.planData[scenario][tech][el].value;
-            this.data.capacity[scenario].labels.push(year);
-            dataset.data.push(value);
-            valueArray.push(value);
-          });
-          this.data.capacity[scenario].datasets.push(dataset);
+      Object.keys(this.planData[scenario]).forEach(tech => {
+        const dataset = {
+          label: tech,
+          backgroundColor: chartColors[tech],
+          borderColor: chartColors[tech],
+          pointRadius: 0,
+          fill: false,
+          data: [],
+        };
+        Object.keys(this.planData[scenario][tech]).forEach(el => {
+          const year = this.planData[scenario][tech][el].year;
+          const value = this.planData[scenario][tech][el].value;
+          this.data.capacity[scenario].labels.push(year);
+          dataset.data.push(value);
+          valueArray.push(value);
         });
-        this.data.capacity[scenario].labels = [...new Set(this.data.capacity[scenario].labels)];
+        this.data.capacity[scenario].datasets.push(dataset);
       });
-      this.chartMax = Math.ceil(Math.max(...valueArray) / 100) * 100;
-      this.createChart();
-      this.dataFetched = true;
+      this.data.capacity[scenario].labels = [...new Set(this.data.capacity[scenario].labels)];
+    });
+    this.chartMax = Math.ceil(Math.max(...valueArray) / 100) * 100;
+    this.createChart();
+    this.dataFetched = true;
   }
 
   createChart() {
@@ -139,9 +161,9 @@ export class LineChartComponent implements AfterViewInit {
         },
         legend: {
           labels: {
-            fontColor: 'white',
+            fontColor: 'rgb(209, 235, 236)',
             fontStyle: 'bold',
-            fontSize: 14
+            fontSize: 12
           }
         },
         scales: {
@@ -149,18 +171,18 @@ export class LineChartComponent implements AfterViewInit {
             display: true,
             gridLines: {
               display: false,
-              color: '#FFFFFF',
+              color: 'rgb(209, 235, 236)',
             },
             ticks: {
               fontSize: 14,
               fontStyle: 'bold',
-              fontColor: 'white',
+              fontColor: 'rgb(209, 235, 236)',
             },
             scaleLabel: {
               display: true,
               fontSize: 18,
               fontStyle: 'bold',
-              fontColor: '#FFFFFF',
+              fontColor: 'rgb(209, 235, 236)',
               labelString: 'Year'
             }
           }],
@@ -168,19 +190,19 @@ export class LineChartComponent implements AfterViewInit {
             display: true,
             gridLines: {
               display: true,
-              color: '#FFFFFF',
+              color: 'rgb(209, 235, 236)',
             },
             ticks: {
               fontSize: 14,
               fontStyle: 'bold',
-              fontColor: 'white',
+              fontColor: 'rgb(209, 235, 236)',
               max: this.chartMax
             },
             scaleLabel: {
               display: true,
               fontSize: 18,
               fontStyle: 'bold',
-              fontColor: '#FFFFFF',
+              fontColor: 'rgb(209, 235, 236)',
               labelString: 'Capacity (MW)'
             }
           }]

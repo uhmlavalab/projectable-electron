@@ -1,7 +1,28 @@
-<div class="map-mover" #mapMover><p>I'm a map</p></div>
-<div class="chart-mover" #pieMover><p>I'm a pie chart</p></div>
-<div class="chart-mover" #lineMover><p>I'm a line chart</p></div>
+<div class="map-mover" #mapMover>
+  <p>I'm a map</p>
+  <div class="button options" (click)="expandMapOptions()">Map Settings</div>
+  <div class="settings-expansion-wrapper" #extraMap>
+      <p>Resize Map</p>
+      <app-slider width="90" horizontal="true" type="resize map"></app-slider>
+  </div>
+</div>
+<div class="chart-mover pie" #pieMover>
+  <p>I'm a pie chart</p>
+  <div class="button options" (click)="expandPieOptions()">Pie Chart Settings</div>
+  <div class="settings-expansion-wrapper" #extraPie>
+    <p>Resize Map</p>
+    <app-slider width="90" horizontal="true" type="resize pie"></app-slider>
+  </div>
+</div>
+<div class="chart-mover" #lineMover>
+  <p>I'm a line chart</p>
+  <div class="button options" (click)="expandLineOptions()">Line Chart Settings</div>
+  <div class="settings-expansion-wrapper" #extraLine>
+    <p>Resize Map</p>
+    <app-slider width="90" horizontal="true" type="resize line"></app-slider>
+  </div>
+</div>
 <div class="button-wrapper">
-    <div class="button" (click)="handleClick(true)" #saveButton>Save Changes</div>
-    <div class="button" (click)="handleClick(false)" #cancelButton>Cancel Changes</div>
+  <div class="button" (click)="handleClick(true)" #saveButton>Save Changes</div>
+  <div class="button" (click)="handleClick(false)" #cancelButton>Cancel Changes</div>
 </div>

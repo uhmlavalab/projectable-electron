@@ -28,6 +28,8 @@ export class PieChartComponent implements AfterViewInit {
   private allReady: any;
 
   private dataFetched = false;
+  private width: number;
+  private height: number;
 
   constructor(private planService: PlanService) {
     this.allReady = {};
@@ -35,9 +37,29 @@ export class PieChartComponent implements AfterViewInit {
     this.allReady.scenarioSet = false;
     this.allReady.yearSet = false;
     this.allReady.dataSet = false;
+    this.width = 0;
+    this.height = 0;
   }
 
   ngAfterViewInit() {
+    this.planService.resizeSubject.subscribe(data => {
+      if (data) {
+        let e = null;
+        const percentage = data.percent / 100 * 2;
+        if (data.id === 'resize pie') {
+          e = this.chartDiv.nativeElement;
+          if (this.width === 0) {
+            this.width = e.getBoundingClientRect().width;
+            this.height = e.getBoundingClientRect().height;
+          }
+          const newWidth = this.width * percentage;
+          const newHeight = this.height * percentage;
+          e.style.width = `${newWidth}px`;
+          e.style.height = `${newHeight}px`;
+        }
+      }
+    });
+
     this.planService.planSetSubject.subscribe(plan => {
       if (plan) {
         this.allReady.planSet = true;
@@ -123,21 +145,21 @@ export class PieChartComponent implements AfterViewInit {
     this.myChart = new Chart(this.ctx, {
       type: 'pie',
       options: {
-        title: {
-          display: true,
-          text: 'Generation',
-          position: 'top',
-          fontColor: 'white',
-          fontSize: 18,
-          fontFamily: "'Dalton Maag - Elevon OneG'",
-          defaultFontFamily: Chart.defaults.global.defaultFontFamily = "'Dalton Maag - Elevon OneG'"
-        },
+        // title: {
+        //   display: true,
+        //   text: 'Generation',
+        //   position: 'top',
+        //   fontColor: 'rgb(209, 235, 236)',
+        //   fontSize: 18,
+        //   fontFamily: 'Dalton Maag - Elevon OneG',
+        //   defaultFontFamily: Chart.defaults.global.defaultFontFamily = 'Dalton Maag - Elevon OneG'
+        // },
         legend: {
           display: false,
           labels: {
             fontColor: 'white',
             fontStyle: 'bold',
-            fontSize: 14,
+            fontSize: 12,
             fontFamily: 'Dalton Maag - Elevon OneG'
 
           }
@@ -156,7 +178,7 @@ export class PieChartComponent implements AfterViewInit {
           },
           {
             render: 'percentage',
-            fontColor: 'white',
+            fontColor: 'rgb(209, 235, 236)',
             fontSize: 8,
             fontStyle: 'bold',
             overlap: false,

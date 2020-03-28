@@ -37,6 +37,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
   private touchId: number;
   private scrolling: boolean;
   private setupComplete: boolean;
+  private stopped: boolean;
 
   constructor(private el: ElementRef, private planService: PlanService) {
     this.optionsData = [];        // Array of objects that contain the data for each menu option
@@ -56,6 +57,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
     this.scrolling = true;        // True if the menu is scrolling.
     this.setupComplete = false;   // True once all data is ready.
     this.touchId = -1;            // Holds the id of the touch event.
+    this.stopped = true;          // True when the menu is not being scrolled.  This determines if app should play the year sound or wait.
   }
 
   ngAfterViewInit() {
@@ -160,6 +162,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
    * @param event the touch/mouse event.
    */
   private startDrag(event): void {
+    this.stopped = false;
     if (this.intervalRunning) {               // Check to make sure no animations are running
       clearInterval(this.speedInterval);      // If there is an interval, clear it.
       this.intervalRunning = false;
@@ -180,6 +183,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
         }, this.repeatRate);
       }
     } else {                        // No animation necessary.  Stop scrolling and see what is in the center.
+      this.stopped = true;
       this.positionHistory = [];
       this.speed = 0;
       this.touchId = -1;
@@ -277,7 +281,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
         // Do a boundary check to determine which button was clicked.
         if (mouseY > e.element.getBoundingClientRect().top && mouseY < e.element.getBoundingClientRect().top + this.dividedHeight) {
           this.selectedOption = e;
-          this.planService.handleMenuChange(this.type, this.selectedOption.value);
+          this.planService.handleMenuChange(this.type, this.selectedOption.value, false);
           e.opacity = 1;
           e.element.style.textDecoration = 'underline';
         } else {
@@ -316,9 +320,10 @@ export class ScrollingMenuComponent implements AfterViewInit {
   private updateSelectedOption(): void {
     const centerIndex = this.getCenterIndex();  // Gets the index of the array that is in the center of the window.
     // Make certain the index is valid and the value at this index is different than the current value.
-    if (centerIndex >= 0 && (this.optionsData[centerIndex].value !== this.selectedValue)) {
+    console.log(this.stopped);
+    if ((centerIndex >= 0 && (this.optionsData[centerIndex].value !== this.selectedValue)) || this.stopped) {
       this.selectedOption = this.optionsData[centerIndex];                        // Update the selected option
-      this.planService.handleMenuChange(this.type, this.selectedOption.value);    // Notify plan service of the change.
+      this.planService.handleMenuChange(this.type, this.selectedOption.value, this.stopped);    // Notify plan service of the change.
       this.selectedValue = this.selectedOption.value;                             // Update the selected value (only holds the string value)
     }
   }
@@ -529,6 +534,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
       this.positionHistory = [];
       this.speed = 0;
       this.speedInterval = -1;
+      this.stopped = true;
       this.updateSelectedOption();
       this.centerSelectedValue();
     } else {

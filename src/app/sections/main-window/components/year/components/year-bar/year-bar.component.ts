@@ -109,11 +109,11 @@ export class YearBarComponent implements AfterViewInit {
 
   @HostListener('click', ['$event.target'])
   onClick() {
-    this.planService.updateYear(this.data);
+    this.planService.updateYear(this.data, true);
    }
 
    @HostListener('touchStart', ['$event.target'])
    onTouchStart() {
-     this.planService.updateYear(this.data);
+     this.planService.updateYear(this.data, true);
     }
 }
