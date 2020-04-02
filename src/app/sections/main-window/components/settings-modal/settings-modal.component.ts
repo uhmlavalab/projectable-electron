@@ -15,9 +15,15 @@ export class SettingsModalComponent implements AfterViewInit {
   @ViewChild('mapMover', { static: false }) mapElement;     // The map component
   @ViewChild('pieMover', { static: false }) pieElement;     // The pie chart component.
   @ViewChild('lineMover', { static: false }) lineElement;   // The line chart component.
+  @ViewChild('displayingDataMover', { static: false }) displayDataElement;   // The line chart component.
+  @ViewChild('lavaLogoMover', { static: false }) lavaLogoElement;   // The line chart component.
+  @ViewChild('hecoLogoMover', { static: false }) hecoLogoElement;   // The line chart component.
   @ViewChild('extraLine', { static: false }) extraLine;   // The line chart component.
   @ViewChild('extraMap', { static: false }) extraMap;   // The line chart component.
   @ViewChild('extraPie', { static: false }) extraPie;   // The line chart component.
+  @ViewChild('extraData', { static: false }) extraData;   // The line chart component.
+  @ViewChild('extraHeco', { static: false }) extraHeco;   // The line chart component.
+  @ViewChild('extraLava', { static: false }) extraLava;   // The line chart component.
 
   private dragging: boolean;
   private touchId: number;
@@ -25,6 +31,10 @@ export class SettingsModalComponent implements AfterViewInit {
   private exMap: boolean;
   private exLine: boolean;
   private exPie: boolean;
+  private exHeco: boolean;
+  private exData: boolean;
+  private exLava: boolean;
+  private z: number;
 
   constructor(private planService: PlanService, private windowService: WindowService) {
     this.dragging = false;
@@ -33,6 +43,10 @@ export class SettingsModalComponent implements AfterViewInit {
     this.exMap = false;
     this.exLine = false;
     this.exPie = false;
+    this.exLava = false;
+    this.exHeco = false;
+    this.exData = false;
+    this.z = 10000;     // This holds the initial z index of the mover.
   }
 
   ngAfterViewInit() {
@@ -81,6 +95,42 @@ export class SettingsModalComponent implements AfterViewInit {
       }
     }, { passive: false });
 
+    this.lavaLogoElement.nativeElement.addEventListener('touchstart', event => {
+      this.startDrag(event.touches, this.lavaLogoElement);
+    }, { passive: false });
+    this.lavaLogoElement.nativeElement.addEventListener('touchend', () => {
+      this.stopDrag();
+    }, { passive: false });
+    this.lavaLogoElement.nativeElement.addEventListener('touchmove', event => {
+      if (this.dragging) {
+        this.drag(event, this.lavaLogoElement, 'lava');
+      }
+    }, { passive: false });
+
+    this.displayDataElement.nativeElement.addEventListener('touchstart', event => {
+      this.startDrag(event.touches, this.displayDataElement);
+    }, { passive: false });
+    this.displayDataElement.nativeElement.addEventListener('touchend', () => {
+      this.stopDrag();
+    }, { passive: false });
+    this.displayDataElement.nativeElement.addEventListener('touchmove', event => {
+      if (this.dragging) {
+        this.drag(event, this.displayDataElement, 'displayData');
+      }
+    }, { passive: false });
+
+    this.hecoLogoElement.nativeElement.addEventListener('touchstart', event => {
+      this.startDrag(event.touches, this.hecoLogoElement);
+    }, { passive: false });
+    this.hecoLogoElement.nativeElement.addEventListener('touchend', () => {
+      this.stopDrag();
+    }, { passive: false });
+    this.hecoLogoElement.nativeElement.addEventListener('touchmove', event => {
+      if (this.dragging) {
+        this.drag(event, this.hecoLogoElement, 'heco');
+      }
+    }, { passive: false });
+
     this.extraMap.nativeElement.addEventListener('touchstart', () => {
       if (this.dragging) {
         this.stopDrag();
@@ -96,6 +146,21 @@ export class SettingsModalComponent implements AfterViewInit {
         this.stopDrag();
       }
     }, { passive: false });
+    this.extraData.nativeElement.addEventListener('touchstart', () => {
+      if (this.dragging) {
+        this.stopDrag();
+      }
+    }, { passive: false });
+    this.extraHeco.nativeElement.addEventListener('touchstart', () => {
+      if (this.dragging) {
+        this.stopDrag();
+      }
+    }, { passive: false });
+    this.extraLava.nativeElement.addEventListener('touchstart', () => {
+      if (this.dragging) {
+        this.stopDrag();
+      }
+    }, { passive: false });
   }
 
 
@@ -107,6 +172,8 @@ export class SettingsModalComponent implements AfterViewInit {
   private startDrag(touches, el): void {
     this.dragging = true;
     this.setTouchId(touches, el); // Set the id of the finger that is dragging.
+    el.nativeElement.style.zIndex = this.z;
+    this.z++;
   }
 
   /** Drags an element on the screen and passes the position values to the other window.
@@ -200,6 +267,24 @@ export class SettingsModalComponent implements AfterViewInit {
     this.exLine = !this.exLine;
     const displayVal = this.exLine ? 'block' : 'none';
     this.extraLine.nativeElement.style.display = displayVal;
+  }
+/** Expands the settings area to add resizing options */
+  private expandLavaOptions(): void {
+    this.exLava = !this.exLava;
+    const displayVal = this.exLava ? 'block' : 'none';
+    this.extraLava.nativeElement.style.display = displayVal;
+  }
+/** Expands the settings area to add resizing options */
+  private expandHecoOptions(): void {
+    this.exHeco = !this.exHeco;
+    const displayVal = this.exHeco ? 'block' : 'none';
+    this.extraHeco.nativeElement.style.display = displayVal;
+  }
+/** Expands the settings area to add resizing options */
+  private expandDataOptions(): void {
+    this.exData = !this.exData;
+    const displayVal = this.exData ? 'block' : 'none';
+    this.extraData.nativeElement.style.display = displayVal;
   }
 
   private handleClick(save: boolean): void {
