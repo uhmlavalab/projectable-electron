@@ -124,8 +124,8 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
         this.lavaLogoWidth = e.getBoundingClientRect().width;
         this.lavaLogoHeight = e.getBoundingClientRect().height;
       }
-      const newWidth = this.lavaLogoWidth * percentage * 50;
-      const newHeight = this.lavaLogoHeight * percentage * 50;
+      const newWidth = this.lavaLogoWidth * percentage / 100 * 2;
+      const newHeight = this.lavaLogoHeight * percentage / 100 * 2;
       e.style.width = `${newWidth}px`;
       e.style.height = `${newHeight}px`;
     }
@@ -136,8 +136,8 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
         this.hecoLogoWidth = e.getBoundingClientRect().width;
         this.hecoLogoHeight = e.getBoundingClientRect().height;
       }
-      const newWidth = this.hecoLogoWidth * percentage * 50;
-      const newHeight = this.hecoLogoHeight * percentage * 50;
+      const newWidth = this.hecoLogoWidth * percentage / 100 * 2;
+      const newHeight = this.hecoLogoHeight * percentage / 100 * 2;
       e.style.width = `${newWidth}px`;
       e.style.height = `${newHeight}px`;
     }
@@ -148,8 +148,8 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
         this.yearDataWidth = e.getBoundingClientRect().width;
         this.yearDataHeight = e.getBoundingClientRect().height;
       }
-      const newWidth = this.yearDataWidth * percentage * 50;
-      const newHeight = this.yearDataHeight * percentage * 50;
+      const newWidth = this.yearDataWidth * percentage / 100 * 2;
+      const newHeight = this.yearDataHeight * percentage / 100 * 2;
       e.style.width = `${newWidth}px`;
       e.style.height = `${newHeight}px`;
     }
