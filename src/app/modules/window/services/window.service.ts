@@ -84,8 +84,13 @@ export class WindowService {
     ipcRenderer.send('close');
   }
 
-  public saveFile(data: { filename: string, file: any }) {
-    ipcRenderer.send('saveFile', data);
+  public saveFile(data: { filename: string, file: any }): boolean {
+    try {
+      ipcRenderer.send('saveFile', data);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   public loadFile(fileUrl: string) {

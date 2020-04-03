@@ -423,9 +423,16 @@ export class PlanService {
     } else if (msg.type === 'resize') {
       this.resizeSubject.next(msg.message);
     } else if (msg.type === 'file information') {
+      console.log('File information -> ');
+      console.log(msg);
       msg.message.forEach(d => {
         if (d.file === 'cssData') {
-          this.setCSS(d.css);
+          if (d.css.charts && d.css.logos && d.css.map && d.css.data) {
+            this.setCSS(d.css);
+          } else {
+            // Create New Css File
+            this.createCssData();
+          }
         }
       });
     } else if (msg.type === 'update cssData file') {
@@ -508,19 +515,47 @@ export class PlanService {
    * saves that data and writes a file.  The data is saved in the positionData section of the dataTable.
    */
   private storeCssData(): void {
-    if (this.dataTable.positionData.line) {
+    console.log(this.dataTable.positionData);
+    if (this.dataTable.positionData.line.x) {
       this.CSS.charts.line.left = `${this.dataTable.positionData.line.x}px`;
       this.CSS.charts.line.top = `${this.dataTable.positionData.line.y}px`;
+      this.CSS.charts.line.percent = `${this.dataTable.positionData.line.percent}`;
     }
-    if (this.dataTable.positionData.pie) {
+    if (this.dataTable.positionData.pie.x) {
       this.CSS.charts.pie.left = `${this.dataTable.positionData.pie.x}px`;
       this.CSS.charts.pie.top = `${this.dataTable.positionData.pie.y}px`;
+      this.CSS.charts.pie.percent = `${this.dataTable.positionData.pie.percent}`;
     }
-    if (this.dataTable.positionData.map) {
+    if (this.dataTable.positionData.map.x) {
       this.CSS.map.left = `${this.dataTable.positionData.map.x}px`;
       this.CSS.map.top = `${this.dataTable.positionData.map.y}px`;
+      this.CSS.map.percent = `${this.dataTable.positionData.map.percent}`;
     }
-    this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) });
+    if (this.dataTable.positionData.displayData.x) {
+      this.CSS.data.left = `${this.dataTable.positionData.displayData.x}px`;
+      this.CSS.data.top = `${this.dataTable.positionData.displayData.y}px`;
+      this.CSS.data.percent = `${this.dataTable.positionData.displayData.percent}`;
+    }
+    if (this.dataTable.positionData.lava.x) {
+      this.CSS.logos.lava.left = `${this.dataTable.positionData.lava.x}px`;
+      this.CSS.logos.lava.top = `${this.dataTable.positionData.lava.y}px`;
+    }
+    if (this.dataTable.positionData.lava.percent) {
+      this.CSS.logos.lava.percent = `${this.dataTable.positionData.lava.percent}`;
+    }
+    if (this.dataTable.positionData.heco.x) {
+      this.CSS.logos.heco.left = `${this.dataTable.positionData.heco.x}px`;
+      this.CSS.logos.heco.top = `${this.dataTable.positionData.heco.y}px`;
+      this.CSS.logos.heco.percent = `${this.dataTable.positionData.heco.percent}`;
+    }
+
+    console.log('Saving => ');
+    console.log(this.CSS);
+    if (this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) })) {
+      console.log('Positon Data Saved.');
+    } else {
+      console.log('Failed to save position data.');
+    }
   }
 
   /** When toolTips are clicked, this function notifies the tooltop element which data to display.
@@ -582,8 +617,42 @@ export class PlanService {
    * @param id a string that identifies the slider.  ie. Map resize, etc.
    */
   public handleSliderChange(percentFromLeft: number, id: string) {
-        this.windowService.sendMessage({ type: 'resize', message: {percent: percentFromLeft, id: id }});
+    console.log(this.dataTable.positionData);
+    switch (id) {
+      case 'resize lava':
+        if (!this.dataTable.positionData.lava) {
+          this.dataTable.positionData.lava = {};
+        }
+        this.dataTable.positionData.lava.percent = percentFromLeft;
+        break;
+      case 'resize map':
+        if (!this.dataTable.positionData.map) {
+          this.dataTable.positionData.map = {};
+        }
+        this.dataTable.positionData.map.percent = percentFromLeft;
+        break;
+      case 'resize pie':
+        if (!this.dataTable.positionData.pie) {
+          this.dataTable.positionData.pie = {};
+        }
+        this.dataTable.positionData.pie.percent = percentFromLeft;
+        break;
+      case 'resize heco':
+        if (!this.dataTable.positionData.heco) {
+          this.dataTable.positionData.heco = {};
+        }
+        this.dataTable.positionData.heco.percent = percentFromLeft;
+        break;
+      case 'resize data':
+        if (!this.dataTable.positionData.displayData) {
+          this.dataTable.positionData.displayData = {};
+        }
+        this.dataTable.positionData.displayData.percent = percentFromLeft;
+        break;
+
     }
+    this.windowService.sendMessage({ type: 'resize', message: { percent: percentFromLeft, id: id } });
+  }
 
   /** Returns the current year data.
    * Years array, current year, current renewable percentage for that year, min year, max year.
@@ -596,6 +665,63 @@ export class PlanService {
   /** Gets all plans associated with the application. */
   public getAllPlans(): Plan[] {
     return this.plans;
+  }
+
+  /** When the app loads the css data from file, if there is nothing there, this file will create a new
+   * set of css data and write it to the file.
+   */
+  private createCssData(): void {
+    if (!this.CSS) {
+      this.CSS = {};
+    }
+    if (!this.CSS.map) {
+      this.CSS.map = {};
+      this.CSS.map.left = `0px`;
+      this.CSS.map.top = `0px`;
+      this.CSS.map.percent = 0;
+    }
+    if (!this.CSS.charts) {
+      this.CSS.charts = {};
+    }
+    if (!this.CSS.charts.line) {
+      this.CSS.charts.line = {};
+      this.CSS.charts.line.left = `0px`;
+      this.CSS.charts.line.top = `0px`;
+      this.CSS.charts.line.percent = 0;
+    }
+    if (!this.CSS.charts.pie) {
+      this.CSS.charts.pie = {};
+      this.CSS.charts.pie.left = `0px`;
+      this.CSS.charts.pie.top = `0px`;
+      this.CSS.charts.pie.percent = 0;
+    }
+    if (!this.CSS.logos) {
+      this.CSS.logos = {};
+    }
+    if (!this.CSS.logos.lava) {
+      this.CSS.logos.lava = {};
+      this.CSS.logos.lava.left = `0px`;
+      this.CSS.logos.lava.top = `0px`;
+      this.CSS.logos.lava.percent = 0;
+    }
+    if (!this.CSS.logos.heco) {
+      this.CSS.logos.heco = {};
+      this.CSS.logos.heco.left = `0px`;
+      this.CSS.logos.heco.top = `0px`;
+      this.CSS.logos.heco.percent = 0;
+    }
+    if (!this.CSS.data) {
+      this.CSS.data = {};
+      this.CSS.data.left = `0px`;
+      this.CSS.data.top = `0px`;
+      this.CSS.data.percent = 0;
+    }
+
+    if (this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) })) {
+      console.log('Positon Data Saved.');
+    } else {
+      console.log('Failed to save position data.');
+    }
   }
 
   /** Debugging method that will print the datatable in its current state to the console. */

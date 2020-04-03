@@ -15,6 +15,8 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
   @ViewChild('pieChart', { static: false, read: ElementRef }) pieChart; // The custom Map component.
   @ViewChild('lineChart', { static: false, read: ElementRef }) lineChart; // The custom Map component.
   @ViewChild('yearData', { static: false, read: ElementRef }) yearData;
+  @ViewChild('hecoLogo', { static: false, read: ElementRef }) hecoLogo;
+  @ViewChild('lavaLogo', { static: false, read: ElementRef }) lavaLogo;
 
   private positionData: any;
   private messageSub = new Subscription();
@@ -22,21 +24,54 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
   private mapWidth: number;
   private lineWidth: number;
   private pieWidth: number;
+  private lavaLogoWidth: number;
+  private lavaLogoHeight: number;
+  private hecoLogoWidth: number;
+  private hecoLogoHeight: number;
+  private yearDataHeight: number;
+  private yearDataWidth: number;
+  private lavaPercent: number;
+  private yearDataPercent: number;
+  private hecoPercent: number;
+  private mapPercent: number;
+  private linePercent: number;
+  private piePercent: number;
 
   constructor(private planService: PlanService, private windowService: WindowService) {
     this.positionData = {};
     this.positionData.line = {};
     this.positionData.pie = {};
     this.positionData.map = {};
+    this.positionData.lava = {};
+    this.positionData.displayData = {};
+    this.positionData.heco = {};
     this.mapWidth = 0;
     this.lineWidth = 0;
     this.pieWidth = 0;
+    this.lavaLogoWidth = 0;
+    this.lavaLogoHeight = 0;
+    this.hecoLogoWidth = 0;
+    this.hecoLogoHeight = 0;
+    this.yearDataWidth = 0;
+    this.yearDataHeight = 0;
   }
 
   ngAfterViewInit() {
 
     this.windowService.windowMessageSubject.subscribe(msg => {
       this.planService.handleMessage(msg);
+    });
+
+    this.planService.resizeSubject.subscribe(data => {
+      if (data) {
+        if (data.id === 'resize lava') {
+          this.resizeLavaLogo(this.lavaLogo.nativeElement, data.percent);
+        } else if (data.id === 'resize heco') {
+          this.resizeHecoLogo(this.hecoLogo.nativeElement, data.percent);
+        } else if (data.id === 'resize data') {
+          this.resizeDataElement(this.yearData.nativeElement, data.percent);
+        }
+      }
     });
 
     this.planService.positionSubject.subscribe(data => {
@@ -47,6 +82,12 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
             e = this.pieChart.nativeElement;
           } else if (data.id === 'line') {
             e = this.lineChart.nativeElement;
+          } else if (data.id === 'displayData') {
+            e = this.yearData.nativeElement;
+          } else if (data.id === 'lava') {
+            e = this.lavaLogo.nativeElement;
+          } else if (data.id === 'heco') {
+            e = this.hecoLogo.nativeElement;
           }
           const rect = e.getBoundingClientRect();
           e.style.left = `${data.x - rect.width / 2}px`;
@@ -60,10 +101,15 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     this.planService.cssSubject.subscribe(cssData => {
       if (cssData) {
         if (!this.windowService.isMain()) {
-          this.positionMap(cssData.map);
-          this.positionLineChart(cssData.charts.line);
-          this.positionPieChart(cssData.charts.pie);
-          this.positionYearData(cssData.mapYearData);
+          this.positionElement(cssData.map, this.mapElement.nativeElement);
+          this.positionElement(cssData.charts.line, this.lineChart.nativeElement);
+          this.positionElement(cssData.charts.pie, this.pieChart.nativeElement);
+          this.positionElement(cssData.data, this.yearData.nativeElement);
+          this.positionElement(cssData.logos.lava, this.lavaLogo.nativeElement);
+          this.positionElement(cssData.logos.heco, this.hecoLogo.nativeElement);
+          this.resizeDataElement(this.yearData.nativeElement, cssData.data.percentage);
+          this.resizeLavaLogo(this.lavaLogo.nativeElement, cssData.logos.lava.percentage);
+          this.resizeHecoLogo(this.hecoLogo.nativeElement, cssData.logos.heco.percentage);
         }
       }
     });
@@ -72,49 +118,49 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     this.messageSub.unsubscribe();
   }
 
-  private positionMap(css: any): void {
-    try {
-      //Select map element from viewchild
-      const e = this.mapElement.nativeElement;
-      e.style.left = css.left;
-      e.style.top = css.top;
-    } catch (error) {
-      console.log('Failed To locate Element to position');
+  resizeLavaLogo(e: any, percentage: any) {
+    if (percentage && percentage > 0) {
+      if (this.lavaLogoWidth === 0) {
+        this.lavaLogoWidth = e.getBoundingClientRect().width;
+        this.lavaLogoHeight = e.getBoundingClientRect().height;
+      }
+      const newWidth = this.lavaLogoWidth * percentage * 50;
+      const newHeight = this.lavaLogoHeight * percentage * 50;
+      e.style.width = `${newWidth}px`;
+      e.style.height = `${newHeight}px`;
+    }
+  }
+  resizeHecoLogo(e: any, percentage: any) {
+    if (percentage && percentage > 0) {
+      if (this.hecoLogoWidth === 0) {
+        this.hecoLogoWidth = e.getBoundingClientRect().width;
+        this.hecoLogoHeight = e.getBoundingClientRect().height;
+      }
+      const newWidth = this.hecoLogoWidth * percentage * 50;
+      const newHeight = this.hecoLogoHeight * percentage * 50;
+      e.style.width = `${newWidth}px`;
+      e.style.height = `${newHeight}px`;
+    }
+  }
+  resizeDataElement(e: any, percentage: any) {
+    if (percentage && percentage > 0) {
+      if (this.yearDataWidth === 0) {
+        this.yearDataWidth = e.getBoundingClientRect().width;
+        this.yearDataHeight = e.getBoundingClientRect().height;
+      }
+      const newWidth = this.yearDataWidth * percentage * 50;
+      const newHeight = this.yearDataHeight * percentage * 50;
+      e.style.width = `${newWidth}px`;
+      e.style.height = `${newHeight}px`;
     }
   }
 
-  private positionLineChart(css: any): void {
+  private positionElement(css: any, e: any): void {
     try {
-      //Select map element from viewchild
-      const e = this.lineChart.nativeElement;
-      e.style.left = css.left;
-      e.style.top = css.top;
-    } catch (error) {
-      console.log('Error.  Failed to find element to position.');
-    }
-  }
-
-  private positionPieChart(css: any): void {
-    try {
-      //Select map element from viewchild
-      const e = this.pieChart.nativeElement;
-      e.style.left = css.left;
-      e.style.top = css.top;
-    } catch (error) {
-      console.log('Error. Failed to find the element to position. ');
-    }
-  }
-
-  private positionYearData(css: any): void {
-    try {
-      //Select map element from viewchild
-      console.log(css);
-      const e = this.yearData.nativeElement;
       e.style.left = css.left;
       e.style.top = css.top;
     } catch (error) {
       console.log('Error.  Failed to find year data element to position.');
     }
   }
-
 }

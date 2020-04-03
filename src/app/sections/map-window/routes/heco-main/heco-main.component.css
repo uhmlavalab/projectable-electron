@@ -12,3 +12,7 @@
     position: absolute;
     color: white;
 }
+
+.heco-logo, .lava-logo {
+    position: absolute;
+}
