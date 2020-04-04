@@ -22,7 +22,14 @@ export class SliderComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.wrapperElement.nativeElement.style.width =  `${this.width}%`;
+
+    this.planService.cssSubject.subscribe(cssData => {
+      if (cssData) {
+        this.setInitialSlidePosition(cssData);
+      }
+    });
+
+    this.wrapperElement.nativeElement.style.width = `${this.width}%`;
     this.wrapperElement.nativeElement.style.left = ` ${(100 - this.width) / 2}%`;
 
     this.slideElement.nativeElement.addEventListener('mousedown', () => this.startDrag());
@@ -36,8 +43,8 @@ export class SliderComponent implements AfterViewInit {
 
     this.slideElement.nativeElement.addEventListener('mousemove', event => {
       if (this.dragging) {
-      //   this.uiService.changeYear(this.drag(event, this.slideElement));
-     }
+        //   this.uiService.changeYear(this.drag(event, this.slideElement));
+      }
     });
 
     this.slideElement.nativeElement.addEventListener('touchstart', () => {
@@ -91,4 +98,33 @@ export class SliderComponent implements AfterViewInit {
     }
   }
 
+  private setInitialSlidePosition(data: any): void {
+
+    let pos = 0;
+    switch (this.type) {
+      case 'resize map':
+        pos = data.map.percent;
+        break;
+      case 'resize pie':
+        pos = data.charts.pie.percent;
+        break;
+      case 'resize line':
+        pos = data.charts.line.percent;
+        break;
+      case 'resize data':
+        pos = data.data.percent;
+        break;
+      case 'resize lava':
+        pos = data.logos.lava.percent;
+        break;
+      case 'resize heco':
+        pos = data.logos.heco.percent;
+        break;
+    }
+
+
+    if (pos) {
+      this.slideElement.nativeElement.style.left = `${pos}%`;
+    }
+  }
 }

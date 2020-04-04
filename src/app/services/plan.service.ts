@@ -86,8 +86,18 @@ export class PlanService {
         curtailment: null,
         tech: null
       },
-      positionData: {}
+      positionData: {
+        locations: {},
+        percents: {
+          lava: -1,
+          map: -1,
+          pie: -1,
+          heco: -1,
+          displayData: -1
+        }
+      }
     };
+
     this.plans = Plans;
   }
 
@@ -422,19 +432,25 @@ export class PlanService {
       this.positionSubject.next(msg.message);
     } else if (msg.type === 'resize') {
       this.resizeSubject.next(msg.message);
+      this.handleSliderChange(msg.message.percent, msg.message.id);
     } else if (msg.type === 'file information') {
-      console.log('File information -> ');
-      console.log(msg);
       msg.message.forEach(d => {
         if (d.file === 'cssData') {
           if (d.css.charts && d.css.logos && d.css.map && d.css.data) {
-            this.setCSS(d.css);
+            if (!this.windowService.isMain()) {
+              this.setCSS(d.css);
+              this.windowService.sendMessage({ type: 'css loaded', message: d.css });
+            }
           } else {
             // Create New Css File
             this.createCssData();
           }
         }
       });
+    } else if (msg.type === 'css loaded') {
+      if (this.windowService.isMain()) {
+        this.setCSS(msg.message);
+      }
     } else if (msg.type === 'update cssData file') {
       this.storeCssData();
     }
@@ -500,7 +516,7 @@ export class PlanService {
    * @param data the id, x, y of the element being repositioned.
    */
   public updatePositionData(data) {
-    this.dataTable.positionData = data;
+    this.dataTable.positionData.locations = data;
   }
 
   /** When the css file is loaded, the data is sent here to be stored and published so that elements can be positioned.
@@ -509,48 +525,70 @@ export class PlanService {
   private setCSS(css: any): void {
     this.CSS = css;
     this.cssSubject.next(this.CSS);
+    if (!this.windowService.isMain()) {
+      if (this.CSS.charts.line.percent && this.CSS.charts.line.percent > 0) {
+        this.resizeSubject.next({ id: 'resize line', percent: this.CSS.charts.line.percent });
+      }
+
+      if (this.CSS.map.percent && this.CSS.map.percent > 0) {
+        this.resizeSubject.next({ id: 'resize map', percent: this.CSS.map.percent });
+      }
+
+      if (this.CSS.charts.pie.percent && this.CSS.charts.pie.percent > 0) {
+        this.resizeSubject.next({ id: 'resize pie', percent: this.CSS.charts.pie.percent });
+      }
+    }
+
+
   }
 
   /** When the user uses the position modal to move map elements around, the data can be saved to a file.  This function
    * saves that data and writes a file.  The data is saved in the positionData section of the dataTable.
    */
   private storeCssData(): void {
-    console.log(this.dataTable.positionData);
-    if (this.dataTable.positionData.line.x) {
-      this.CSS.charts.line.left = `${this.dataTable.positionData.line.x}px`;
-      this.CSS.charts.line.top = `${this.dataTable.positionData.line.y}px`;
-      this.CSS.charts.line.percent = `${this.dataTable.positionData.line.percent}`;
+    if (this.dataTable.positionData.locations.line.x) {
+      this.CSS.charts.line.left = `${this.dataTable.positionData.locations.line.x}px`;
+      this.CSS.charts.line.top = `${this.dataTable.positionData.locations.line.y}px`;
     }
-    if (this.dataTable.positionData.pie.x) {
-      this.CSS.charts.pie.left = `${this.dataTable.positionData.pie.x}px`;
-      this.CSS.charts.pie.top = `${this.dataTable.positionData.pie.y}px`;
-      this.CSS.charts.pie.percent = `${this.dataTable.positionData.pie.percent}`;
+    if (this.dataTable.positionData.locations.pie.x) {
+      this.CSS.charts.pie.left = `${this.dataTable.positionData.locations.pie.x}px`;
+      this.CSS.charts.pie.top = `${this.dataTable.positionData.locations.pie.y}px`;
     }
-    if (this.dataTable.positionData.map.x) {
-      this.CSS.map.left = `${this.dataTable.positionData.map.x}px`;
-      this.CSS.map.top = `${this.dataTable.positionData.map.y}px`;
-      this.CSS.map.percent = `${this.dataTable.positionData.map.percent}`;
+    if (this.dataTable.positionData.locations.map.x) {
+      this.CSS.map.left = `${this.dataTable.positionData.locations.map.x}px`;
+      this.CSS.map.top = `${this.dataTable.positionData.locations.map.y}px`;
     }
-    if (this.dataTable.positionData.displayData.x) {
-      this.CSS.data.left = `${this.dataTable.positionData.displayData.x}px`;
-      this.CSS.data.top = `${this.dataTable.positionData.displayData.y}px`;
-      this.CSS.data.percent = `${this.dataTable.positionData.displayData.percent}`;
+    if (this.dataTable.positionData.locations.displayData.x) {
+      this.CSS.data.left = `${this.dataTable.positionData.locations.displayData.x}px`;
+      this.CSS.data.top = `${this.dataTable.positionData.locations.displayData.y}px`;
     }
-    if (this.dataTable.positionData.lava.x) {
-      this.CSS.logos.lava.left = `${this.dataTable.positionData.lava.x}px`;
-      this.CSS.logos.lava.top = `${this.dataTable.positionData.lava.y}px`;
+    if (this.dataTable.positionData.locations.lava.x) {
+      this.CSS.logos.lava.left = `${this.dataTable.positionData.locations.lava.x}px`;
+      this.CSS.logos.lava.top = `${this.dataTable.positionData.locations.lava.y}px`;
     }
-    if (this.dataTable.positionData.lava.percent) {
-      this.CSS.logos.lava.percent = `${this.dataTable.positionData.lava.percent}`;
+    if (this.dataTable.positionData.locations.heco.x) {
+      this.CSS.logos.heco.left = `${this.dataTable.positionData.locations.heco.x}px`;
+      this.CSS.logos.heco.top = `${this.dataTable.positionData.locations.heco.y}px`;
     }
-    if (this.dataTable.positionData.heco.x) {
-      this.CSS.logos.heco.left = `${this.dataTable.positionData.heco.x}px`;
-      this.CSS.logos.heco.top = `${this.dataTable.positionData.heco.y}px`;
-      this.CSS.logos.heco.percent = `${this.dataTable.positionData.heco.percent}`;
+    if (this.dataTable.positionData.percents.map > 0) {
+      this.CSS.map.percent = `${this.dataTable.positionData.percents.map}`;
+    }
+    if (this.dataTable.positionData.percents.pie > 0) {
+      this.CSS.charts.pie.percent = `${this.dataTable.positionData.percents.pie}`;
+    }
+    if (this.dataTable.positionData.percents.line > 0) {
+      this.CSS.charts.line.percent = `${this.dataTable.positionData.percents.line}`;
+    }
+    if (this.dataTable.positionData.percents.lava > 0) {
+      this.CSS.logos.lava.percent = `${this.dataTable.positionData.percents.lava}`;
+    }
+    if (this.dataTable.positionData.percents.heco > 0) {
+      this.CSS.logos.heco.percent = `${this.dataTable.positionData.percents.heco}`;
+    }
+    if (this.dataTable.positionData.percents.displayData > 0) {
+      this.CSS.data.percent = `${this.dataTable.positionData.percents.displayData}`;
     }
 
-    console.log('Saving => ');
-    console.log(this.CSS);
     if (this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) })) {
       console.log('Positon Data Saved.');
     } else {
@@ -617,41 +655,30 @@ export class PlanService {
    * @param id a string that identifies the slider.  ie. Map resize, etc.
    */
   public handleSliderChange(percentFromLeft: number, id: string) {
-    console.log(this.dataTable.positionData);
     switch (id) {
       case 'resize lava':
-        if (!this.dataTable.positionData.lava) {
-          this.dataTable.positionData.lava = {};
-        }
-        this.dataTable.positionData.lava.percent = percentFromLeft;
+        this.dataTable.positionData.percents.lava = percentFromLeft;
         break;
       case 'resize map':
-        if (!this.dataTable.positionData.map) {
-          this.dataTable.positionData.map = {};
-        }
-        this.dataTable.positionData.map.percent = percentFromLeft;
+        this.dataTable.positionData.percents.map = percentFromLeft;
         break;
       case 'resize pie':
-        if (!this.dataTable.positionData.pie) {
-          this.dataTable.positionData.pie = {};
-        }
-        this.dataTable.positionData.pie.percent = percentFromLeft;
+        this.dataTable.positionData.percents.pie = percentFromLeft;
+        break;
+      case 'resize line':
+        this.dataTable.positionData.percents.line = percentFromLeft;
         break;
       case 'resize heco':
-        if (!this.dataTable.positionData.heco) {
-          this.dataTable.positionData.heco = {};
-        }
-        this.dataTable.positionData.heco.percent = percentFromLeft;
+        this.dataTable.positionData.percents.heco = percentFromLeft;
         break;
       case 'resize data':
-        if (!this.dataTable.positionData.displayData) {
-          this.dataTable.positionData.displayData = {};
-        }
-        this.dataTable.positionData.displayData.percent = percentFromLeft;
+        this.dataTable.positionData.percents.displayData = percentFromLeft;
         break;
 
     }
-    this.windowService.sendMessage({ type: 'resize', message: { percent: percentFromLeft, id: id } });
+    if (this.windowService.isMain()) {
+      this.windowService.sendMessage({ type: 'resize', message: { percent: percentFromLeft, id: id } });
+    }
   }
 
   /** Returns the current year data.
