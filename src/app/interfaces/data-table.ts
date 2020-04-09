@@ -45,6 +45,9 @@ export interface DataTable {
         curtailment: any;
         tech: any[];
     };
-    positionData: any;
+    positionData: {
+        locations: any;
+        percents: any;
+    };
 
 }

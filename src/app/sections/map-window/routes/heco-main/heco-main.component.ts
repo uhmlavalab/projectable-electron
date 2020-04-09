@@ -107,9 +107,12 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
           this.positionElement(cssData.data, this.yearData.nativeElement);
           this.positionElement(cssData.logos.lava, this.lavaLogo.nativeElement);
           this.positionElement(cssData.logos.heco, this.hecoLogo.nativeElement);
-          this.resizeDataElement(this.yearData.nativeElement, cssData.data.percentage);
-          this.resizeLavaLogo(this.lavaLogo.nativeElement, cssData.logos.lava.percentage);
-          this.resizeHecoLogo(this.hecoLogo.nativeElement, cssData.logos.heco.percentage);
+          setTimeout(()=> {
+            this.resizeDataElement(this.yearData.nativeElement, cssData.data.percent);
+            this.resizeLavaLogo(this.lavaLogo.nativeElement, cssData.logos.lava.percent);
+            this.resizeHecoLogo(this.hecoLogo.nativeElement, cssData.logos.heco.percent);
+          }, 500);
+
         }
       }
     });
@@ -126,6 +129,8 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       }
       const newWidth = this.lavaLogoWidth * percentage / 100 * 2;
       const newHeight = this.lavaLogoHeight * percentage / 100 * 2;
+
+      console.log(percentage, this.lavaLogoWidth, this.lavaLogoHeight, newWidth, newHeight);
       e.style.width = `${newWidth}px`;
       e.style.height = `${newHeight}px`;
     }
