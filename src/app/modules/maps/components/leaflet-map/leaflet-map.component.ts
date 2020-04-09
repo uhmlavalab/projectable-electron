@@ -2,6 +2,7 @@ import { Component, OnInit, Input, SimpleChanges } from '@angular/core';
 import * as L from 'leaflet';
 import { MapLayer } from '../../../../interfaces/mapLayer';
 import * as d3 from 'd3';
+import { PlanService } from '@app/services/plan.service';
 
 @Component({
   selector: 'app-leaflet-map',
@@ -15,6 +16,8 @@ export class LeafletMapComponent implements OnInit {
   @Input() layers: MapLayer[];
   map: L.Map;
 
+  leafletLayers: { layer: L.GeoJSON, name: string, active: boolean }[] = [];
+
   centerUpdate: number;
   options = {
     layers: [
@@ -26,7 +29,7 @@ export class LeafletMapComponent implements OnInit {
     center: L.latLng(46.879966, -121.726909),
     zoomControl: false
   };
-  constructor() { }
+  constructor(private planService: PlanService) { }
 
   ngOnInit(): void {
     this.centerUpdate = Date.now();
@@ -49,21 +52,52 @@ export class LeafletMapComponent implements OnInit {
     }
     if (changes.layers) {
       this.layers = changes.layers.currentValue;
-
+      this.leafletLayers.forEach(el => {
+        this.map.removeLayer(el.layer);
+      })
+      this.leafletLayers = [];
       this.layers.forEach(layer => {
-        console.log(layer);
-        if (layer['layer'].name == 'solar' || layer['layer'].name == 'ial') return;
         d3.json(layer['layer'].filePath, (error, geoData) => {
-          
+
           const d = new L.GeoJSON(geoData);
+          this.leafletLayers.push({ name: layer['layer'].name, 'layer': d, active: false });
           d.setStyle({ fillColor: layer['layer'].fillColor })
           d.setStyle({ color: 'white' })
           d.setStyle({ fillOpacity: 0.8 })
           d.setStyle({ weight: 2 })
-          d.addTo(this.map);
+          // d.addTo(this.map);
         })
       });
     }
+
+    // Subscribe to layer toggling
+    this.planService.toggleLayerSubject.subscribe(layer => {
+      if (layer) {
+        console.log(layer, this.leafletLayers)
+       const togLayer = this.leafletLayers.find(el => el.name == layer.layer.name);
+       console.log(togLayer);
+
+       if (togLayer) {
+          togLayer.active = layer.state;
+          if (togLayer.active) {
+            this.map.addLayer(togLayer.layer);
+          } else {
+            this.map.removeLayer(togLayer.layer);
+
+          }
+       }
+      }
+    });
+
+    // this.planService.yearSubject.subscribe(year => {
+    //   if (year) {
+    //     if (this.windowService.isMain()) {
+    //       this.updateYear(year);
+    //     } else {
+    //       this.updateYear(year);
+    //     }
+    //   }
+    // });
 
   }
 

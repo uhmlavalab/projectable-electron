@@ -19,8 +19,10 @@
   <div class="top">
     <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Mini Map')">
     <div class="section-title">{{sectionTitles.map}}</div>
-    <div class='map-container'></div>
-    <app-leaflet-map [center]="center" [zoom]="zoom" [layers]="layers"></app-leaflet-map>
+    <div class='map-container'>
+      <app-leaflet-map [center]="center" [zoom]="zoom" [layers]="layers"></app-leaflet-map>
+    </div>
+
 
   </div>
   <div class="middle">

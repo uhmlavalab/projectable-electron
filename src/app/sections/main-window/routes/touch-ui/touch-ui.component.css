@@ -65,20 +65,15 @@ app-border-line {
 
 .map-container {
   width: 100%;
-  padding-top: 5%;
+  height:40vh;
   position: relative;
+  border-radius: 100%;
+  overflow: hidden;
 }
-app-leaflet-map {
-  width: 80%;
-  height: 80%;
-  position: relative;
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform: translate(11%, 13%);
-  border-radius: 1rem;
-  border: solid gray 6px;
 
+app-leaflet-map {
+  width: 100%;
+  height: 100%;
 }
 
 /* Second row in the center container */
