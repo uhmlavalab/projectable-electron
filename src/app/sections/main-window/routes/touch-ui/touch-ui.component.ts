@@ -21,6 +21,8 @@ export class TouchUiComponent implements AfterViewInit {
   private allReady: {layersSet: boolean; planSet: boolean; yearSet: boolean; scenarioSet: boolean; };  // Necessary elements.
   private settingsIconPath: string;    // Path to the settings icon.
   private showSettingsModal: boolean;  // True, show the reposition modal, false hide it.
+  private center =  [21.473589, -157.963849];
+  private zoom = 10;
 
   constructor( private planService: PlanService, private windowService: WindowService) {
     this.setupComplete = false;

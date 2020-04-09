@@ -5,7 +5,7 @@
   <div class="chart pie">
     <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Generation Chart')">
     <app-pie-chart></app-pie-chart>
-    
+
     <!-- <app-progress-ring></app-progress-ring> -->
   </div>
   <div class="chart line">
@@ -19,8 +19,9 @@
   <div class="top">
     <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Mini Map')">
     <div class="section-title">{{sectionTitles.map}}</div>
-    <!-- <app-map-element class="map-container" cdkDrag #map>
-    </app-map-element> -->
+    <div class='map-container'></div>
+    <app-leaflet-map [center]="center" [zoom]="zoom" [layers]="layers"></app-leaflet-map>
+
   </div>
   <div class="middle">
     <div class="left">
@@ -49,8 +50,9 @@
       <!-- Wrapper forces the buttons to be 1 to 1 ratio -->
       <div class="buttons-container">
         <div class="layer-button-wrapper" *ngFor="let layer of layers">
-          <app-layer-button class="layer-button" layerName={{layer.layer.name}} layerDisplayName={{layer.layer.displayName}}
-            layerIcon={{layer.layer.iconPath}} color={{layer.layer.legendColor}}></app-layer-button>
+          <app-layer-button class="layer-button" layerName={{layer.layer.name}}
+            layerDisplayName={{layer.layer.displayName}} layerIcon={{layer.layer.iconPath}}
+            color={{layer.layer.legendColor}}></app-layer-button>
         </div>
       </div>
     </div>

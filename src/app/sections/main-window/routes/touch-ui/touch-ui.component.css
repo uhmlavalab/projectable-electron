@@ -68,7 +68,18 @@ app-border-line {
   padding-top: 5%;
   position: relative;
 }
+app-leaflet-map {
+  width: 80%;
+  height: 80%;
+  position: relative;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(11%, 13%);
+  border-radius: 1rem;
+  border: solid gray 6px;
 
+}
 
 /* Second row in the center container */
 .center-container>.middle {
