@@ -44,18 +44,24 @@ export class PieChartComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.planService.resizeSubject.subscribe(data => {
       if (data) {
-        let e = null;
-        const percentage = data.percent / 100 * 2;
-        if (data.id === 'resize pie') {
-          e = this.chartDiv.nativeElement;
-          if (this.width === 0) {
-            this.width = e.getBoundingClientRect().width;
-            this.height = e.getBoundingClientRect().height;
+        if (data) {
+          let e = null;
+          const percentage = data.percent / 100 * 2;
+          let width = data.width;
+          let height = data.height;
+          if (data.id === 'resize pie') {
+            e = this.chartDiv.nativeElement;
+            if (width === 0 || height === 0) {
+              width = e.getBoundingClientRect().width;
+              height = e.getBoundingClientRect().height;
+              this.planService.updateCSSHeight('charts', 'pie', height);
+              this.planService.updateCSSWidth('charts', 'pie', width);
+            }
+            const newWidth = width * percentage;
+            const newHeight = height * percentage;
+            e.style.width = `${newWidth}px`;
+            e.style.height = `${newHeight}px`;
           }
-          const newWidth = this.width * percentage;
-          const newHeight = this.height * percentage;
-          e.style.width = `${newWidth}px`;
-          e.style.height = `${newHeight}px`;
         }
       }
     });

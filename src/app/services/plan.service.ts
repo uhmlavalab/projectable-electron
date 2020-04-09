@@ -8,6 +8,7 @@ import { SoundsService } from '@app/sounds';
 import * as d3 from 'd3/d3.min';
 import { WindowService } from '@app/modules/window';
 import { DataTable } from '@app/interfaces/data-table';
+import { Message } from '@angular/compiler/src/i18n/i18n_ast';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class PlanService {
   private dataTable: DataTable; // This variable holds all active data.
   private CSS: any;       // Holds the css data for the positioning of the charts and map objects.
   private plans: Plan[];  // Array holding all plans (memory is cleared when plan is set.
+  private elements: {category: string, tag: string}[];
 
   // Data publishers.
   public planSetSubject = new BehaviorSubject<boolean>(null);          // Tells components when the plan is set.
@@ -32,6 +34,7 @@ export class PlanService {
   public positionSubject = new BehaviorSubject<any>(null);             // Publishes the repositioning data from the position modal.
   public resizeSubject = new BehaviorSubject<any>(null);               // Publishes the resizing data from the position modal.
   public closeModalSubject = new BehaviorSubject<any>(null);           // Notifies the position modal to close.
+  public revertPositionsSubject = new BehaviorSubject<any>(null);      // Reverts repositioning on the map screen when changes are canceled.
   public capDataSubject = new BehaviorSubject<any>(null);              // Publishes capacity data.
   public genDataSubject = new BehaviorSubject<any>(null);              // Publishes the generation data.
   public curDataSubject = new BehaviorSubject<any>(null);              // Puslishes the curtailment data.
@@ -40,6 +43,14 @@ export class PlanService {
   public tooltipSubject = new BehaviorSubject<any>(null);              // Publishes the which tooltip to display.
 
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
+    this.elements = [
+      {category: null, tag: 'map'},
+      {category: null, tag: 'data'},
+      {category: 'charts', tag: 'line'},
+      {category: 'charts', tag: 'pie'},
+      {category: 'logos', tag: 'lava'},
+      {category: 'logos', tag: 'heco'}
+  ];
 
     // The dataTable stores all relevant data and can be printed to the console using the function printDataTable().
     this.dataTable = {
@@ -433,6 +444,10 @@ export class PlanService {
     } else if (msg.type === 'resize') {
       this.resizeSubject.next(msg.message);
       this.handleSliderChange(msg.message.percent, msg.message.id);
+    } else if (msg.type === 'update height') {
+      this.updateCSSHeight(msg.message.cat, msg.message.name, msg.message.height);
+    } else if (msg.type === 'update width') {
+      this.updateCSSWidth(msg.message.cat, msg.message.name, msg.message.width);
     } else if (msg.type === 'file information') {
       msg.message.forEach(d => {
         if (d.file === 'cssData') {
@@ -452,7 +467,23 @@ export class PlanService {
         this.setCSS(msg.message);
       }
     } else if (msg.type === 'update cssData file') {
-      this.storeCssData();
+      if (!this.windowService.isMain() && msg.message.saveData) {
+        this.storeCssData();
+      } else if (!msg.message.saveData && !this.windowService.isMain()) {
+        this.revertPositionsSubject.next(this.CSS);
+        if (this.CSS.charts.line.percent && this.CSS.charts.line.percent > 0) {
+          // tslint:disable-next-line: max-line-length
+          this.resizeSubject.next({ id: 'resize line', width: this.CSS.charts.line.width, height: this.CSS.charts.line.height, percent: this.CSS.charts.line.percent });
+        }
+        if (this.CSS.map.percent && this.CSS.map.percent > 0) {
+          // tslint:disable-next-line: max-line-length
+          this.resizeSubject.next({ id: 'resize map', width: this.CSS.map.width, height: this.CSS.map.height, percent: this.CSS.map.percent });
+        }
+        if (this.CSS.charts.pie.percent && this.CSS.charts.pie.percent > 0) {
+          // tslint:disable-next-line: max-line-length
+          this.resizeSubject.next({ id: 'resize pie', width: this.CSS.charts.pie.width, height: this.CSS.charts.pie.height, percent: this.CSS.charts.pie.percent });
+        }
+      }
     }
     return true;
   }
@@ -506,10 +537,11 @@ export class PlanService {
    * @param save true if user clicks save, false if the user clicks cancel.alert-danger
    */
   public closePositionModal(save: boolean) {
-    if (save) {
       this.windowService.sendMessage({ type: 'update cssData file', message: { saveData: save } });
-    }
-    this.closeModalSubject.next({ saveData: save });
+      this.closeModalSubject.next({ saveData: save });
+      if (this.windowService.isMain() && !save) {
+        this.revertPositionsSubject.next(this.CSS);
+      }
   }
 
   /** When the user uses the position modal to position map elements, the data changes are stored in the datatable.
@@ -527,15 +559,18 @@ export class PlanService {
     this.cssSubject.next(this.CSS);
     if (!this.windowService.isMain()) {
       if (this.CSS.charts.line.percent && this.CSS.charts.line.percent > 0) {
-        this.resizeSubject.next({ id: 'resize line', percent: this.CSS.charts.line.percent });
+        // tslint:disable-next-line: max-line-length
+        this.resizeSubject.next({ id: 'resize line', width: this.CSS.charts.line.width, height: this.CSS.charts.line.height, percent: this.CSS.charts.line.percent });
       }
 
       if (this.CSS.map.percent && this.CSS.map.percent > 0) {
-        this.resizeSubject.next({ id: 'resize map', percent: this.CSS.map.percent });
+        // tslint:disable-next-line: max-line-length
+        this.resizeSubject.next({ id: 'resize map', width: this.CSS.map.width, height: this.CSS.map.height, percent: this.CSS.map.percent });
       }
 
       if (this.CSS.charts.pie.percent && this.CSS.charts.pie.percent > 0) {
-        this.resizeSubject.next({ id: 'resize pie', percent: this.CSS.charts.pie.percent });
+        // tslint:disable-next-line: max-line-length
+        this.resizeSubject.next({ id: 'resize pie', width: this.CSS.charts.pie.width, height: this.CSS.charts.pie.height, percent: this.CSS.charts.pie.percent });
       }
     }
 
@@ -655,29 +690,44 @@ export class PlanService {
    * @param id a string that identifies the slider.  ie. Map resize, etc.
    */
   public handleSliderChange(percentFromLeft: number, id: string) {
+    let width = 0;
+    let height = 0;
+
     switch (id) {
       case 'resize lava':
         this.dataTable.positionData.percents.lava = percentFromLeft;
+        width = this.CSS.logos.lava.width;
+        height = this.CSS.logos.lava.height;
         break;
       case 'resize map':
         this.dataTable.positionData.percents.map = percentFromLeft;
+        width = this.CSS.map.width;
+        height = this.CSS.map.height;
         break;
       case 'resize pie':
         this.dataTable.positionData.percents.pie = percentFromLeft;
+        width = this.CSS.charts.pie.width;
+        height = this.CSS.charts.pie.height;
         break;
       case 'resize line':
         this.dataTable.positionData.percents.line = percentFromLeft;
+        height = this.CSS.charts.line.height;
+        width = this.CSS.charts.line.width;
         break;
       case 'resize heco':
         this.dataTable.positionData.percents.heco = percentFromLeft;
+        width = this.CSS.logos.heco.width;
+        height = this.CSS.logos.heco.height;
         break;
       case 'resize data':
         this.dataTable.positionData.percents.displayData = percentFromLeft;
+        width = this.CSS.data.width;
+        height = this.CSS.data.height;
         break;
-
     }
+
     if (this.windowService.isMain()) {
-      this.windowService.sendMessage({ type: 'resize', message: { percent: percentFromLeft, id: id } });
+      this.windowService.sendMessage({ type: 'resize', message: { percent: percentFromLeft, id: id, width: width, height: height } });
     }
   }
 
@@ -706,6 +756,8 @@ export class PlanService {
       this.CSS.map.left = `0px`;
       this.CSS.map.top = `0px`;
       this.CSS.map.percent = 0;
+      this.CSS.map.width = 0;
+      this.CSS.map.height = 0;
     }
     if (!this.CSS.charts) {
       this.CSS.charts = {};
@@ -715,12 +767,16 @@ export class PlanService {
       this.CSS.charts.line.left = `0px`;
       this.CSS.charts.line.top = `0px`;
       this.CSS.charts.line.percent = 0;
+      this.CSS.charts.line.width = 0;
+      this.CSS.charts.line.height = 0;
     }
     if (!this.CSS.charts.pie) {
       this.CSS.charts.pie = {};
       this.CSS.charts.pie.left = `0px`;
       this.CSS.charts.pie.top = `0px`;
       this.CSS.charts.pie.percent = 0;
+      this.CSS.charts.pie.width = 0;
+      this.CSS.charts.pie.height = 0;
     }
     if (!this.CSS.logos) {
       this.CSS.logos = {};
@@ -730,24 +786,56 @@ export class PlanService {
       this.CSS.logos.lava.left = `0px`;
       this.CSS.logos.lava.top = `0px`;
       this.CSS.logos.lava.percent = 0;
+      this.CSS.logos.lava.width = 0;
+      this.CSS.logos.lava.height = 0;
     }
     if (!this.CSS.logos.heco) {
       this.CSS.logos.heco = {};
       this.CSS.logos.heco.left = `0px`;
       this.CSS.logos.heco.top = `0px`;
       this.CSS.logos.heco.percent = 0;
+      this.CSS.logos.heco.width = 0;
+      this.CSS.logos.heco.height = 0;
     }
     if (!this.CSS.data) {
       this.CSS.data = {};
       this.CSS.data.left = `0px`;
       this.CSS.data.top = `0px`;
       this.CSS.data.percent = 0;
+      this.CSS.data.width = 0;
+      this.CSS.data.height = 0;
     }
 
     if (this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) })) {
       console.log('Positon Data Saved.');
     } else {
       console.log('Failed to save position data.');
+    }
+  }
+
+  public updateCSSHeight(elementCategory: string, elementName: string, heightValue: number) {
+    if (this.CSS) {
+      if (elementCategory) {
+        this.CSS[elementCategory][elementName].height = heightValue;
+      } else {
+        this.CSS[elementName].height = heightValue;
+      }
+    }
+    if (!this.windowService.isMain()) {
+      this.windowService.sendMessage({ type: 'update height', message: { cat: elementCategory, name: elementName, height: heightValue } });
+    }
+
+  }
+  public updateCSSWidth(elementCategory: string, elementName: string, widthValue: number) {
+    if (this.CSS) {
+      if (elementCategory) {
+        this.CSS[elementCategory][elementName].width = widthValue;
+      } else {
+        this.CSS[elementName].width = widthValue;
+      }
+      if (!this.windowService.isMain()) {
+        this.windowService.sendMessage({ type: 'update width', message: { cat: elementCategory, name: elementName, width: widthValue } });
+      }
     }
   }
 

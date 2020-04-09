@@ -40,6 +40,12 @@ export class SliderComponent implements AfterViewInit {
       }
     });
 
+    this.planService.revertPositionsSubject.subscribe(val => {
+      if (val) {
+        this.setInitialSlidePosition(val);
+      }
+    });
+
 
     this.slideElement.nativeElement.addEventListener('mousemove', event => {
       if (this.dragging) {
