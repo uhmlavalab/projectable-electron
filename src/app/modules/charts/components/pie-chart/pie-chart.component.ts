@@ -42,6 +42,7 @@ export class PieChartComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
+
     this.planService.resizeSubject.subscribe(data => {
       if (data) {
         if (data) {

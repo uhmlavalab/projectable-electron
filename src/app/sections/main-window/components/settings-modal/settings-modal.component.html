@@ -3,7 +3,7 @@
   <div class="button options" (click)="expandMapOptions()">Map Settings</div>
   <div class="settings-expansion-wrapper" #extraMap>
       <p>Resize Map</p>
-      <app-slider width="90" horizontal="true" type="resize map"></app-slider>
+      <app-slider width="90" horizontal="true" type="resize map" category="" name="map"></app-slider>
   </div>
 </div>
 <div class="chart-mover pie mover" #pieMover>
@@ -11,7 +11,7 @@
   <div class="button options" (click)="expandPieOptions()">Pie Chart Settings</div>
   <div class="settings-expansion-wrapper" #extraPie>
     <p>Resize Pie Chart</p>
-    <app-slider width="90" horizontal="true" type="resize pie"></app-slider>
+    <app-slider width="90" horizontal="true" type="resize pie" category="charts" name="pie"></app-slider>
   </div>
 </div>
 <div class="chart-mover mover" #lineMover>
@@ -19,7 +19,7 @@
   <div class="button options" (click)="expandLineOptions()">Line Chart Settings</div>
   <div class="settings-expansion-wrapper" #extraLine>
     <p>Resize Line Chart</p>
-    <app-slider width="90" horizontal="true" type="resize line"></app-slider>
+    <app-slider width="90" horizontal="true" type="resize line" category="charts" name="line"></app-slider>
   </div>
 </div>
 <div class="displaying-data-mover mover" #displayingDataMover>
@@ -27,7 +27,7 @@
   <div class="button options" (click)="expandDataOptions()">Data Display Settings</div>
   <div class="settings-expansion-wrapper" #extraData>
     <p>Resize Data Display</p>
-    <app-slider width="90" horizontal="true" type="resize data"></app-slider>
+    <app-slider width="90" horizontal="true" type="resize data" category="" name="data"></app-slider>
   </div>
 </div>
 <div class="lava-logo-mover mover" #lavaLogoMover>
@@ -35,7 +35,7 @@
   <div class="button options" (click)="expandLavaOptions()">Lava Logo Settings</div>
   <div class="settings-expansion-wrapper" #extraLava>
     <p>Resize Lava Logo</p>
-    <app-slider width="90" horizontal="true" type="resize lava"></app-slider>
+    <app-slider width="90" horizontal="true" type="resize lava" category="logos" name="lava"></app-slider>
   </div>
 </div>
 <div class="heco-logo-mover mover" #hecoLogoMover>
@@ -43,7 +43,7 @@
   <div class="button options" (click)="expandHecoOptions()">Heco Logo Settings</div>
   <div class="settings-expansion-wrapper" #extraHeco>
     <p>Resize Heco Logo</p>
-    <app-slider width="90" horizontal="true" type="resize heco"></app-slider>
+    <app-slider width="90" horizontal="true" type="resize heco" category="logos" name="heco"></app-slider>
   </div>
 </div>
 <div class="button-wrapper">

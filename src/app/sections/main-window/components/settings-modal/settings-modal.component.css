@@ -58,10 +58,13 @@
 
 .options {
   width: 80%;
-  margin-left: 2%;
+  margin-left: -92%;
   font-size: 14px;
   text-align: center;
   padding: 4% 2% 4% 2%;
+  position: absolute;
+  top: 40%;
+  background-color: black;
 }
 
 .pie>p {
@@ -69,10 +72,10 @@
 }
 
 .settings-expansion-wrapper {
-  height: 200px;
+  height: 100%;
   width: 400px;
   position: absolute;
-  left: 200px;
+  left: 100%;
   border: 1px solid white;
   border-color: var(--menu-blue);
   top: -1px;
@@ -121,6 +124,7 @@
   width: 50%;
   margin: 4% 25% 4% 25%;
 }
+
 .displaying-data-mover>img {
   width: 50%;
   margin: 4% 25% 4% 25%;

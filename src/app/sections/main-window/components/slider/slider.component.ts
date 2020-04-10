@@ -14,6 +14,8 @@ export class SliderComponent implements AfterViewInit {
   @Input() width: number;
   @Input() horizontal: boolean;
   @Input() type: string;
+  @Input() category: string;
+  @Input() name: string;
 
   private dragging: boolean;
 
@@ -100,7 +102,7 @@ export class SliderComponent implements AfterViewInit {
     } catch (error) {
       console.log('Error Dragging Slider object');
     } finally {
-      this.planService.handleSliderChange(percentFromLeft * 100, this.type);
+      this.planService.handleSliderChange(percentFromLeft * 100, this.type, this.category, this.name);
     }
   }
 

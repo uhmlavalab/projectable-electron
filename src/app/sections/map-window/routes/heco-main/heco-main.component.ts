@@ -59,7 +59,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
             e = this.pieChart.nativeElement;
           } else if (data.id === 'line') {
             e = this.lineChart.nativeElement;
-          } else if (data.id === 'displayData') {
+          } else if (data.id === 'data') {
             e = this.yearData.nativeElement;
           } else if (data.id === 'lava') {
             e = this.lavaLogo.nativeElement;
