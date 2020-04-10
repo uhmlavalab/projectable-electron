@@ -150,7 +150,7 @@ export class SettingsModalComponent implements AfterViewInit {
           el.nativeElement.style.top = `${element.top}px`;
           el.nativeElement.style.left = `${element.left}px`;
           this.planService.positionMapElements(identifier, element.left, element.top); // Notify plan service of changes.
-          this.positionHistory = [];
+          this.positionHistory = [this.positionHistory[this.positionHistory.length - 1]];
         }
       }
     } catch (error) {
