@@ -34,6 +34,8 @@ export class SoundsService {
   private e3gm: HTMLAudioElement;
   private postApril: HTMLAudioElement;
   private years: {year: number; audio: HTMLAudioElement}[];
+  private loadingScenario: HTMLAudioElement;
+  private loadingLayer: HTMLAudioElement;
 
   private playYearOk: boolean; // when true, its ok to play the year sound.
   private nextYearToPlay: number;

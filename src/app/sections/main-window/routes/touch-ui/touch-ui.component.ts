@@ -80,6 +80,12 @@ export class TouchUiComponent implements AfterViewInit {
       }
     });
 
+    this.planService.freshCssSubject.subscribe((val: boolean) => {
+      if (val) {
+        this.showSettingsModal = val;
+      }
+    });
+
     this.windowService.getFileData();  // Nptifies the window service to get the data from any files and publish it.
 
     // Subscribes to a bariable that tells whether to open or close the modal.

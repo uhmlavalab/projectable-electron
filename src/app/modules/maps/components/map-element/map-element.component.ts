@@ -103,6 +103,13 @@ export class MapElementComponent implements OnInit {
         }
       }
     });
+
+    this.planService.getWidthSubject.subscribe((val: boolean) => {
+      if (val) {
+        this.planService.updateCSSWidth(null, 'map', this.width);
+        this.planService.updateCSSHeight(null, 'map', this.height);
+      }
+    });
   }
 
   private drawMap(): void {

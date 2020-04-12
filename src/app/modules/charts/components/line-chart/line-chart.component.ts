@@ -82,6 +82,13 @@ export class LineChartComponent implements AfterViewInit {
         this.checkReadyState();
       }
     });
+
+    this.planService.getWidthSubject.subscribe((val: boolean) => {
+      if (val) {
+        this.planService.updateCSSHeight('charts', 'line', this.chartDiv.nativeElement.getBoundingClientRect().height);
+        this.planService.updateCSSWidth('charts', 'line', this.chartDiv.nativeElement.getBoundingClientRect().width);
+      }
+    });
   }
 
   private checkReadyState(): void {

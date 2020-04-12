@@ -19,7 +19,8 @@ export class PlanService {
   private CSS: any;       // Holds the css data for the positioning of the charts and map objects.
   private plans: Plan[];  // Array holding all plans (memory is cleared when plan is set.
   private elements: { category: string, tag: string }[];  // Array storing all element tags.
-  private windowData: { main: boolean, width: number, height: number}[];
+  private windowData: { main: boolean, width: number, height: number }[];
+  private freshCss: boolean;
 
   // Data publishers.
   public planSetSubject = new BehaviorSubject<boolean>(null);          // Tells components when the plan is set.
@@ -43,8 +44,12 @@ export class PlanService {
   public cssSubject = new BehaviorSubject<any>(null);                  // Publishes the css data.
   public tooltipSubject = new BehaviorSubject<any>(null);              // Publishes the which tooltip to display.
   public windowDataSubject = new BehaviorSubject<any>(null);
+  public toggleElementSubject = new BehaviorSubject<{ tag: string, show: boolean }>(null);
+  public freshCssSubject = new BehaviorSubject<boolean>(null);
+  public getWidthSubject = new BehaviorSubject<boolean>(null);
 
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
+    this.freshCss = true;
     this.elements = [
       { category: null, tag: 'map' },
       { category: null, tag: 'data' },
@@ -108,6 +113,14 @@ export class PlanService {
           heco: -1,
           data: -1
         }
+      },
+      visibility: {
+        lava: true,
+        map: true,
+        heco: true,
+        pie: true,
+        data: true,
+        line: true
       }
     };
 
@@ -343,6 +356,10 @@ export class PlanService {
     }
   }
 
+  public requestPercentageUpdate(): void {
+    this.windowService.sendMessage({type: 'request percent', message: true});
+  }
+
   /** Sets the current percent of renewable for a specific year.
    * @param year the current year for the data.
    * @return the renewable percentage.
@@ -450,11 +467,15 @@ export class PlanService {
       this.updateCSSHeight(msg.message.cat, msg.message.name, msg.message.height);
     } else if (msg.type === 'update width') {
       this.updateCSSWidth(msg.message.cat, msg.message.name, msg.message.width);
+    } else if (msg.type === 'toggle visibility') {
+      this.toggleElement(msg.message.tag, msg.message.show);
     } else if (msg.type === 'get other window data') {
       // tslint:disable-next-line: max-line-length
-      this.windowService.sendMessage({type: 'receive other window data', message: {main: this.windowService.isMain(), width: window.innerWidth, height: window.innerHeight}});
+      this.windowService.sendMessage({ type: 'receive other window data', message: { main: this.windowService.isMain(), width: window.innerWidth, height: window.innerHeight } });
     } else if (msg.type === 'receive other window data') {
       this.windowDataSubject.next(msg.message);
+    } else if (msg.type === 'request percent') {
+      this.windowService.sendMessage({ type: 'percent change', message: this.dataTable.year.currentRenewablePercent});
     } else if (msg.type === 'file information') {
       msg.message.forEach(d => {
         if (d.file === 'cssData') {
@@ -562,8 +583,18 @@ export class PlanService {
    * @param css the css data object.
    */
   private setCSS(css: any): void {
+    let freshCss = true;
     this.CSS = css;
     this.cssSubject.next(this.CSS);
+    this.elements.forEach(e => {
+      const css_path = e.category ? this.CSS[e.category][e.tag] : this.CSS[e.tag];
+      this.dataTable.visibility[e.tag] = css_path.visible;
+      this.toggleElement(e.tag, css_path.visible);
+      if (css_path.left !== '0px' && css_path.top !== '0px') {
+        freshCss = false;
+      }
+    });
+
     if (!this.windowService.isMain()) {
       if (this.CSS.charts.line.percent && this.CSS.charts.line.percent > 0) {
         // tslint:disable-next-line: max-line-length
@@ -578,6 +609,13 @@ export class PlanService {
         this.resizeSubject.next({ id: 'resize pie', width: this.CSS.charts.pie.width, height: this.CSS.charts.pie.height, percent: this.CSS.charts.pie.percent });
       }
     }
+    if (freshCss) {
+      // Need to capture the width of the elements since they were all reset.
+      this.getWidthSubject.next(true);
+      this.freshCssSubject.next(freshCss);
+    } else {
+      this.freshCss = false;
+    }
   }
 
   /** When the user uses the position modal to move map elements around, the data can be saved to a file.  This function
@@ -585,22 +623,15 @@ export class PlanService {
    */
   private storeCssData(): void {
     this.elements.forEach(e => {
+      const css_path = e.category ? this.CSS[e.category][e.tag] : this.CSS[e.tag];
       if (this.dataTable.positionData.locations[e.tag] && this.dataTable.positionData.locations[e.tag].x) {
-        if (e.category) {
-          this.CSS[e.category][e.tag].left = `${this.dataTable.positionData.locations[e.tag].x}px`;
-          this.CSS[e.category][e.tag].top = `${this.dataTable.positionData.locations[e.tag].y}px`;
-        } else {
-          this.CSS[e.tag].left = `${this.dataTable.positionData.locations[e.tag].x}px`;
-          this.CSS[e.tag].top = `${this.dataTable.positionData.locations[e.tag].y}px`;
-        }
+        css_path.left = `${this.dataTable.positionData.locations[e.tag].x}px`;
+        css_path.top = `${this.dataTable.positionData.locations[e.tag].y}px`;
       }
       if (this.dataTable.positionData.percents[e.tag] > 0) {
-        if (e.category) {
-          this.CSS[e.category][e.tag].percent = `${this.dataTable.positionData.percents[e.tag]}`;
-        } else {
-          this.CSS[e.tag].percent = `${this.dataTable.positionData.percents[e.tag]}`;
-        }
+        css_path.percent = `${this.dataTable.positionData.percents[e.tag]}`;
       }
+      css_path.visible = this.dataTable.visibility[e.tag];
     });
     if (this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) })) {
       console.log('Positon Data Saved.');
@@ -670,15 +701,10 @@ export class PlanService {
   public handleSliderChange(percentFromLeft: number, id: string, category: string, name: string) {
     let width = 0;
     let height = 0;
-    console.log(category, name);
+    const css_path = category === '' ? this.CSS[name] : this.CSS[category][name];
     this.dataTable.positionData.percents[name] = percentFromLeft;
-    if (category === '') {
-      width = this.CSS[name].width;
-      height = this.CSS[name].width;
-    } else {
-      width = this.CSS[category][name].width;
-      height = this.CSS[category][name].height;
-    }
+    width = css_path.width;
+    height = css_path.height;
     if (this.windowService.isMain()) {
       // tslint:disable-next-line: max-line-length
       this.windowService.sendMessage({ type: 'resize', message: { percent: percentFromLeft, id: id, width: width, height: height, category: category, name: name } });
@@ -698,10 +724,12 @@ export class PlanService {
     return this.plans;
   }
 
+
+
   /** When the app loads the css data from file, if there is nothing there, this file will create a new
    * set of css data and write it to the file.
    */
-  private createCssData(): void {
+  public createCssData(): void {
     if (!this.CSS) {
       this.CSS = {};
     }
@@ -715,18 +743,20 @@ export class PlanService {
         }
         this.CSS[e.category][e.tag].left = `0px`;
         this.CSS[e.category][e.tag].top = `0px`;
-        this.CSS[e.category][e.tag].percent = 0;
+        this.CSS[e.category][e.tag].percent = 50;
         this.CSS[e.category][e.tag].width = 0;
         this.CSS[e.category][e.tag].height = 0;
+        this.CSS[e.category][e.tag].visible = true;
       } else {
         if (!this.CSS[e.tag]) {
           this.CSS[e.tag] = {};
         }
         this.CSS[e.tag].left = `0px`;
         this.CSS[e.tag].top = `0px`;
-        this.CSS[e.tag].percent = 0;
+        this.CSS[e.tag].percent = 50;
         this.CSS[e.tag].width = 0;
         this.CSS[e.tag].height = 0;
+        this.CSS[e.tag].visible = true;
       }
     });
 
@@ -734,6 +764,15 @@ export class PlanService {
       console.log('Positon Data Saved.');
     } else {
       console.log('Failed to save position data.');
+    }
+  }
+
+  public toggleElement(tag: string, show: boolean): void {
+    this.dataTable.visibility[tag] = show;
+    if (this.windowService.isMain()) {
+      this.windowService.sendMessage({ type: 'toggle visibility', message: { tag: tag, show: show } });
+    } else {
+      this.toggleElementSubject.next({ tag: tag, show: show });
     }
   }
 
@@ -752,13 +791,23 @@ export class PlanService {
   }
   public updateCSSWidth(elementCategory: string, elementName: string, widthValue: number) {
     if (this.CSS) {
-      if (elementCategory) {
-        this.CSS[elementCategory][elementName].width = widthValue;
-      } else {
-        this.CSS[elementName].width = widthValue;
-      }
+      const css_path = elementCategory ? this.CSS[elementCategory][elementName] : this.CSS[elementName];
+      css_path.width = widthValue;
       if (!this.windowService.isMain()) {
         this.windowService.sendMessage({ type: 'update width', message: { cat: elementCategory, name: elementName, width: widthValue } });
+      }
+      if (this.freshCss) {
+        let allWidthSet = true;
+        this.elements.forEach(e => {
+          const path = e.category ? this.CSS[e.category][e.tag] : this.CSS[e.tag];
+          if (path.width === 0) {
+            allWidthSet = false;
+          }
+        });
+        if (allWidthSet) {
+          this.cssSubject.next(this.CSS);
+        }
+        console.log(this.CSS);
       }
     }
   }
@@ -769,7 +818,6 @@ export class PlanService {
   }
 
   public getOtherWindowData(): void {
-    this.windowService.sendMessage({ type: 'get other window data', message: this.windowService.isMain()});
+    this.windowService.sendMessage({ type: 'get other window data', message: this.windowService.isMain() });
   }
-
 }
