@@ -58,22 +58,29 @@ export const HecoPlan: Plan = {
         legendColor: mapLayerColors.Transmission.border,
         filePath: 'assets/plans/oahu-heco/layers/transmission.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, isD3: boolean) {
           this.parcels.forEach(parcel => {
-            d3.select(parcel.path)
-              .style('fill', this.fillColor)
-              .style('opacity', this.active ? 0.85 : 0.0)
-              .style('stroke', this.borderColor)
-              .style('stroke-width', (this.borderWidth * parcel.properties.Voltage_kV) + 'px');
+            if (isD3) {
+              d3.select(parcel.path)
+                .style('fill', this.fillColor)
+                .style('opacity', this.active ? 0.85 : 0.0)
+                .style('stroke', this.borderColor)
+                .style('stroke-width', (this.borderWidth * parcel.properties.Voltage_kV) + 'px');
+            } else {
+              parcel.path.options.color = this.borderColor;
+              parcel.path.options.weight = (this.borderWidth * parcel.properties.Voltage_kV);
+            }
           });
         },
-        updateFunction(planService: PlanService, state) {
+        updateFunction(planService: PlanService, state, isD3: boolean) {
           this.parcels.forEach(parcel => {
-            d3.select(parcel.path)
-              .style('opacity', state ? 0.85 : 0.0);
+            if (isD3) {
+              d3.select(parcel.path)
+                .style('opacity', state ? 0.85 : 0.0);
+            }
           });
         },
-        legend: [{ text: 'Transmission Lines', color: mapLayerColors.Transmission.border}],
+        legend: [{ text: 'Transmission Lines', color: mapLayerColors.Transmission.border }],
       },
       {
         name: 'dod',
@@ -89,7 +96,7 @@ export const HecoPlan: Plan = {
         legendColor: mapLayerColors.Dod.fill,
         filePath: 'assets/plans/oahu-heco/layers/government.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, isD3: boolean) {
           const colors = {
             'Public-Federal': '#e60000',
             'Public-State': '#ff7f7f',
@@ -97,24 +104,32 @@ export const HecoPlan: Plan = {
             'Public-County': '#00c5ff',
           }
           this.parcels.forEach(parcel => {
-            d3.select(parcel.path)
-              .style('fill', colors[parcel.properties.type])
-              .style('opacity', this.active ? 0.85 : 0.0)
-              .style('stroke', this.borderColor)
-              .style('stroke-width', this.borderWidth + 'px');
+            if (isD3) {
+              d3.select(parcel.path)
+                .style('fill', colors[parcel.properties.type])
+                .style('opacity', this.active ? 0.85 : 0.0)
+                .style('stroke', this.borderColor)
+                .style('stroke-width', this.borderWidth + 'px');
+            } else {
+              parcel.path.options.color = this.borderColor;
+              parcel.path.options.fillColor = colors[parcel.properties.type];
+              parcel.path.options.weight = this.borderWidth;
+            }
           });
         },
-        updateFunction(planService: PlanService, state) {
+        updateFunction(planService: PlanService, state, isD3: boolean) {
           this.parcels.forEach(parcel => {
-            d3.select(parcel.path)
-              .style('opacity', state ? 0.85 : 0.0);
+            if (isD3) {
+              d3.select(parcel.path)
+                .style('opacity', state ? 0.85 : 0.0);
+            }
           });
         },
         legend: [
-          {text: 'Federal Land', color: '#e60000'},
-          {text: 'State Land', color: '#ff7f7f'},
-          {text: 'Department of Hawaiian Homelands', color: '#895a44'},
-          {text: 'County Land', color: '#00c5ff'},
+          { text: 'Federal Land', color: '#e60000' },
+          { text: 'State Land', color: '#ff7f7f' },
+          { text: 'Department of Hawaiian Homelands', color: '#895a44' },
+          { text: 'County Land', color: '#00c5ff' },
         ]
       },
       {
@@ -133,7 +148,7 @@ export const HecoPlan: Plan = {
         parcels: [],
         setupFunction: null,
         updateFunction: null,
-        legend: [{text: 'Park Lands', color: mapLayerColors.Parks.fill}],
+        legend: [{ text: 'Park Lands', color: mapLayerColors.Parks.fill }],
       },
       {
         name: 'existing_re',
@@ -151,7 +166,7 @@ export const HecoPlan: Plan = {
         parcels: [],
         setupFunction: null,
         updateFunction: null,
-        legend: [{text: 'Existing Renewables', color: mapLayerColors.Existing_RE.fill}],
+        legend: [{ text: 'Existing Renewables', color: mapLayerColors.Existing_RE.fill }],
       },
       {
         name: 'wind',
@@ -167,7 +182,7 @@ export const HecoPlan: Plan = {
         legendColor: mapLayerColors.Wind.fill,
         filePath: 'assets/plans/oahu-heco/layers/wind.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, isD3: boolean) {
           let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']) - 99;
           const dictSort = {
             '8.5+': 0,
@@ -178,39 +193,65 @@ export const HecoPlan: Plan = {
           this.parcels.sort((a, b) => parseFloat(b.properties.MWac) - parseFloat(a.properties.MWac));
           this.parcels.forEach(parcel => {
             if (windTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('opacity', (this.active) ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('opacity', (this.active) ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = this.fillColor
+                parcel.path.options.weight = this.borderWidth;
+              }
+
               windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
             } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('opacity', (this.active) ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = 'transparent'
+                parcel.path.options.weight = this.borderWidth;
+              }
             }
           });
         },
-        updateFunction(planService: PlanService, state: number) {
+        updateFunction(planService: PlanService, state: number, isD3: boolean) {
           let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']) - 99;
           this.parcels.forEach(parcel => {
             if (windTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('opacity', state ? 0.85 : 0.0);
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('opacity', state ? 0.85 : 0.0);
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = this.fillColor
+                parcel.path.options.weight = this.borderWidth;
+              }
+
               windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
             } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('opacity', state === 1 ? 0.85 : 0.0);
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('opacity', state === 1 ? 0.85 : 0.0);
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = (state) ? this.fillColor : 'transparent';
+                parcel.path.options.weight = this.borderWidth;
+              }
             }
           });
         },
         legend: [
           { text: 'Viable land for wind energy ', color: 'white' },
-          { text: 'Land Area required to meet wind energy goal', color: mapLayerColors.Wind.fill}
+          { text: 'Land Area required to meet wind energy goal', color: mapLayerColors.Wind.fill }
         ],
       },
       {
@@ -227,42 +268,69 @@ export const HecoPlan: Plan = {
         legendColor: mapLayerColors.Solar.fill,
         filePath: 'assets/plans/oahu-heco/layers/solar.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, isD3: boolean) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
           this.parcels.sort((a, b) => parseFloat(b.properties.cf_1) - parseFloat(a.properties.cf_1));
           this.parcels.forEach(parcel => {
             if (solarTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('opacity', (this.active) ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('opacity', (this.active) ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = this.fillColor
+                parcel.path.options.weight = this.borderWidth;
+              }
+
               solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
             } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('opacity', (this.active) ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = 'transparent'
+                parcel.path.options.weight = this.borderWidth;
+              }
+
             }
           });
         },
-        updateFunction(planService: PlanService, state: number) {
+        updateFunction(planService: PlanService, state: number, isD3: boolean) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
           this.parcels.forEach(parcel => {
             if (solarTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('opacity', state === 1 ? 0.85 : 0.0);
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('opacity', state === 1 ? 0.85 : 0.0);
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = this.fillColor
+                parcel.path.options.weight = this.borderWidth;
+              }
+
               solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
             } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('opacity', state === 1 ? 0.85 : 0.0);
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('opacity', state === 1 ? 0.85 : 0.0);
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = (state) ? this.fillColor : 'transparent';
+                parcel.path.options.weight = this.borderWidth;
+              }
             }
           });
         },
@@ -285,7 +353,7 @@ export const HecoPlan: Plan = {
         legendColor: mapLayerColors.Agriculture.fill,
         filePath: 'assets/plans/oahu-heco/layers/lsb2.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, isD3: boolean) {
           const colors = {
             'A': '#7de87d',
             'B': '#2edd2e',
@@ -294,25 +362,46 @@ export const HecoPlan: Plan = {
             'E': '#005400',
           };
           this.parcels.forEach(parcel => {
-            d3.select(parcel.path)
-              .style('fill', colors[parcel.properties.type])
-              .style('opacity', this.active ? 0.85 : 0.0)
-              .style('stroke', this.borderColor)
-              .style('stroke-width', this.borderWidth + 'px');
+            if (isD3) {
+              d3.select(parcel.path)
+                .style('fill', colors[parcel.properties.type])
+                .style('opacity', this.active ? 0.85 : 0.0)
+                .style('stroke', this.borderColor)
+                .style('stroke-width', this.borderWidth + 'px');
+            } else {
+              parcel.path.options.color = this.borderColor;
+              parcel.path.options.fillColor = colors[parcel.properties.type];
+              parcel.path.options.weight = this.borderWidth;
+            }
+
           });
         },
-        updateFunction(planService: PlanService, state: number) {
+        updateFunction(planService: PlanService, state: number, isD3: boolean) {
           this.parcels.forEach(parcel => {
-            d3.select(parcel.path)
-              .style('opacity', state === 1 ? 0.85 : 0.0);
+            if (isD3) {
+              d3.select(parcel.path)
+                .style('opacity', state === 1 ? 0.85 : 0.0);
+            } else {
+              const colors = {
+                'A': '#7de87d',
+                'B': '#2edd2e',
+                'C': '#00d100',
+                'D': '#009300',
+                'E': '#005400',
+              };
+              parcel.path.options.color = this.borderColor;
+              parcel.path.options.fillColor = (state) ? colors[parcel.properties.type] : 'transparent';
+              parcel.path.options.weight = this.borderWidth;
+            }
+
           });
         },
         legend: [
-          { text: 'Class A Lands', color: '#7de87d'},
-          { text: 'Class B Lands', color: '#2edd2e'},
-          { text: 'Class C Lands', color: '#00d100'},
-          { text: 'Class D Lands', color: '#009300'},
-          { text: 'Class E Lands', color: '#005400'},
+          { text: 'Class A Lands', color: '#7de87d' },
+          { text: 'Class B Lands', color: '#2edd2e' },
+          { text: 'Class C Lands', color: '#00d100' },
+          { text: 'Class D Lands', color: '#009300' },
+          { text: 'Class E Lands', color: '#005400' },
         ],
       },
       {
@@ -329,60 +418,100 @@ export const HecoPlan: Plan = {
         legendColor: mapLayerColors.Solar.fill,
         filePath: 'assets/plans/oahu-heco/layers/solar.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, isD3: boolean) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
           this.parcels.sort((a, b) => parseFloat(b.properties.cf_1) - parseFloat(a.properties.cf_1));
           this.parcels.forEach(parcel => {
             if (parcel.properties.IAL === "Y") {
-              d3.select(parcel.path)
-                .style('fill', 'black')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', 'black')
+                  .style('opacity', (this.active) ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = 'black';
+                parcel.path.options.weight = this.borderWidth;
+              }
+
             } else if (solarTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('opacity', (this.active) ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('opacity', (this.active) ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = this.fillColor;
+                parcel.path.options.weight = this.borderWidth;
+              }
+
               solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
             } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('opacity', (this.active) ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = 'transparent';
+                parcel.path.options.weight = this.borderWidth;
+              }
             }
           });
         },
-        updateFunction(planService: PlanService, state: number) {
+        updateFunction(planService: PlanService, state: number, isD3: boolean) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
           this.parcels.forEach(parcel => {
             if (parcel.properties.IAL === "Y") {
-              d3.select(parcel.path)
-                .style('fill', 'black')
-                .style('opacity', (state === 1) ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', 'black')
+                  .style('opacity', (state === 1) ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = 'black';
+                parcel.path.options.weight = this.borderWidth;
+              }
+
             } else if (solarTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('opacity', (state === 1) ? 0.85 : 0.0);
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('opacity', (state === 1) ? 0.85 : 0.0);
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = this.fillColor;
+                parcel.path.options.weight = this.borderWidth;
+              }
               solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
             } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('opacity', state === 1 ? 0.85 : 0.0);
+              if (isD3) {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('opacity', state === 1 ? 0.85 : 0.0);
+              } else {
+                parcel.path.options.color = this.borderColor;
+                parcel.path.options.fillColor = 'transparent';
+                parcel.path.options.weight = this.borderWidth;
+              }
+
             }
           });
         },
         legend: [
-          {text: 'Land defined as Important Agriculture', color: 'black'},
-          { text: 'Land necessary to meet solar energy goal', color: mapLayerColors.Solar.fill}
+          { text: 'Land defined as Important Agriculture', color: 'black' },
+          { text: 'Land necessary to meet solar energy goal', color: mapLayerColors.Solar.fill }
         ],
       },
       {
@@ -399,7 +528,7 @@ export const HecoPlan: Plan = {
         legendColor: 'orange',
         filePath: 'assets/plans/oahu-heco/layers/DERdata.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, isD3: boolean) {
           this.derColors = [
             {
               minValue: 0.75,
@@ -474,15 +603,22 @@ export const HecoPlan: Plan = {
                     }
                     return this.derColors[this.derColors.length - 1].color;
                   };
-                  d3.select(parcel.path)
-                    .style('fill', color)
-                    .style('opacity', (this.active) ? 0.85 : 0.0);
+                  if (isD3) {
+                    d3.select(parcel.path)
+                      .style('fill', color)
+                      .style('opacity', (this.active) ? 0.85 : 0.0);
+                  } else {
+                    parcel.path.options.color = 'transparent';
+                    parcel.path.options.fillColor = color;
+                    parcel.path.options.weight = 0;
+                  }
+
                 }
               }
             });
           });
         },
-        updateFunction(planService: PlanService, state:number) {
+        updateFunction(planService: PlanService, state: number, isD3: boolean) {
           this.parcels.forEach(parcel => {
             const id = parcel.properties.Building_F.toString().split('_')[1];
             const year = (planService.getCurrentYear().current).toString();
@@ -501,15 +637,21 @@ export const HecoPlan: Plan = {
                   }
                   return this.derColors[this.derColors.length - 1].color;
                 };
-                d3.select(parcel.path)
-                  .style('fill', color)
-                  .style('opacity', state === 1 ? 1.00 : 0.0);
+                if (isD3) {
+                  d3.select(parcel.path)
+                    .style('fill', color)
+                    .style('opacity', (this.active) ? 1.0 : 0.0);
+                } else {
+                  parcel.path.options.color = 'transparent';
+                  parcel.path.options.fillColor = color;
+                  parcel.path.options.weight = 0;
+                }
               }
             }
           });
         },
         legend: [
-          { text: 'The layer changes to red as DER is added.', color: 'linear-gradient(90deg, #f5f500 0%, #f5da00 11%, #f5be00 22%, #f5a300 33%, #f58800 44%, #f56d00 55%, #f55200 66%, #f53600 77%, #f51b00 88%, #f50000 100%)'}
+          { text: 'The layer changes to red as DER is added.', color: 'linear-gradient(90deg, #f5f500 0%, #f5da00 11%, #f5be00 22%, #f5a300 33%, #f58800 44%, #f56d00 55%, #f55200 66%, #f53600 77%, #f51b00 88%, #f50000 100%)' }
         ],
       }
     ],

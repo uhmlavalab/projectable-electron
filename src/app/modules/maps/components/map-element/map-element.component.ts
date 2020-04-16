@@ -157,7 +157,7 @@ export class MapElementComponent implements OnInit {
             layer.layer.parcels.push({ path: this, properties: (d.hasOwnProperty(`properties`)) ? d[`properties`] : null } as Parcel);
           }).call(() => {
             if (layer.layer.setupFunction !== null) {
-              layer.layer.setupFunction(this.planService, layer.state);
+              layer.layer.setupFunction(this.planService, layer.state, true);
             } else {
               this.defaultFill(layer.layer, layer.state);
             }
@@ -193,7 +193,7 @@ export class MapElementComponent implements OnInit {
     if (this.ready() && this.drawn) {
       this.layers.forEach(layer => {
         if (layer.layer.updateFunction !== null && layer.state === 1) {
-          layer.layer.updateFunction(this.planService, layer.state);
+          layer.layer.updateFunction(this.planService, layer.state, true);
         }
       });
     } else if (this.ready() && !this.drawn) {

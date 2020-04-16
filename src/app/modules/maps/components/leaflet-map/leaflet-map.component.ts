@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, SimpleChanges } from '@angular/core';
 import * as L from 'leaflet';
-import { MapLayer } from '../../../../interfaces/mapLayer';
+import { MapLayer, Parcel } from '../../../../interfaces/mapLayer';
 import * as d3 from 'd3';
 import { PlanService } from '@app/services/plan.service';
 
@@ -36,14 +36,12 @@ export class LeafletMapComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log(changes);
     if (changes.center && this.map) {
       if ((Date.now() - this.centerUpdate) > 0.25) {
         this.center = changes.center.currentValue;
         this.map.panTo(L.latLng(this.center[0], this.center[1]), { animate: false });
         this.centerUpdate = Date.now();
       }
-
     }
 
     if (changes.zoom && this.map) {
@@ -52,52 +50,42 @@ export class LeafletMapComponent implements OnInit {
     }
     if (changes.layers) {
       this.layers = changes.layers.currentValue;
-      this.leafletLayers.forEach(el => {
-        this.map.removeLayer(el.layer);
-      })
-      this.leafletLayers = [];
       this.layers.forEach(layer => {
         d3.json(layer['layer'].filePath, (error, geoData) => {
-
           const d = new L.GeoJSON(geoData);
-          this.leafletLayers.push({ name: layer['layer'].name, 'layer': d, active: false });
-          d.setStyle({ fillColor: layer['layer'].fillColor })
-          d.setStyle({ color: 'white' })
-          d.setStyle({ fillOpacity: 0.8 })
-          d.setStyle({ weight: 2 })
-          // d.addTo(this.map);
+          d.eachLayer((el) => {
+            layer['layer'].parcels.push({ path: el, properties: (el['feature'].hasOwnProperty(`properties`)) ? el['feature'][`properties`] : null } as Parcel)
+          });
+          console.log(layer);
+          if (layer['layer'].setupFunction) {
+            layer['layer'].setupFunction(this.planService, false);
+          } else {
+            layer['layer'].parcels.forEach(parcel => {
+              parcel.path.options.color = layer['layer'].fillColor;
+              parcel.path.options.weight = layer['layer'].borderWidth;
+            })
+          }
         })
       });
     }
 
     // Subscribe to layer toggling
     this.planService.toggleLayerSubject.subscribe(layer => {
-      if (layer) {
-        console.log(layer, this.leafletLayers)
-       const togLayer = this.leafletLayers.find(el => el.name == layer.layer.name);
-       console.log(togLayer);
-
-       if (togLayer) {
-          togLayer.active = layer.state;
-          if (togLayer.active) {
-            this.map.addLayer(togLayer.layer);
-          } else {
-            this.map.removeLayer(togLayer.layer);
-
-          }
-       }
-      }
+      if (!layer) return;
+      (layer.state) ? layer['layer'].parcels.forEach(el => { this.map.addLayer(el.path); }) : layer['layer'].parcels.forEach(el => { this.map.removeLayer(el.path); });
     });
-
-    // this.planService.yearSubject.subscribe(year => {
-    //   if (year) {
-    //     if (this.windowService.isMain()) {
-    //       this.updateYear(year);
-    //     } else {
-    //       this.updateYear(year);
-    //     }
-    //   }
-    // });
+    
+    this.planService.yearSubject.subscribe(year => {
+      this.layers.forEach(layer => {
+        if (layer['state']) {
+          if (layer['layer'].updateFunction) {
+            layer['layer'].parcels.forEach(el => { this.map.removeLayer(el.path); })
+            layer['layer'].updateFunction(this.planService, layer['layer'].active, false);
+            layer['layer'].parcels.forEach(el => { this.map.addLayer(el.path); })
+          }
+        }
+      })
+    });
 
   }
 
