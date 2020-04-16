@@ -1,6 +1,8 @@
 .content-wrapper {
     padding: 2%;
-    width: 100%;
+    width: 132%;
+    left: -16%;
+    position: relative;
 }
 
 .left {
@@ -12,8 +14,10 @@
 img { width: 100%;}
 
 .title { 
-    width: 100%;
-    text-align: center;
+        width: 100%;
+        text-align: center;
+        margin-bottom: -1px;
+        margin-top: 9px;
 }
 
 .right {
@@ -43,4 +47,24 @@ img { width: 100%;}
     background-color: var(--menu-blue);
     color: black;
     text-decoration: underline;
+}
+
+.legend-row {
+    width: 98%;
+    padding: 1%;
+    height: 32px;
+}
+.legend-text {
+    font-size: 12px;
+    width: 80%;
+    display: inline-block;
+    vertical-align: top;
+    padding: 1%;
+}
+.legend-color {
+    width: 18%;
+    height: 100%;
+    display:inline-block;
+    outline: 1px solid white;
+    outline-color: var(--menu-blue);
 }

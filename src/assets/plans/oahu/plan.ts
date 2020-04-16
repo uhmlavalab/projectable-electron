@@ -74,6 +74,7 @@ export const OahuPlan: Plan = {
               .style('opacity', this.active ? 0.85 : 0.0);
           });
         },
+        legend: null,
       },
       {
         name: 'dod',
@@ -109,7 +110,9 @@ export const OahuPlan: Plan = {
             d3.select(parcel.path)
               .style('opacity', this.active ? 0.85 : 0.0);
           });
-        },      },
+        },
+        legend: null,
+      },
       {
         name: 'parks',
         displayName: 'Park Lands',
@@ -126,6 +129,7 @@ export const OahuPlan: Plan = {
         parcels: [],
         setupFunction: null,
         updateFunction: null,
+        legend: null,
       },
       {
         name: 'existing_re',
@@ -143,6 +147,7 @@ export const OahuPlan: Plan = {
         parcels: [],
         setupFunction: null,
         updateFunction: null,
+        legend: null,
       },
       {
         name: 'wind',
@@ -199,6 +204,7 @@ export const OahuPlan: Plan = {
             }
           });
         },
+        legend: null,
       },
       {
         name: 'solar',
@@ -253,6 +259,7 @@ export const OahuPlan: Plan = {
             }
           });
         },
+        legend: null,
       },
       {
         name: 'agriculture',
@@ -270,6 +277,7 @@ export const OahuPlan: Plan = {
         parcels: [],
         setupFunction: null,
         updateFunction: null,
+        legend: null,
       },
       {
         name: 'ial',
@@ -293,10 +301,10 @@ export const OahuPlan: Plan = {
           this.parcels.forEach(parcel => {
             if (parcel.properties.IAL === "Y") {
               d3.select(parcel.path)
-              .style('fill', 'black')
-              .style('opacity', (this.active) ? 0.85 : 0.0)
-              .style('stroke', this.borderColor)
-              .style('stroke-width', this.borderWidth + 'px');
+                .style('fill', 'black')
+                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('stroke', this.borderColor)
+                .style('stroke-width', this.borderWidth + 'px');
             }
             else if (solarTotal > 0) {
               d3.select(parcel.path)
@@ -321,10 +329,10 @@ export const OahuPlan: Plan = {
           this.parcels.forEach(parcel => {
             if (parcel.properties.IAL === "Y") {
               d3.select(parcel.path)
-              .style('fill', 'black')
-              .style('opacity', (this.active) ? 0.85 : 0.0)
-              .style('stroke', this.borderColor)
-              .style('stroke-width', this.borderWidth + 'px');
+                .style('fill', 'black')
+                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('stroke', this.borderColor)
+                .style('stroke-width', this.borderWidth + 'px');
             }
             else if (solarTotal > 0) {
               d3.select(parcel.path)
@@ -338,6 +346,7 @@ export const OahuPlan: Plan = {
             }
           });
         },
+        legend: null,
       },
       {
         name: 'der',
@@ -355,6 +364,7 @@ export const OahuPlan: Plan = {
         parcels: [],
         setupFunction: null,
         updateFunction: null,
+        legend: null,
       }
     ],
   }

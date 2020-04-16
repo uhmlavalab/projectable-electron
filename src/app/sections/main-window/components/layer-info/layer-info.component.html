@@ -13,6 +13,9 @@
   </div>
   </span>
   <span *ngIf="showDetails === false">
-      <p>Legend Goes Here</p>
+      <div class="legend-row" *ngFor="let row of layer.legend">
+         <span class="legend-color" [style.background]="row.color"></span>
+         <p class="legend-text">{{row.text}}</p>
+      </div>
   </span>
 </div>

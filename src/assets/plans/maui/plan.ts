@@ -70,6 +70,7 @@ export const MauiPlan: Plan = {
               .style('opacity', this.active ? 0.85 : 0.0);
           });
         },
+        legend: null,
       },
       {
         name: 'dod',
@@ -106,6 +107,7 @@ export const MauiPlan: Plan = {
               .style('opacity', this.active ? 0.85 : 0.0);
           });
         },
+        legend: null,
       },
       {
         name: 'parks',
@@ -123,6 +125,7 @@ export const MauiPlan: Plan = {
         filePath: 'assets/plans/maui/layers/parks.json',
         setupFunction: null,
         updateFunction: null,
+        legend: null,
       },
       {
         name: 'wind',
@@ -178,6 +181,7 @@ export const MauiPlan: Plan = {
             }
           });
         },
+        legend: null,
       },
       {
         name: 'solar',
@@ -229,6 +233,7 @@ export const MauiPlan: Plan = {
             }
           });
         },
+        legend: null,
       },
       {
         name: 'agriculture',
@@ -257,7 +262,7 @@ export const MauiPlan: Plan = {
               .style('fill', colors[parcel.properties.type])
               .style('opacity', this.active ? 0.85 : 0.0)
               .style('stroke', this.borderColor)
-              .style('stroke-width', this.borderWidth  + 'px');
+              .style('stroke-width', this.borderWidth + 'px');
           });
         },
         updateFunction(planService: PlanService) {
@@ -266,6 +271,7 @@ export const MauiPlan: Plan = {
               .style('opacity', this.active ? 0.85 : 0.0);
           });
         },
+        legend: null,
       },
     ],
   },

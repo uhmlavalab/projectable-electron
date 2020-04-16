@@ -526,16 +526,9 @@ export class PlanService {
   }
 
   public handleLayerButtonInfoClick(layerName: string) {
-    let el = null;
-    this.dataTable.layers.all.forEach(e => {
-      if (e.layer.name === layerName) {
-        el = e;
-      }
-    });
-    if (el) {
-      this.layerInfoSubject.next(el);
-    }
+    this.layerInfoSubject.next(this.dataTable.layers.all.find(e => e.layer.name === layerName));
   }
+
 
   /** When the user uses the modal to position the map elements the data is parsed here and sent to the
    * map window to adjust the position of the elements there.
