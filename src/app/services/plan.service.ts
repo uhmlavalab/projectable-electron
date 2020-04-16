@@ -123,7 +123,6 @@ export class PlanService {
         line: true
       }
     };
-
     this.plans = Plans;
   }
 
@@ -279,19 +278,21 @@ export class PlanService {
     const curtailmentData = {};
     return new Promise((resolve, error) => {
       d3.csv(this.dataTable.data.curtailmentPath, (data) => {
-        data.forEach(element => {
-          const year = element.year;
-          const technology = element.technology;
-          const value = element.value;
-          const scenario = element.scenario;
-          if (!curtailmentData.hasOwnProperty(scenario)) {
-            curtailmentData[scenario] = {};
-          }
-          if (!curtailmentData[scenario].hasOwnProperty(technology)) {
-            curtailmentData[scenario][technology] = [];
-          }
-          curtailmentData[scenario][technology].push({ year: Number(year), value: Number(value) });
-        });
+        if (data) {
+          data.forEach(element => {
+            const year = element.year;
+            const technology = element.technology;
+            const value = element.value;
+            const scenario = element.scenario;
+            if (!curtailmentData.hasOwnProperty(scenario)) {
+              curtailmentData[scenario] = {};
+            }
+            if (!curtailmentData[scenario].hasOwnProperty(technology)) {
+              curtailmentData[scenario][technology] = [];
+            }
+            curtailmentData[scenario][technology].push({ year: Number(year), value: Number(value) });
+          });
+        }
         return resolve(curtailmentData);
       });
     });
@@ -357,7 +358,7 @@ export class PlanService {
   }
 
   public requestPercentageUpdate(): void {
-    this.windowService.sendMessage({type: 'request percent', message: true});
+    this.windowService.sendMessage({ type: 'request percent', message: true });
   }
 
   /** Sets the current percent of renewable for a specific year.
@@ -475,13 +476,13 @@ export class PlanService {
     } else if (msg.type === 'receive other window data') {
       this.windowDataSubject.next(msg.message);
     } else if (msg.type === 'request percent') {
-      this.windowService.sendMessage({ type: 'percent change', message: this.dataTable.year.currentRenewablePercent});
+      this.windowService.sendMessage({ type: 'percent change', message: this.dataTable.year.currentRenewablePercent });
     } else if (msg.type === 'file information') {
       msg.message.forEach(d => {
         if (d.file === 'cssData') {
-          console.log(JSON.stringify(this.dataTable.plan.name));
+          const css_path = d.css[this.dataTable.plan.name];
           // tslint:disable-next-line: max-line-length
-          if (d.css.charts && d.css[this.dataTable.plan.name].logos && d.css[this.dataTable.plan.name].map && d.css[this.dataTable.plan.name].data) {
+          if (css_path.charts && css_path.logos && css_path.map && css_path.data) {
             if (!this.windowService.isMain()) {
               this.setCSS(d.css);
               this.windowService.sendMessage({ type: 'css loaded', message: d.css });
@@ -500,18 +501,25 @@ export class PlanService {
       if (!this.windowService.isMain() && msg.message.saveData) {
         this.storeCssData();
       } else if (!msg.message.saveData && !this.windowService.isMain()) {
-        this.revertPositionsSubject.next(this.CSS[this.dataTable.plan.name]);
-        if (this.CSS[this.dataTable.plan.name].charts.line.percent && this.CSS[this.dataTable.plan.name].charts.line.percent > 0) {
-          // tslint:disable-next-line: max-line-length
-          this.resizeSubject.next({ id: 'resize line', width: this.CSS[this.dataTable.plan.name].charts.line.width, height: this.CSS[this.dataTable.plan.name].charts.line.height, percent: this.CSS[this.dataTable.plan.name].charts.line.percent });
+        const css_path = this.CSS[this.dataTable.plan.name];
+        this.revertPositionsSubject.next(css_path);
+        if (css_path.charts.line.percent && css_path.charts.line.percent > 0) {
+          this.resizeSubject.next(
+            {
+              id: 'resize line',
+              width: css_path.charts.line.width,
+              height: css_path.charts.line.height,
+              percent: css_path.charts.line.percent
+            }
+          );
         }
-        if (this.CSS.map.percent && this.CSS.map.percent > 0) {
+        if (css_path.map.percent && css_path.map.percent > 0) {
           // tslint:disable-next-line: max-line-length
-          this.resizeSubject.next({ id: 'resize map', width: this.CSS[this.dataTable.plan.name].map.width, height: this.CSS[this.dataTable.plan.name].map.height, percent: this.CSS[this.dataTable.plan.name].map.percent });
+          this.resizeSubject.next({ id: 'resize map', width: css_path.map.width, height: css_path.map.height, percent: css_path.map.percent });
         }
-        if (this.CSS[this.dataTable.plan.name].charts.pie.percent && this.CSS[this.dataTable.plan.name].charts.pie.percent > 0) {
+        if (css_path.charts.pie.percent && css_path.charts.pie.percent > 0) {
           // tslint:disable-next-line: max-line-length
-          this.resizeSubject.next({ id: 'resize pie', width: this.CSS[this.dataTable.plan.name].charts.pie.width, height: this.CSS[this.dataTable.plan.name].charts.pie.height, percent: this.CSS[this.dataTable.plan.name].charts.pie.percent });
+          this.resizeSubject.next({ id: 'resize pie', width: css_path.charts.pie.width, height: css_path.charts.pie.height, percent: css_path.charts.pie.percent });
         }
       }
     }
@@ -563,7 +571,7 @@ export class PlanService {
     this.windowService.sendMessage({ type: 'update cssData file', message: { saveData: save } });
     this.closeModalSubject.next({ saveData: save });
     if (this.windowService.isMain() && !save) {
-      this.revertPositionsSubject.next(this.CSS);
+      this.revertPositionsSubject.next(this.CSS[this.dataTable.plan.name]);
     }
   }
 
@@ -582,6 +590,7 @@ export class PlanService {
     this.CSS = css;
     this.cssSubject.next(this.CSS[this.dataTable.plan.name]);
     this.elements.forEach(e => {
+      // tslint:disable-next-line: no-shadowed-variable
       const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.tag] : this.CSS[this.dataTable.plan.name][e.tag];
       this.dataTable.visibility[e.tag] = css_path.visible;
       this.toggleElement(e.tag, css_path.visible);
@@ -589,19 +598,36 @@ export class PlanService {
         freshCss = false;
       }
     });
-
+    const css_path = this.CSS[this.dataTable.plan.name];
     if (!this.windowService.isMain()) {
-      if (this.CSS[this.dataTable.plan.name].charts.line.percent && this.CSS[this.dataTable.plan.name].charts.line.percent > 0) {
-        // tslint:disable-next-line: max-line-length
-        this.resizeSubject.next({ id: 'resize line', width: this.CSS[this.dataTable.plan.name].charts.line.width, height: this.CSS[this.dataTable.plan.name].charts.line.height, percent: this.CSS[this.dataTable.plan.name].charts.line.percent });
+      if (css_path.charts.line.percent && css_path.charts.line.percent > 0) {
+        this.resizeSubject.next(
+          {
+            id: 'resize line',
+            width: css_path.charts.line.width,
+            height: css_path.charts.line.height,
+            percent: css_path.charts.line.percent
+          }
+        );
       }
-      if (this.CSS[this.dataTable.plan.name].map.percent && this.CSS.map.percent > 0) {
-        // tslint:disable-next-line: max-line-length
-        this.resizeSubject.next({ id: 'resize map', width: this.CSS[this.dataTable.plan.name].map.width, height: this.CSS[this.dataTable.plan.name].map.height, percent: this.CSS[this.dataTable.plan.name].map.percent });
+      if (css_path.map.percent && css_path.map.percent > 0) {
+        this.resizeSubject.next(
+          {
+            id: 'resize map',
+            width: css_path.map.width,
+            height: css_path.map.height,
+            percent: css_path.map.percent
+          }
+        );
       }
-      if (this.CSS[this.dataTable.plan.name].charts.pie.percent && this.CSS[this.dataTable.plan.name].charts.pie.percent > 0) {
-        // tslint:disable-next-line: max-line-length
-        this.resizeSubject.next({ id: 'resize pie', width: this.CSS[this.dataTable.plan.name].charts.pie.width, height: this.CSS[this.dataTable.plan.name].charts.pie.height, percent: this.CSS[this.dataTable.plan.name].charts.pie.percent });
+      if (css_path.charts.pie.percent && css_path.charts.pie.percent > 0) {
+        this.resizeSubject.next(
+          {
+            id: 'resize pie',
+            width: css_path.charts.pie.width,
+            height: css_path.charts.pie.height,
+            percent: css_path.charts.pie.percent
+          });
       }
     }
     if (freshCss) {
@@ -726,7 +752,8 @@ export class PlanService {
     if (!this.CSS) {
       this.CSS = {};
     }
-    this.plans.forEach(p => {
+    console.log(Plans);
+    Plans.forEach(p => {
       if (!this.CSS[p.name]) {
         this.CSS[p.name] = {};
       }
@@ -757,7 +784,7 @@ export class PlanService {
         }
       });
     });
-
+    console.log(this.CSS);
     if (this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) })) {
       console.log('Positon Data Saved.');
     } else {
@@ -806,7 +833,6 @@ export class PlanService {
         if (allWidthSet) {
           this.cssSubject.next(this.CSS[this.dataTable.plan.name]);
         }
-        console.log(this.CSS);
       }
     }
   }

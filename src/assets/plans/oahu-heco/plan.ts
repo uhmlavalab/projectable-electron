@@ -482,7 +482,7 @@ export const HecoPlan: Plan = {
             });
           });
         },
-        updateFunction(planService: PlanService, state:number) {
+        updateFunction(planService: PlanService, state: number) {
           this.parcels.forEach(parcel => {
             const id = parcel.properties.Building_F.toString().split('_')[1];
             const year = (planService.getCurrentYear().current).toString();

@@ -29,7 +29,7 @@ export const BigIslandPlan: Plan = {
     capacityPath: 'assets/plans/bigisland/data/capacity.csv',
     generationPath: 'assets/plans/bigisland/data/generation.csv',
     batteryPath: 'assets/plans/bigisland/data/battery.csv',
-    curtailmentPath: 'assets/plans/oahu/data/curtailment.csv',
+    curtailmentPath: 'assets/plans/oahu-heco/data/curtailment.csv',
     colors: chartColors
   },
   map: {
@@ -45,9 +45,9 @@ export const BigIslandPlan: Plan = {
         displayName: 'Transmission Lines',
         active: false,
         included: true,
-        iconPath: 'assets/plans/bigisland/images/icons/transmission-icon.png',
-        secondScreenImagePath: 'assets/plans/bigisland/images/second-screen-images/layer-images/transmission.jpg',
-        secondScreenText: 'Slide the Layer Puck to add or remove this layer.',
+        iconPath: 'assets/plans/bigisland/images/icons/TRANSMISSION.png',
+        secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/layer-images/transmission.jpg',
+        secondScreenText: 'This layer shows the high-voltage electric transmission system for the island of Oahu. Transmission is important for moving bulk power from utility-scale generation to load centers.',
         fillColor: mapLayerColors.Transmission.fill,
         borderColor: mapLayerColors.Transmission.border,
         borderWidth: 0.04,
@@ -63,10 +63,10 @@ export const BigIslandPlan: Plan = {
               .style('stroke-width', (this.borderWidth * parcel.properties.Voltage_kV) + 'px');
           });
         },
-        updateFunction(planService: PlanService) {
+        updateFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('opacity', this.active ? 0.85 : 0.0);
+              .style('opacity', state ? 0.85 : 0.0);
           });
         },
         legend: null,
@@ -76,9 +76,9 @@ export const BigIslandPlan: Plan = {
         displayName: 'Government Lands',
         active: false,
         included: true,
-        iconPath: 'assets/plans/bigisland/images/icons/dod-icon.png',
-        secondScreenImagePath: 'assets/plans/bigisland/images/second-screen-images/layer-images/dod.jpg',
-        secondScreenText: 'Slide the Layer Puck to add or remove this layer.',
+        iconPath: 'assets/plans/bigisland/images/icons/GOVERNMENT.png',
+        secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/layer-images/dod.jpg',
+        secondScreenText: 'This layer shows land owned by different levels of government including Federal, State, County, and DHHL.',
         fillColor: mapLayerColors.Dod.fill,
         borderColor: mapLayerColors.Dod.border,
         borderWidth: 1,
@@ -100,10 +100,10 @@ export const BigIslandPlan: Plan = {
               .style('stroke-width', this.borderWidth + 'px');
           });
         },
-        updateFunction(planService: PlanService) {
+        updateFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('opacity', this.active ? 0.85 : 0.0);
+              .style('opacity', state ? 0.85 : 0.0);
           });
         },
         legend: null,
@@ -113,9 +113,9 @@ export const BigIslandPlan: Plan = {
         displayName: 'Solar',
         active: false,
         included: true,
-        iconPath: 'assets/plans/bigisland/images/icons/solar-icon.png',
-        secondScreenImagePath: 'assets/plans/bigisland/images/second-screen-images/layer-images/solar.jpg',
-        secondScreenText: 'Slide the Layer Puck to add or remove this layer.',
+        iconPath: 'assets/plans/bigisland/images/icons/SOLAR.png',
+        secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/layer-images/solar.jpg',
+        secondScreenText: 'This layer represents the technical potential of solar based on analysis by the National Renewable Energy Laboratory that accounts for solar irradiance, zoning and use, and slope. The analysis estimates that there is potential for 2970 MW of utility scale solar. This layer fills in orange based on the highest capacity factor.',
         fillColor: mapLayerColors.Solar.fill,
         borderColor: mapLayerColors.Solar.border,
         borderWidth: 0.5,
@@ -142,19 +142,19 @@ export const BigIslandPlan: Plan = {
             }
           });
         },
-        updateFunction(planService: PlanService) {
+        updateFunction(planService: PlanService, state) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           console.log(solarTotal);
           this.parcels.forEach(parcel => {
             if (solarTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('opacity', (this.active) ? 0.85 : 0.0);
+                .style('opacity', state ? 0.85 : 0.0);
               solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('opacity', (this.active) ? 0.85 : 0.0);
+                .style('opacity', state ? 0.85 : 0.0);
             }
           });
         },
@@ -165,9 +165,9 @@ export const BigIslandPlan: Plan = {
         displayName: 'Wind Energy',
         active: false,
         included: true,
-        iconPath: 'assets/plans/bigisland/images/icons/wind-icon.png',
-        secondScreenImagePath: 'assets/plans/bigisland/images/second-screen-images/layer-images/wind.jpg',
-        secondScreenText: 'Slide the Layer Puck to add or remove this layer.',
+        iconPath: 'assets/plans/bigisland/images/icons/WIND.png',
+        secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/layer-images/wind.jpg',
+        secondScreenText: 'This layer represents this technical potential of solar based on an analysis by the National Renewable Energy Laboratory that accounts for the wind resource by location.',
         fillColor: mapLayerColors.Wind.fill,
         borderColor: mapLayerColors.Wind.border,
         borderWidth: .05,
@@ -194,18 +194,18 @@ export const BigIslandPlan: Plan = {
             }
           });
         },
-        updateFunction(planService: PlanService) {
+        updateFunction(planService: PlanService, state) {
           let windTotal = planService.getGenerationTotalForCurrentYear(['Wind']);
           this.parcels.forEach(parcel => {
             if (windTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('opacity', (this.active) ? 0.85 : 0.0);
+                .style('opacity', state ? 0.85 : 0.0);
               windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('opacity', (this.active) ? 0.85 : 0.0);
+                .style('opacity', state ? 0.85 : 0.0);
             }
           });
         },
@@ -216,9 +216,9 @@ export const BigIslandPlan: Plan = {
         displayName: 'Ag Lands',
         active: false,
         included: true,
-        iconPath: 'assets/plans/bigisland/images/icons/agriculture-icon.png',
-        secondScreenImagePath: 'assets/plans/bigisland/images/second-screen-images/layer-images/agriculture.jpg',
-        secondScreenText: 'Slide the Layer Puck to add or remove this layer.',
+        iconPath: 'assets/plans/bigisland/images/icons/AG.png',
+        secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/layer-images/agriculture.jpg',
+        secondScreenText: 'This layer shows the Land Study Bureau’s Overall Productivity Rating (LSB) for agricultural lands. The ratings of the land move from Class A (most productive) to Class E (least productive). ',
         fillColor: mapLayerColors.Agriculture.fill,
         borderColor: mapLayerColors.Agriculture.border,
         borderWidth: 1,
@@ -241,10 +241,10 @@ export const BigIslandPlan: Plan = {
               .style('stroke-width', this.borderWidth + 'px');
           });
         },
-        updateFunction(planService: PlanService) {
+        updateFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('opacity', this.active ? 0.85 : 0.0);
+              .style('opacity', state ? 0.85 : 0.0);
           });
         },
         legend: null,

@@ -107,7 +107,6 @@ export class SliderComponent implements AfterViewInit {
   }
 
   private setInitialSlidePosition(data: any): void {
-
     let pos = 0;
     switch (this.type) {
       case 'resize map':
