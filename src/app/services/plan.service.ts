@@ -479,7 +479,9 @@ export class PlanService {
     } else if (msg.type === 'file information') {
       msg.message.forEach(d => {
         if (d.file === 'cssData') {
-          if (d.css.charts && d.css.logos && d.css.map && d.css.data) {
+          console.log(JSON.stringify(this.dataTable.plan.name));
+          // tslint:disable-next-line: max-line-length
+          if (d.css.charts && d.css[this.dataTable.plan.name].logos && d.css[this.dataTable.plan.name].map && d.css[this.dataTable.plan.name].data) {
             if (!this.windowService.isMain()) {
               this.setCSS(d.css);
               this.windowService.sendMessage({ type: 'css loaded', message: d.css });
@@ -498,18 +500,18 @@ export class PlanService {
       if (!this.windowService.isMain() && msg.message.saveData) {
         this.storeCssData();
       } else if (!msg.message.saveData && !this.windowService.isMain()) {
-        this.revertPositionsSubject.next(this.CSS);
-        if (this.CSS.charts.line.percent && this.CSS.charts.line.percent > 0) {
+        this.revertPositionsSubject.next(this.CSS[this.dataTable.plan.name]);
+        if (this.CSS[this.dataTable.plan.name].charts.line.percent && this.CSS[this.dataTable.plan.name].charts.line.percent > 0) {
           // tslint:disable-next-line: max-line-length
-          this.resizeSubject.next({ id: 'resize line', width: this.CSS.charts.line.width, height: this.CSS.charts.line.height, percent: this.CSS.charts.line.percent });
+          this.resizeSubject.next({ id: 'resize line', width: this.CSS[this.dataTable.plan.name].charts.line.width, height: this.CSS[this.dataTable.plan.name].charts.line.height, percent: this.CSS[this.dataTable.plan.name].charts.line.percent });
         }
         if (this.CSS.map.percent && this.CSS.map.percent > 0) {
           // tslint:disable-next-line: max-line-length
-          this.resizeSubject.next({ id: 'resize map', width: this.CSS.map.width, height: this.CSS.map.height, percent: this.CSS.map.percent });
+          this.resizeSubject.next({ id: 'resize map', width: this.CSS[this.dataTable.plan.name].map.width, height: this.CSS[this.dataTable.plan.name].map.height, percent: this.CSS[this.dataTable.plan.name].map.percent });
         }
-        if (this.CSS.charts.pie.percent && this.CSS.charts.pie.percent > 0) {
+        if (this.CSS[this.dataTable.plan.name].charts.pie.percent && this.CSS[this.dataTable.plan.name].charts.pie.percent > 0) {
           // tslint:disable-next-line: max-line-length
-          this.resizeSubject.next({ id: 'resize pie', width: this.CSS.charts.pie.width, height: this.CSS.charts.pie.height, percent: this.CSS.charts.pie.percent });
+          this.resizeSubject.next({ id: 'resize pie', width: this.CSS[this.dataTable.plan.name].charts.pie.width, height: this.CSS[this.dataTable.plan.name].charts.pie.height, percent: this.CSS[this.dataTable.plan.name].charts.pie.percent });
         }
       }
     }
@@ -578,9 +580,9 @@ export class PlanService {
   private setCSS(css: any): void {
     let freshCss = true;
     this.CSS = css;
-    this.cssSubject.next(this.CSS);
+    this.cssSubject.next(this.CSS[this.dataTable.plan.name]);
     this.elements.forEach(e => {
-      const css_path = e.category ? this.CSS[e.category][e.tag] : this.CSS[e.tag];
+      const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.tag] : this.CSS[this.dataTable.plan.name][e.tag];
       this.dataTable.visibility[e.tag] = css_path.visible;
       this.toggleElement(e.tag, css_path.visible);
       if (css_path.left !== '0px' && css_path.top !== '0px') {
@@ -589,17 +591,17 @@ export class PlanService {
     });
 
     if (!this.windowService.isMain()) {
-      if (this.CSS.charts.line.percent && this.CSS.charts.line.percent > 0) {
+      if (this.CSS[this.dataTable.plan.name].charts.line.percent && this.CSS[this.dataTable.plan.name].charts.line.percent > 0) {
         // tslint:disable-next-line: max-line-length
-        this.resizeSubject.next({ id: 'resize line', width: this.CSS.charts.line.width, height: this.CSS.charts.line.height, percent: this.CSS.charts.line.percent });
+        this.resizeSubject.next({ id: 'resize line', width: this.CSS[this.dataTable.plan.name].charts.line.width, height: this.CSS[this.dataTable.plan.name].charts.line.height, percent: this.CSS[this.dataTable.plan.name].charts.line.percent });
       }
-      if (this.CSS.map.percent && this.CSS.map.percent > 0) {
+      if (this.CSS[this.dataTable.plan.name].map.percent && this.CSS.map.percent > 0) {
         // tslint:disable-next-line: max-line-length
-        this.resizeSubject.next({ id: 'resize map', width: this.CSS.map.width, height: this.CSS.map.height, percent: this.CSS.map.percent });
+        this.resizeSubject.next({ id: 'resize map', width: this.CSS[this.dataTable.plan.name].map.width, height: this.CSS[this.dataTable.plan.name].map.height, percent: this.CSS[this.dataTable.plan.name].map.percent });
       }
-      if (this.CSS.charts.pie.percent && this.CSS.charts.pie.percent > 0) {
+      if (this.CSS[this.dataTable.plan.name].charts.pie.percent && this.CSS[this.dataTable.plan.name].charts.pie.percent > 0) {
         // tslint:disable-next-line: max-line-length
-        this.resizeSubject.next({ id: 'resize pie', width: this.CSS.charts.pie.width, height: this.CSS.charts.pie.height, percent: this.CSS.charts.pie.percent });
+        this.resizeSubject.next({ id: 'resize pie', width: this.CSS[this.dataTable.plan.name].charts.pie.width, height: this.CSS[this.dataTable.plan.name].charts.pie.height, percent: this.CSS[this.dataTable.plan.name].charts.pie.percent });
       }
     }
     if (freshCss) {
@@ -616,7 +618,7 @@ export class PlanService {
    */
   private storeCssData(): void {
     this.elements.forEach(e => {
-      const css_path = e.category ? this.CSS[e.category][e.tag] : this.CSS[e.tag];
+      const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.tag] : this.CSS[this.dataTable.plan.name][e.tag];
       if (this.dataTable.positionData.locations[e.tag] && this.dataTable.positionData.locations[e.tag].x) {
         css_path.left = `${this.dataTable.positionData.locations[e.tag].x}px`;
         css_path.top = `${this.dataTable.positionData.locations[e.tag].y}px`;
@@ -694,7 +696,7 @@ export class PlanService {
   public handleSliderChange(percentFromLeft: number, id: string, category: string, name: string) {
     let width = 0;
     let height = 0;
-    const css_path = category === '' ? this.CSS[name] : this.CSS[category][name];
+    const css_path = category === '' ? this.CSS[this.dataTable.plan.name][name] : this.CSS[this.dataTable.plan.name][category][name];
     this.dataTable.positionData.percents[name] = percentFromLeft;
     width = css_path.width;
     height = css_path.height;
@@ -717,8 +719,6 @@ export class PlanService {
     return this.plans;
   }
 
-
-
   /** When the app loads the css data from file, if there is nothing there, this file will create a new
    * set of css data and write it to the file.
    */
@@ -726,31 +726,36 @@ export class PlanService {
     if (!this.CSS) {
       this.CSS = {};
     }
-    this.elements.forEach(e => {
-      if (e.category) {
-        if (!this.CSS[e.category]) {
-          this.CSS[e.category] = {};
-        }
-        if (!this.CSS[e.category][e.tag]) {
-          this.CSS[e.category][e.tag] = {};
-        }
-        this.CSS[e.category][e.tag].left = `0px`;
-        this.CSS[e.category][e.tag].top = `0px`;
-        this.CSS[e.category][e.tag].percent = 50;
-        this.CSS[e.category][e.tag].width = 0;
-        this.CSS[e.category][e.tag].height = 0;
-        this.CSS[e.category][e.tag].visible = true;
-      } else {
-        if (!this.CSS[e.tag]) {
-          this.CSS[e.tag] = {};
-        }
-        this.CSS[e.tag].left = `0px`;
-        this.CSS[e.tag].top = `0px`;
-        this.CSS[e.tag].percent = 50;
-        this.CSS[e.tag].width = 0;
-        this.CSS[e.tag].height = 0;
-        this.CSS[e.tag].visible = true;
+    this.plans.forEach(p => {
+      if (!this.CSS[p.name]) {
+        this.CSS[p.name] = {};
       }
+      this.elements.forEach(e => {
+        if (e.category) {
+          if (!this.CSS[p.name][e.category]) {
+            this.CSS[p.name][e.category] = {};
+          }
+          if (!this.CSS[p.name][e.category][e.tag]) {
+            this.CSS[p.name][e.category][e.tag] = {};
+          }
+          this.CSS[p.name][e.category][e.tag].left = `0px`;
+          this.CSS[p.name][e.category][e.tag].top = `0px`;
+          this.CSS[p.name][e.category][e.tag].percent = 50;
+          this.CSS[p.name][e.category][e.tag].width = 0;
+          this.CSS[p.name][e.category][e.tag].height = 0;
+          this.CSS[p.name][e.category][e.tag].visible = true;
+        } else {
+          if (!this.CSS[p.name][e.tag]) {
+            this.CSS[p.name][e.tag] = {};
+          }
+          this.CSS[p.name][e.tag].left = `0px`;
+          this.CSS[p.name][e.tag].top = `0px`;
+          this.CSS[p.name][e.tag].percent = 50;
+          this.CSS[p.name][e.tag].width = 0;
+          this.CSS[p.name][e.tag].height = 0;
+          this.CSS[p.name][e.tag].visible = true;
+        }
+      });
     });
 
     if (this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) })) {
@@ -772,9 +777,9 @@ export class PlanService {
   public updateCSSHeight(elementCategory: string, elementName: string, heightValue: number) {
     if (this.CSS) {
       if (elementCategory) {
-        this.CSS[elementCategory][elementName].height = heightValue;
+        this.CSS[this.dataTable.plan.name][elementCategory][elementName].height = heightValue;
       } else {
-        this.CSS[elementName].height = heightValue;
+        this.CSS[this.dataTable.plan.name][elementName].height = heightValue;
       }
     }
     if (!this.windowService.isMain()) {
@@ -784,7 +789,8 @@ export class PlanService {
   }
   public updateCSSWidth(elementCategory: string, elementName: string, widthValue: number) {
     if (this.CSS) {
-      const css_path = elementCategory ? this.CSS[elementCategory][elementName] : this.CSS[elementName];
+      // tslint:disable-next-line: max-line-length
+      const css_path = elementCategory ? this.CSS[this.dataTable.plan.name][elementCategory][elementName] : this.CSS[this.dataTable.plan.name][elementName];
       css_path.width = widthValue;
       if (!this.windowService.isMain()) {
         this.windowService.sendMessage({ type: 'update width', message: { cat: elementCategory, name: elementName, width: widthValue } });
@@ -792,13 +798,13 @@ export class PlanService {
       if (this.freshCss) {
         let allWidthSet = true;
         this.elements.forEach(e => {
-          const path = e.category ? this.CSS[e.category][e.tag] : this.CSS[e.tag];
+          const path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.tag] : this.CSS[this.dataTable.plan.name][e.tag];
           if (path.width === 0) {
             allWidthSet = false;
           }
         });
         if (allWidthSet) {
-          this.cssSubject.next(this.CSS);
+          this.cssSubject.next(this.CSS[this.dataTable.plan.name]);
         }
         console.log(this.CSS);
       }
