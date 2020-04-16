@@ -23,7 +23,7 @@ export class YearComponent implements AfterViewInit {
   constructor(private planService: PlanService) {
     this.years = [];
     this.barLength = 40;
-    this.displayData = {year: 9999, percentRenewable: 0, scenario: ''};
+    this.displayData = {year: 2016, percentRenewable: 0, scenario: ''};
   }
 
   ngAfterViewInit() {
@@ -38,6 +38,11 @@ export class YearComponent implements AfterViewInit {
     this.planService.precentRenewableByYearSubject.subscribe(percent => {
       if (percent) {
         this.displayData.percentRenewable = percent;
+        if (percent === 0) {
+          setTimeout( () => {
+            this.planService.updateYear(this.displayData.year, false);
+          }, 5000);
+        }
       }
     });
 

@@ -218,7 +218,8 @@ export class ScrollingMenuComponent implements AfterViewInit {
           this.moveEachOption(Math.round(sum));  // Update element positions.
           this.positionOptions();    // Move the elemnts
           this.getSpeed();           // Always get the current finger speed in case the touch ends.
-          this.positionHistory = []; // Alwyas clear all touch positions.
+          // Alwyas clear all touch positions except for the last one.
+          this.positionHistory = [this.positionHistory[this.positionHistory.length - 1]];
           /* Running total keeps track of the TOTAL distance moved so that when it is larger than the height of a
           menu option the bottom element is moved to the top or vice versa */
           this.runningTotal = this.checkRunningTotal(sum);

@@ -14,6 +14,7 @@ export interface MapLayer {
   borderWidth: number;
   legendColor: string;
   parcels: Parcel[];
+  legend: { text: string, color: string }[];
   setupFunction(planService: PlanService): any | null;
   updateFunction(planService: PlanService, state: number): any | null;
 }

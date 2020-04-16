@@ -40,6 +40,10 @@ export class MapElementComponent implements OnInit {
     this.height = mapData.height * this.scale;
     this.rasterBounds = mapData.bounds;
     this.baseMapImagePath = mapData.path;
+    setTimeout( () => {
+      this.planService.updateCSSWidth(null, 'map', this.width);
+      this.planService.updateCSSHeight(null, 'map', this.height);
+    });
   }
 
   ngOnInit() {
@@ -51,8 +55,8 @@ export class MapElementComponent implements OnInit {
           e = this.mapDiv.nativeElement.children[0];
           const image = e.children[0];
           if (this.width === 0) {
-            this.width = e.getBoundingClientRect().width;
-            this.height = e.getBoundingClientRect().height;
+            this.planService.updateCSSWidth(null, 'map', this.width);
+            this.planService.updateCSSHeight(null, 'map', this.height);
           }
           const newWidth = this.width * percentage;
           const newHeight = this.height * percentage;
@@ -97,6 +101,13 @@ export class MapElementComponent implements OnInit {
         } else {
           this.updateYear(year);
         }
+      }
+    });
+
+    this.planService.getWidthSubject.subscribe((val: boolean) => {
+      if (val) {
+        this.planService.updateCSSWidth(null, 'map', this.width);
+        this.planService.updateCSSHeight(null, 'map', this.height);
       }
     });
   }

@@ -1,52 +1,76 @@
 <div class="map-mover mover" #mapMover>
   <img src="../../../../../assets/images/oahu-outline.png">
-  <div class="button options" (click)="expandMapOptions()">Map Settings</div>
+  <div class="button options" (click)="expand('map')">Map Settings</div>
   <div class="settings-expansion-wrapper" #extraMap>
-      <p>Resize Map</p>
-      <app-slider width="90" horizontal="true" type="resize map"></app-slider>
+    <p>Resize Map</p>
+    <app-slider width="90" horizontal="true" type="resize map" category="" name="map"></app-slider>
+     <div class="button show-hide" (click)="hide('map')">Hide</div>
+     <div class="button show-hide" (click)="show('map')">Show</div>
   </div>
 </div>
 <div class="chart-mover pie mover" #pieMover>
   <img src="../../../../../assets/images/pie-img.png">
-  <div class="button options" (click)="expandPieOptions()">Pie Chart Settings</div>
+  <div class="button options" (click)="expand('pie')">Pie Chart Settings</div>
   <div class="settings-expansion-wrapper" #extraPie>
     <p>Resize Pie Chart</p>
-    <app-slider width="90" horizontal="true" type="resize pie"></app-slider>
+    <app-slider width="90" horizontal="true" type="resize pie" category="charts" name="pie"></app-slider>
+     <div class="button show-hide" (click)="hide('pie')">Hide</div>
+     <div class="button show-hide" (click)="show('pie')">Show</div>
   </div>
 </div>
 <div class="chart-mover mover" #lineMover>
   <img src="../../../../../assets/images/line-img.png">
-  <div class="button options" (click)="expandLineOptions()">Line Chart Settings</div>
+  <div class="button options" (click)="expand('line')">Line Chart Settings</div>
   <div class="settings-expansion-wrapper" #extraLine>
     <p>Resize Line Chart</p>
-    <app-slider width="90" horizontal="true" type="resize line"></app-slider>
+    <app-slider width="90" horizontal="true" type="resize line" category="charts" name="line"></app-slider>
+     <div class="button show-hide" (click)="hide('line')">Hide</div>
+     <div class="button show-hide" (click)="show('line')">Show</div>
   </div>
 </div>
 <div class="displaying-data-mover mover" #displayingDataMover>
   <img src="../../../../../assets/images/display.png">
-  <div class="button options" (click)="expandDataOptions()">Data Display Settings</div>
+  <div class="button options" (click)="expand('data')">Data Display Settings</div>
   <div class="settings-expansion-wrapper" #extraData>
     <p>Resize Data Display</p>
-    <app-slider width="90" horizontal="true" type="resize data"></app-slider>
+    <app-slider width="90" horizontal="true" type="resize data" category="" name="data"></app-slider>
+     <div class="button show-hide" (click)="hide('data')">Hide</div>
+     <div class="button show-hide" (click)="show('data')">Show</div>
   </div>
 </div>
 <div class="lava-logo-mover mover" #lavaLogoMover>
   <img src="../../../../../assets/images/lava-logo-curves-01.webp">
-  <div class="button options" (click)="expandLavaOptions()">Lava Logo Settings</div>
+  <div class="button options" (click)="expand('lava')">Lava Logo Settings</div>
   <div class="settings-expansion-wrapper" #extraLava>
     <p>Resize Lava Logo</p>
-    <app-slider width="90" horizontal="true" type="resize lava"></app-slider>
+    <app-slider width="90" horizontal="true" type="resize lava" category="logos" name="lava"></app-slider>
+    <div class="button show-hide" (click)="hide('lava')">Hide</div>
+    <div class="button show-hide" (click)="show('lava')">Show</div>
   </div>
 </div>
 <div class="heco-logo-mover mover" #hecoLogoMover>
   <img src="../../../../../assets/images/heco-logo.png">
-  <div class="button options" (click)="expandHecoOptions()">Heco Logo Settings</div>
+  <div class="button options" (click)="expand('heco')">Heco Logo Settings</div>
   <div class="settings-expansion-wrapper" #extraHeco>
     <p>Resize Heco Logo</p>
-    <app-slider width="90" horizontal="true" type="resize heco"></app-slider>
+    <app-slider width="90" horizontal="true" type="resize heco" category="logos" name="heco"></app-slider>
+    <div class="button show-hide" (click)="hide('heco')">Hide</div>
+    <div class="button show-hide" (click)="show('heco')">Show</div>
   </div>
 </div>
 <div class="button-wrapper">
-  <div class="button" (click)="handleClick(true)" #saveButton>Save Changes</div>
-  <div class="button" (click)="handleClick(false)" #cancelButton>Cancel Changes</div>
+  <div class="button finish" (click)="handleClick(true)" #saveButton>Save Changes</div>
+  <div class="button finish" (click)="handleClick(false)" #cancelButton>Cancel Changes</div>
+</div>
+<div class="instructions" #instructions>
+  <h3>Welcome to the HECO 3d Projection Map</h3>
+  <p>We noticed that you do not have a saved Map Layout.  You can now position and resize your display as well as hide any elements that you do not want shown.</p>
+  <p>Each map element is represented by a box and icon here.  You can drag an drop them wherever you want to and the cooresponding element that is being projected will move to the cooresponding position</p>
+  <p>Click on the Settings button of any element and you will see options to resize, hide, or show that element.</p>
+  <div class="images">
+    <img src="../../../../../assets/images/line-mover.png">
+    <img src="../../../../../assets/images/line-move-extra.png">
+  </div>
+  <p>When you are finished, click Save Changes to save this layout for the next time you load the application or Cancel Changes if you want to start over.</p>
+  <div class="button" (click)="proceed()">Proceed to Setup</div>
 </div>

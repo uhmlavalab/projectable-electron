@@ -22,8 +22,6 @@ export class LineChartComponent implements AfterViewInit {
   private planData: any;
   private allReady: any;
   private dataFetched = false;
-  private width: number;
-  private height: number;
 
   constructor(private planService: PlanService) {
     this.allReady = {};
@@ -31,8 +29,6 @@ export class LineChartComponent implements AfterViewInit {
     this.allReady.scenarioSet = false;
     this.allReady.yearSet = false;
     this.allReady.dataSet = false;
-    this.width = 0;
-    this.height = 0;
   }
 
   ngAfterViewInit() {
@@ -41,14 +37,18 @@ export class LineChartComponent implements AfterViewInit {
       if (data) {
         let e = null;
         const percentage = data.percent / 100 * 2;
+        let width = data.width;
+        let height = data.height;
         if (data.id === 'resize line') {
           e = this.chartDiv.nativeElement;
-          if (this.width === 0) {
-            this.width = e.getBoundingClientRect().width;
-            this.height = e.getBoundingClientRect().height;
+          if (width === 0 || height === 0) {
+            width = e.getBoundingClientRect().width;
+            height = e.getBoundingClientRect().height;
+            this.planService.updateCSSHeight('charts', 'line', height);
+            this.planService.updateCSSWidth('charts', 'line', width);
           }
-          const newWidth = this.width * percentage;
-          const newHeight = this.height * percentage;
+          const newWidth = width * percentage;
+          const newHeight = height * percentage;
           e.style.width = `${newWidth}px`;
           e.style.height = `${newHeight}px`;
         }
@@ -80,6 +80,13 @@ export class LineChartComponent implements AfterViewInit {
       if (value) {
         this.updateData(value);
         this.checkReadyState();
+      }
+    });
+
+    this.planService.getWidthSubject.subscribe((val: boolean) => {
+      if (val) {
+        this.planService.updateCSSHeight('charts', 'line', this.chartDiv.nativeElement.getBoundingClientRect().height);
+        this.planService.updateCSSWidth('charts', 'line', this.chartDiv.nativeElement.getBoundingClientRect().width);
       }
     });
   }

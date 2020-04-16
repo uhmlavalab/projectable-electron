@@ -49,5 +49,12 @@ export interface DataTable {
         locations: any;
         percents: any;
     };
-
+    visibility: {
+        lava: boolean;
+        map: boolean;
+        heco: boolean;
+        data: boolean;
+        pie: boolean;
+        line: boolean;
+    }
 }

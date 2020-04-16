@@ -69,6 +69,7 @@ export const BigIslandPlan: Plan = {
               .style('opacity', this.active ? 0.85 : 0.0);
           });
         },
+        legend: null,
       },
       {
         name: 'dod',
@@ -105,6 +106,7 @@ export const BigIslandPlan: Plan = {
               .style('opacity', this.active ? 0.85 : 0.0);
           });
         },
+        legend: null,
       },
       {
         name: 'solar',
@@ -156,6 +158,7 @@ export const BigIslandPlan: Plan = {
             }
           });
         },
+        legend: null,
       },
       {
         name: 'wind',
@@ -206,6 +209,7 @@ export const BigIslandPlan: Plan = {
             }
           });
         },
+        legend: null,
       },
       {
         name: 'agriculture',
@@ -243,7 +247,9 @@ export const BigIslandPlan: Plan = {
               .style('opacity', this.active ? 0.85 : 0.0);
           });
         },
+        legend: null,
       }
     ],
   }
 }
+

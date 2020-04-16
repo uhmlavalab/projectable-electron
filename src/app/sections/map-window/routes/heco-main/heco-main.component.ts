@@ -20,22 +20,8 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
 
   private positionData: any;
   private messageSub = new Subscription();
-
-  private mapWidth: number;
-  private lineWidth: number;
-  private pieWidth: number;
-  private lavaLogoWidth: number;
-  private lavaLogoHeight: number;
-  private hecoLogoWidth: number;
-  private hecoLogoHeight: number;
-  private yearDataHeight: number;
-  private yearDataWidth: number;
-  private lavaPercent: number;
-  private yearDataPercent: number;
-  private hecoPercent: number;
-  private mapPercent: number;
-  private linePercent: number;
-  private piePercent: number;
+  private cssData: any;
+  private elements: { e: ElementRef; tag: string, category: string }[];
 
   constructor(private planService: PlanService, private windowService: WindowService) {
     this.positionData = {};
@@ -45,19 +31,18 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     this.positionData.lava = {};
     this.positionData.displayData = {};
     this.positionData.heco = {};
-    this.mapWidth = 0;
-    this.lineWidth = 0;
-    this.pieWidth = 0;
-    this.lavaLogoWidth = 0;
-    this.lavaLogoHeight = 0;
-    this.hecoLogoWidth = 0;
-    this.hecoLogoHeight = 0;
-    this.yearDataWidth = 0;
-    this.yearDataHeight = 0;
+    this.cssData = null;
   }
 
   ngAfterViewInit() {
-
+    this.elements = [
+      { e: this.mapElement, tag: 'map', category: null },
+      { e: this.pieChart, tag: 'pie', category: 'charts' },
+      { e: this.lineChart, tag: 'line', category: 'charts' },
+      { e: this.yearData, tag: 'data', category: null },
+      { e: this.hecoLogo, tag: 'heco', category: 'logos' },
+      { e: this.lavaLogo, tag: 'lava', category: 'logos' }
+    ];
     this.windowService.windowMessageSubject.subscribe(msg => {
       this.planService.handleMessage(msg);
     });
@@ -65,11 +50,11 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     this.planService.resizeSubject.subscribe(data => {
       if (data) {
         if (data.id === 'resize lava') {
-          this.resizeLavaLogo(this.lavaLogo.nativeElement, data.percent);
+          this.resizeElement(this.lavaLogo.nativeElement, 'logos', 'lava', data.width, data.height, data.percent);
         } else if (data.id === 'resize heco') {
-          this.resizeHecoLogo(this.hecoLogo.nativeElement, data.percent);
+          this.resizeElement(this.hecoLogo.nativeElement, 'logos', 'heco', data.width, data.height, data.percent);
         } else if (data.id === 'resize data') {
-          this.resizeDataElement(this.yearData.nativeElement, data.percent);
+          this.resizeElement(this.yearData.nativeElement, null, 'data', data.width, data.height, data.percent);
         }
       }
     });
@@ -77,43 +62,47 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     this.planService.positionSubject.subscribe(data => {
       if (data) {
         if (data.x && data.y) {
-          let e = this.mapElement.nativeElement;
-          if (data.id === 'pie') {
-            e = this.pieChart.nativeElement;
-          } else if (data.id === 'line') {
-            e = this.lineChart.nativeElement;
-          } else if (data.id === 'displayData') {
-            e = this.yearData.nativeElement;
-          } else if (data.id === 'lava') {
-            e = this.lavaLogo.nativeElement;
-          } else if (data.id === 'heco') {
-            e = this.hecoLogo.nativeElement;
-          }
-          const rect = e.getBoundingClientRect();
-          e.style.left = `${data.x - rect.width / 2}px`;
-          e.style.top = `${data.y - rect.height / 2}px`;
-          this.positionData[data.id] = { x: data.x - rect.width / 2, y: data.y - rect.height / 2 };
+          // Data is percentage from left (x) and top (y) and must be converted to pixel values.
+          const x = this.convertPercentToPixel(data.x, true);
+          const y = this.convertPercentToPixel(data.y, false);
+          const e = this.elements.find(element => element.tag === data.id);
+          e.e.nativeElement.style.left = `${x}px`;
+          e.e.nativeElement.style.top = `${y}px`;
+          this.positionData[data.id] = { x: x, y: y };
           this.planService.updatePositionData(this.positionData);
+        }
+      }
+    });
+
+    this.planService.revertPositionsSubject.subscribe(val => {
+      if (val) {
+        if (!this.windowService.isMain()) {
+          this.positionAll(this.cssData);
         }
       }
     });
 
     this.planService.cssSubject.subscribe(cssData => {
       if (cssData) {
+        this.cssData = cssData;
         if (!this.windowService.isMain()) {
-          this.positionElement(cssData.map, this.mapElement.nativeElement);
-          this.positionElement(cssData.charts.line, this.lineChart.nativeElement);
-          this.positionElement(cssData.charts.pie, this.pieChart.nativeElement);
-          this.positionElement(cssData.data, this.yearData.nativeElement);
-          this.positionElement(cssData.logos.lava, this.lavaLogo.nativeElement);
-          this.positionElement(cssData.logos.heco, this.hecoLogo.nativeElement);
-          setTimeout(()=> {
-            this.resizeDataElement(this.yearData.nativeElement, cssData.data.percent);
-            this.resizeLavaLogo(this.lavaLogo.nativeElement, cssData.logos.lava.percent);
-            this.resizeHecoLogo(this.hecoLogo.nativeElement, cssData.logos.heco.percent);
-          }, 500);
-
+          this.positionAll(cssData);
         }
+      }
+    });
+
+    this.planService.toggleElementSubject.subscribe(val => {
+      if (val) {
+        this.elements.find(e => e.tag === val.tag).e.nativeElement.style.display = val.show ? 'block' : 'none';
+      }
+    });
+
+    this.planService.getWidthSubject.subscribe((val: boolean) => {
+      if (val) {
+        this.elements.forEach(e => {
+          this.planService.updateCSSHeight(e.category, e.tag, e.e.nativeElement.getBoundingClientRect().height);
+          this.planService.updateCSSWidth(e.category, e.tag, e.e.nativeElement.e.getBoundingClientRect().width);
+        });
       }
     });
   }
@@ -121,40 +110,38 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     this.messageSub.unsubscribe();
   }
 
-  resizeLavaLogo(e: any, percentage: any) {
-    if (percentage && percentage > 0) {
-      if (this.lavaLogoWidth === 0) {
-        this.lavaLogoWidth = e.getBoundingClientRect().width;
-        this.lavaLogoHeight = e.getBoundingClientRect().height;
-      }
-      const newWidth = this.lavaLogoWidth * percentage / 100 * 2;
-      const newHeight = this.lavaLogoHeight * percentage / 100 * 2;
+  positionAll(cssData) {
+    this.elements.forEach(e => {
+      const css = e.category ? cssData[e.category][e.tag] : cssData[e.tag];
+      this.positionElement(css, e.e.nativeElement);
+      e.e.nativeElement.style.display = css.visible ? 'block' : 'none';
+    });
+    setTimeout(() => {
+      this.resizeElement(this.yearData.nativeElement, null, 'data', cssData.data.width, cssData.data.height, cssData.data.percent);
+      // tslint:disable-next-line: max-line-length
+      this.resizeElement(this.lavaLogo.nativeElement, 'logos', 'lava', cssData.logos.lava.width, cssData.logos.lava.height, cssData.logos.lava.percent);
+      // tslint:disable-next-line: max-line-length
+      this.resizeElement(this.hecoLogo.nativeElement, 'logos', 'heco', cssData.logos.heco.width, cssData.logos.heco.height, cssData.logos.heco.percent);
+    }, 500);
+  }
 
-      console.log(percentage, this.lavaLogoWidth, this.lavaLogoHeight, newWidth, newHeight);
-      e.style.width = `${newWidth}px`;
-      e.style.height = `${newHeight}px`;
+  resizeElement(e: any, category: string, elementName: string, width: number, height: number, percentage: any) {
+    if (!width || !height) {
+      width = 0;
+      height = 0;
     }
-  }
-  resizeHecoLogo(e: any, percentage: any) {
-    if (percentage && percentage > 0) {
-      if (this.hecoLogoWidth === 0) {
-        this.hecoLogoWidth = e.getBoundingClientRect().width;
-        this.hecoLogoHeight = e.getBoundingClientRect().height;
-      }
-      const newWidth = this.hecoLogoWidth * percentage / 100 * 2;
-      const newHeight = this.hecoLogoHeight * percentage / 100 * 2;
-      e.style.width = `${newWidth}px`;
-      e.style.height = `${newHeight}px`;
+    if (width === 0 || height === 0) {
+      width = e.getBoundingClientRect().width;
+      height = e.getBoundingClientRect().height;
+      this.planService.updateCSSHeight(category, elementName, height);
+      this.planService.updateCSSWidth(category, elementName, width);
+      const css_path = category ? this.cssData[category][elementName] : this.cssData[elementName];
+      css_path.width = width;
+      css_path.height = height;
     }
-  }
-  resizeDataElement(e: any, percentage: any) {
     if (percentage && percentage > 0) {
-      if (this.yearDataWidth === 0) {
-        this.yearDataWidth = e.getBoundingClientRect().width;
-        this.yearDataHeight = e.getBoundingClientRect().height;
-      }
-      const newWidth = this.yearDataWidth * percentage / 100 * 2;
-      const newHeight = this.yearDataHeight * percentage / 100 * 2;
+      const newWidth = width * percentage / 100 * 2;
+      const newHeight = height * percentage / 100 * 2;
       e.style.width = `${newWidth}px`;
       e.style.height = `${newHeight}px`;
     }
@@ -167,5 +154,9 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     } catch (error) {
       console.log('Error.  Failed to find year data element to position.');
     }
+  }
+
+  private convertPercentToPixel(percent: number, width: boolean): number {
+    return width ? percent / 100 * window.innerWidth : percent / 100 * window.innerHeight;
   }
 }
