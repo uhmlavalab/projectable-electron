@@ -1,21 +1,21 @@
 <div class="content-wrapper" *ngIf="layerSet === true">
   <div class="button-wrapper">
-      <div class="button deets" (click)="handleClick(true)" #detailsButton>Details</div>
-      <div class="button" (click)="handleClick(false)" #legendButton>Legend</div>
+    <div class="button deets" (click)="handleClick(true)" #legendButton>Legend</div>
+    <div class="button" (click)="handleClick(false)" #detailsButton>Details</div>
   </div>
   <p class="title">{{layer.displayName}}</p>
-  <span *ngIf="showDetails === true">
-  <div class="left">
-    <img src={{layer.secondScreenImagePath}}>
-  </div>
-  <div class="right">
-    <p>{{layer.secondScreenText}}</p>
-  </div>
+  <span *ngIf="showLegend === true">
+    <div class="legend-row" *ngFor="let row of layer.legend">
+      <span class="legend-color" [style.background]="row.color"></span>
+      <p class="legend-text">{{row.text}}</p>
+    </div>
   </span>
-  <span *ngIf="showDetails === false">
-      <div class="legend-row" *ngFor="let row of layer.legend">
-         <span class="legend-color" [style.background]="row.color"></span>
-         <p class="legend-text">{{row.text}}</p>
-      </div>
+  <span *ngIf="showLegend === false">
+    <div class="left">
+      <img src={{layer.secondScreenImagePath}}>
+    </div>
+    <div class="right">
+      <p>{{layer.secondScreenText}}</p>
+    </div>
   </span>
 </div>

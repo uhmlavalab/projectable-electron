@@ -14,12 +14,12 @@ export class LayerInfoComponent implements OnInit {
 
   private layer: any;
   private layerSet: boolean;
-  private showDetails: boolean; // If true, details are shown, if false legend is shown.
+  private showLegend: boolean; // If true, details are shown, if false legend is shown.
 
   constructor(private planService: PlanService) {
     this.layerSet = false;
     this.layer = null;
-    this.showDetails = true;
+    this.showLegend = true;
   }
 
   ngOnInit() {
@@ -31,20 +31,17 @@ export class LayerInfoComponent implements OnInit {
     });
   }
 
-  private handleClick(details: boolean) {
+  private handleClick(legend: boolean) {
 
-    this.showDetails = details;
+    this.showLegend = legend;
 
     const activeColor = 'rgb(156, 210, 207)';
     const activeTextColor = 'rgb(209, 235, 236)';
     const black = 'black';
-    let activeE = null;
-    let other = null;
+    let activeE = this.deets.nativeElement;
+    let other = this.legend.nativeElement;
 
-    if (details) {
-      activeE = this.deets.nativeElement;
-      other = this.legend.nativeElement;
-    } else {
+    if (legend) {
       activeE = this.legend.nativeElement;
       other = this.deets.nativeElement;
     }
