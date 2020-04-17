@@ -53,6 +53,4 @@ export class LayerInfoComponent implements OnInit {
     other.style.color = activeColor;
     other.style.textDecoration = 'none';
   }
-
-
 }

@@ -8,7 +8,6 @@ import { SoundsService } from '@app/sounds';
 import * as d3 from 'd3/d3.min';
 import { WindowService } from '@app/modules/window';
 import { DataTable } from '@app/interfaces/data-table';
-import { Message } from '@angular/compiler/src/i18n/i18n_ast';
 
 @Injectable({
   providedIn: 'root'
@@ -43,13 +42,19 @@ export class PlanService {
   public technologySubject = new BehaviorSubject<any>(null);           // Publishes an array of all technologies and their colors.
   public cssSubject = new BehaviorSubject<any>(null);                  // Publishes the css data.
   public tooltipSubject = new BehaviorSubject<any>(null);              // Publishes the which tooltip to display.
-  public windowDataSubject = new BehaviorSubject<any>(null);
+  public windowDataSubject = new BehaviorSubject<any>(null);           // Publishes the size of the other screen.
   public toggleElementSubject = new BehaviorSubject<{ tag: string, show: boolean }>(null);
   public freshCssSubject = new BehaviorSubject<boolean>(null);
   public getWidthSubject = new BehaviorSubject<boolean>(null);
 
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
     this.freshCss = true;
+    this.initializeElementsArray();
+    this.initializeDataTable();
+  }
+
+  /** These are the necessary elements that the map uses and will be modified by the css data file. */
+  private initializeElementsArray(): void {
     this.elements = [
       { category: null, tag: 'map' },
       { category: null, tag: 'data' },
@@ -58,7 +63,9 @@ export class PlanService {
       { category: 'logos', tag: 'lava' },
       { category: 'logos', tag: 'heco' }
     ];
-
+  }
+  /** The data table stores the current state of the table. */
+  private initializeDataTable(): void {
     // The dataTable stores all relevant data and can be printed to the console using the function printDataTable().
     this.dataTable = {
       state: 0,
@@ -123,13 +130,11 @@ export class PlanService {
         line: true
       }
     };
-    this.plans = Plans;
   }
 
   /* Start The Map */
   public startTheMap(plan: Plan): void {
-    this.setupSelectedPlan(this.plans.find(el => plan.name === el.name));
-    this.plans = [];  // Free Up the memory.
+    this.setupSelectedPlan(Plans.find(el => plan.name === el.name));
     this.setState(1);
     this.windowService.sendMessage({ type: 'state', message: 'run', plan: plan });
   }
@@ -429,117 +434,6 @@ export class PlanService {
     };
   }
 
-  /** The scrollable menu passes data and type to this function and the UI and Map
- * are notified of the change.
- * @param type the type of change
- * @param data the value of the change.
- */
-  public handleMenuChange(type: string, data: any, play: boolean): void {
-    if (type === 'year') {
-      this.updateYear(data, play);
-    } else if (type === 'scenario') {
-      const scen = this.dataTable.scenario.all.find(el => el.displayName === data);
-      this.updateScenario(scen.name);
-      this.windowService.sendMessage({ type: 'scenario change', message: scen.name });
-    }
-  }
-
-  /** Messages are received by heco-main component and touch-ui component for the two windows.  The messages are sent
-   * to this function to be parsed.
-   * @param msg the message to be parsed.
-   * @return true when finished.
-   */
-  public handleMessage(msg: any): boolean {
-    if (msg.type === 'year change') {
-      this.updateYear(msg.message, false);
-    } else if (msg.type === 'percent change') {
-      this.dataTable.year.currentRenewablePercent = msg.message;
-      this.precentRenewableByYearSubject.next(msg.message);
-    } else if (msg.type === 'scenario change') {
-      this.updateScenario(this.dataTable.scenario.all.find(el => el.name === msg.message).name);
-    } else if (msg.type === 'toggle layer') {
-      this.toggleLayer(msg.message);
-    } else if (msg.type === 'position elements' && !this.windowService.isMain()) {
-      this.positionSubject.next(msg.message);
-    } else if (msg.type === 'resize') {
-      this.resizeSubject.next(msg.message);
-      this.handleSliderChange(msg.message.percent, msg.message.id, msg.message.category, msg.message.name);
-    } else if (msg.type === 'update height') {
-      this.updateCSSHeight(msg.message.cat, msg.message.name, msg.message.height);
-    } else if (msg.type === 'update width') {
-      this.updateCSSWidth(msg.message.cat, msg.message.name, msg.message.width);
-    } else if (msg.type === 'toggle visibility') {
-      this.toggleElement(msg.message.tag, msg.message.show);
-    } else if (msg.type === 'get other window data') {
-      // tslint:disable-next-line: max-line-length
-      this.windowService.sendMessage({ type: 'receive other window data', message: { main: this.windowService.isMain(), width: window.innerWidth, height: window.innerHeight } });
-    } else if (msg.type === 'receive other window data') {
-      this.windowDataSubject.next(msg.message);
-    } else if (msg.type === 'request percent') {
-      this.windowService.sendMessage({ type: 'percent change', message: this.dataTable.year.currentRenewablePercent });
-    } else if (msg.type === 'file information') {
-      msg.message.forEach(d => {
-        if (d.file === 'cssData') {
-          const css_path = d.css[this.dataTable.plan.name];
-          // tslint:disable-next-line: max-line-length
-          if (css_path.charts && css_path.logos && css_path.map && css_path.data) {
-            if (!this.windowService.isMain()) {
-              this.setCSS(d.css);
-              this.windowService.sendMessage({ type: 'css loaded', message: d.css });
-            }
-          } else {
-            // Create New Css File
-            this.createCssData();
-          }
-        }
-      });
-    } else if (msg.type === 'css loaded') {
-      if (this.windowService.isMain()) {
-        this.setCSS(msg.message);
-      }
-    } else if (msg.type === 'update cssData file') {
-      if (!this.windowService.isMain() && msg.message.saveData) {
-        this.storeCssData();
-      } else if (!msg.message.saveData && !this.windowService.isMain()) {
-        const css_path = this.CSS[this.dataTable.plan.name];
-        this.revertPositionsSubject.next(css_path);
-        if (css_path.charts.line.percent && css_path.charts.line.percent > 0) {
-          this.resizeSubject.next(
-            {
-              id: 'resize line',
-              width: css_path.charts.line.width,
-              height: css_path.charts.line.height,
-              percent: css_path.charts.line.percent
-            }
-          );
-        }
-        if (css_path.map.percent && css_path.map.percent > 0) {
-          // tslint:disable-next-line: max-line-length
-          this.resizeSubject.next({ id: 'resize map', width: css_path.map.width, height: css_path.map.height, percent: css_path.map.percent });
-        }
-        if (css_path.charts.pie.percent && css_path.charts.pie.percent > 0) {
-          // tslint:disable-next-line: max-line-length
-          this.resizeSubject.next({ id: 'resize pie', width: css_path.charts.pie.width, height: css_path.charts.pie.height, percent: css_path.charts.pie.percent });
-        }
-      }
-    }
-    return true;
-  }
-
-  /** Toggles the selected layer and messages the other window.
-   * @param layerName the name of the layer that was toggled.
-   */
-  public handleLayerButtonClick(layerName: string): void {
-    this.toggleLayer(layerName);
-    const msg = { type: 'toggle layer', message: layerName };
-    this.windowService.sendMessage(msg);
-  }
-
-  public handleLayerButtonInfoClick(layerName: string) {
-    this.layerInfoSubject.next(this.dataTable.layers.all.find(e => e.layer.name === layerName));
-  }
-
-
   /** When the user uses the modal to position the map elements the data is parsed here and sent to the
    * map window to adjust the position of the elements there.
    * @param id a string idenfifying the element to move. (ie. 'map', 'pie').
@@ -580,95 +474,6 @@ export class PlanService {
    */
   public updatePositionData(data) {
     this.dataTable.positionData.locations = data;
-  }
-
-  /** When the css file is loaded, the data is sent here to be stored and published so that elements can be positioned.
-   * @param css the css data object.
-   */
-  private setCSS(css: any): void {
-    let freshCss = true;
-    this.CSS = css;
-    this.cssSubject.next(this.CSS[this.dataTable.plan.name]);
-    this.elements.forEach(e => {
-      // tslint:disable-next-line: no-shadowed-variable
-      const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.tag] : this.CSS[this.dataTable.plan.name][e.tag];
-      this.dataTable.visibility[e.tag] = css_path.visible;
-      this.toggleElement(e.tag, css_path.visible);
-      if (css_path.left !== '0px' && css_path.top !== '0px') {
-        freshCss = false;
-      }
-    });
-    const css_path = this.CSS[this.dataTable.plan.name];
-    if (!this.windowService.isMain()) {
-      if (css_path.charts.line.percent && css_path.charts.line.percent > 0) {
-        this.resizeSubject.next(
-          {
-            id: 'resize line',
-            width: css_path.charts.line.width,
-            height: css_path.charts.line.height,
-            percent: css_path.charts.line.percent
-          }
-        );
-      }
-      if (css_path.map.percent && css_path.map.percent > 0) {
-        this.resizeSubject.next(
-          {
-            id: 'resize map',
-            width: css_path.map.width,
-            height: css_path.map.height,
-            percent: css_path.map.percent
-          }
-        );
-      }
-      if (css_path.charts.pie.percent && css_path.charts.pie.percent > 0) {
-        this.resizeSubject.next(
-          {
-            id: 'resize pie',
-            width: css_path.charts.pie.width,
-            height: css_path.charts.pie.height,
-            percent: css_path.charts.pie.percent
-          });
-      }
-    }
-    if (freshCss) {
-      // Need to capture the width of the elements since they were all reset.
-      this.getWidthSubject.next(true);
-      this.freshCssSubject.next(freshCss);
-    } else {
-      this.freshCss = false;
-    }
-  }
-
-  /** When the user uses the position modal to move map elements around, the data can be saved to a file.  This function
-   * saves that data and writes a file.  The data is saved in the positionData section of the dataTable.
-   */
-  private storeCssData(): void {
-    this.elements.forEach(e => {
-      const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.tag] : this.CSS[this.dataTable.plan.name][e.tag];
-      if (this.dataTable.positionData.locations[e.tag] && this.dataTable.positionData.locations[e.tag].x) {
-        css_path.left = `${this.dataTable.positionData.locations[e.tag].x}px`;
-        css_path.top = `${this.dataTable.positionData.locations[e.tag].y}px`;
-      }
-      if (this.dataTable.positionData.percents[e.tag] > 0) {
-        css_path.percent = `${this.dataTable.positionData.percents[e.tag]}`;
-      }
-      css_path.visible = this.dataTable.visibility[e.tag];
-    });
-    if (this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) })) {
-      console.log('Positon Data Saved.');
-    } else {
-      console.log('Failed to save position data.');
-    }
-  }
-
-  /** When toolTips are clicked, this function notifies the tooltop element which data to display.
-   * @param event the touch/click event.
-   * @param id a string identifying which tooltip was clicked.
-   */
-  public handleToolTipEvent(event, id: string): void {
-    const x = event.screenX;
-    const y = event.screenY;
-    this.tooltipSubject.next({ x: x, y: y, id: id });
   }
 
   /** Scrolling menus need their data fed through a subject.  Publishes all data at once and the component will
@@ -714,24 +519,6 @@ export class PlanService {
     return technologies;
   }
 
-  /** When a slider is moved, the distance from the left is calculated and fed to this funciton.  All
-   * sliders begin at 50%.
-   * @param percentFromLeft this is a percentage that the center of the slider is from the left of the bar.
-   * @param id a string that identifies the slider.  ie. Map resize, etc.
-   */
-  public handleSliderChange(percentFromLeft: number, id: string, category: string, name: string) {
-    let width = 0;
-    let height = 0;
-    const css_path = category === '' ? this.CSS[this.dataTable.plan.name][name] : this.CSS[this.dataTable.plan.name][category][name];
-    this.dataTable.positionData.percents[name] = percentFromLeft;
-    width = css_path.width;
-    height = css_path.height;
-    if (this.windowService.isMain()) {
-      // tslint:disable-next-line: max-line-length
-      this.windowService.sendMessage({ type: 'resize', message: { percent: percentFromLeft, id: id, width: width, height: height, category: category, name: name } });
-    }
-  }
-
   /** Returns the current year data.
    * Years array, current year, current renewable percentage for that year, min year, max year.
    * @return the current year data.
@@ -742,17 +529,116 @@ export class PlanService {
 
   /** Gets all plans associated with the application. */
   public getAllPlans(): Plan[] {
-    return this.plans;
+    return Plans;
+  }
+
+  /** When the css file is loaded, the data is sent here to be stored and published so that elements can be positioned.
+ * @param css the css data object.
+ */
+  private setCSS(css: any): void {
+    /* The freshCss variable will be true throughout this entire function if the css data from the saved file is all 0's.  This
+    happens when a new CSS data file is generated.  It will load the settings modal and ask the user to position elements before
+    doing anything else */
+    let freshCss = true;
+
+    this.CSS = css;
+    this.cssSubject.next(this.CSS[this.dataTable.plan.name]);
+
+    /* Iterate thorugh the elements array.  Some elements have categories, like charts or logos and others do not.  Toggle the visibility
+    of the element based on the saved values in the css file*/
+    this.elements.forEach(e => {
+      // tslint:disable-next-line: no-shadowed-variable
+      const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.tag] : this.CSS[this.dataTable.plan.name][e.tag];
+      this.dataTable.visibility[e.tag] = css_path.visible;
+      this.toggleElement(e.tag, css_path.visible);
+
+      // Check to see if the positons are all equal to 0px.  If they are not, then this is not a fresh install.
+      if (css_path.left !== '0px' && css_path.top !== '0px') {
+        freshCss = false;
+      }
+    });
+
+    const css_path = this.CSS[this.dataTable.plan.name];  // Define the path based on the loaded plan.
+
+    // Resize the elements, but only in the map window.
+    if (!this.windowService.isMain()) {
+      if (css_path.charts.line.percent && css_path.charts.line.percent > 0) {
+        this.resizeSubject.next(
+          {
+            id: 'resize line',
+            width: css_path.charts.line.width,
+            height: css_path.charts.line.height,
+            percent: css_path.charts.line.percent
+          }
+        );
+      }
+      if (css_path.map.percent && css_path.map.percent > 0) {
+        this.resizeSubject.next(
+          {
+            id: 'resize map',
+            width: css_path.map.width,
+            height: css_path.map.height,
+            percent: css_path.map.percent
+          }
+        );
+      }
+      if (css_path.charts.pie.percent && css_path.charts.pie.percent > 0) {
+        this.resizeSubject.next(
+          {
+            id: 'resize pie',
+            width: css_path.charts.pie.width,
+            height: css_path.charts.pie.height,
+            percent: css_path.charts.pie.percent
+          });
+      }
+    }
+
+    // If this is a fresh install request the default width sizes of the elements and prompt the user to set new css data.
+    if (freshCss) {
+      // Need to capture the width of the elements since they were all reset.
+      this.getWidthSubject.next(true);
+      this.freshCssSubject.next(freshCss);
+    } else {
+      this.freshCss = false;
+    }
+  }
+
+  /** When the user uses the position modal to move map elements around, the data can be saved to a file.  This function
+   * saves that data and writes a file.  The data is saved in the positionData section of the dataTable.
+   */
+  private storeCssData(): void {
+    this.elements.forEach(e => {
+      // Set the path to the css data based on the plan name and if there is a category associated with the element.
+      const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.tag] : this.CSS[this.dataTable.plan.name][e.tag];
+
+      // Check for changes in the data table.  If they exist, write them to the CSS object.
+      if (this.dataTable.positionData.locations[e.tag] && this.dataTable.positionData.locations[e.tag].x) {
+        css_path.left = `${this.dataTable.positionData.locations[e.tag].x}px`;
+        css_path.top = `${this.dataTable.positionData.locations[e.tag].y}px`;
+      }
+      if (this.dataTable.positionData.percents[e.tag] > 0) {
+        css_path.percent = `${this.dataTable.positionData.percents[e.tag]}`;
+      }
+      css_path.visible = this.dataTable.visibility[e.tag];
+    });
+
+    // Save the data to the cssData.json file.
+    if (this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) })) {
+      console.log('Positon Data Saved.');
+    } else {
+      console.log('Failed to save position data.');
+    }
   }
 
   /** When the app loads the css data from file, if there is nothing there, this file will create a new
-   * set of css data and write it to the file.
+   * set of css data and write it to the file.  This can also be called manually, but it will permanently overwrite any saved
+   * CSS data.  The elements that need to be included in the file are found in the local variable, this.elements.  Any changes
+   * will not be seen until the application restarts.
    */
   public createCssData(): void {
     if (!this.CSS) {
       this.CSS = {};
     }
-    console.log(Plans);
     Plans.forEach(p => {
       if (!this.CSS[p.name]) {
         this.CSS[p.name] = {};
@@ -784,7 +670,6 @@ export class PlanService {
         }
       });
     });
-    console.log(this.CSS);
     if (this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) })) {
       console.log('Positon Data Saved.');
     } else {
@@ -812,7 +697,6 @@ export class PlanService {
     if (!this.windowService.isMain()) {
       this.windowService.sendMessage({ type: 'update height', message: { cat: elementCategory, name: elementName, height: heightValue } });
     }
-
   }
   public updateCSSWidth(elementCategory: string, elementName: string, widthValue: number) {
     if (this.CSS) {
@@ -837,6 +721,62 @@ export class PlanService {
     }
   }
 
+  /** The scrollable menu passes data and type to this function and the UI and Map
+* are notified of the change.
+* @param type the type of change
+* @param data the value of the change.
+*/
+  public handleMenuChange(type: string, data: any, play: boolean): void {
+    if (type === 'year') {
+      this.updateYear(data, play);
+    } else if (type === 'scenario') {
+      const scen = this.dataTable.scenario.all.find(el => el.displayName === data);
+      this.updateScenario(scen.name);
+      this.windowService.sendMessage({ type: 'scenario change', message: scen.name });
+    }
+  }
+
+  /** When toolTips are clicked, this function notifies the tooltop element which data to display.
+ * @param event the touch/click event.
+ * @param id a string identifying which tooltip was clicked.
+ */
+  public handleToolTipEvent(event, id: string): void {
+    const x = event.screenX;
+    const y = event.screenY;
+    this.tooltipSubject.next({ x: x, y: y, id: id });
+  }
+
+  /** When a slider is moved, the distance from the left is calculated and fed to this funciton.  All
+   * sliders begin at 50%.
+   * @param percentFromLeft this is a percentage that the center of the slider is from the left of the bar.
+   * @param id a string that identifies the slider.  ie. Map resize, etc.
+   */
+  public handleSliderChange(percentFromLeft: number, id: string, category: string, name: string) {
+    let width = 0;
+    let height = 0;
+    const css_path = category === '' ? this.CSS[this.dataTable.plan.name][name] : this.CSS[this.dataTable.plan.name][category][name];
+    this.dataTable.positionData.percents[name] = percentFromLeft;
+    width = css_path.width;
+    height = css_path.height;
+    if (this.windowService.isMain()) {
+      // tslint:disable-next-line: max-line-length
+      this.windowService.sendMessage({ type: 'resize', message: { percent: percentFromLeft, id: id, width: width, height: height, category: category, name: name } });
+    }
+  }
+
+  /** Toggles the selected layer and messages the other window.
+   * @param layerName the name of the layer that was toggled.
+   */
+  public handleLayerButtonClick(layerName: string): void {
+    this.toggleLayer(layerName);
+    const msg = { type: 'toggle layer', message: layerName };
+    this.windowService.sendMessage(msg);
+  }
+
+  public handleLayerButtonInfoClick(layerName: string) {
+    this.layerInfoSubject.next(this.dataTable.layers.all.find(e => e.layer.name === layerName));
+  }
+
   /** Debugging method that will print the datatable in its current state to the console. */
   public printDataTable(): void {
     console.log(JSON.stringify(this.dataTable));
@@ -844,5 +784,87 @@ export class PlanService {
 
   public getOtherWindowData(): void {
     this.windowService.sendMessage({ type: 'get other window data', message: this.windowService.isMain() });
+  }
+
+  /** Messages are received by heco-main component and touch-ui component for the two windows.  The messages are sent
+   * to this function to be parsed.
+   * @param msg the message to be parsed.
+   * @return true when finished.
+   */
+  public handleMessage(msg: any): boolean {
+    if (msg.type === 'year change') {
+      this.updateYear(msg.message, false);
+    } else if (msg.type === 'percent change') {
+      this.dataTable.year.currentRenewablePercent = msg.message;
+      this.precentRenewableByYearSubject.next(msg.message);
+    } else if (msg.type === 'scenario change') {
+      this.updateScenario(this.dataTable.scenario.all.find(el => el.name === msg.message).name);
+    } else if (msg.type === 'toggle layer') {
+      this.toggleLayer(msg.message);
+    } else if (msg.type === 'position elements' && !this.windowService.isMain()) {
+      this.positionSubject.next(msg.message);
+    } else if (msg.type === 'resize') {
+      this.resizeSubject.next(msg.message);
+      this.handleSliderChange(msg.message.percent, msg.message.id, msg.message.category, msg.message.name);
+    } else if (msg.type === 'update height') {
+      this.updateCSSHeight(msg.message.cat, msg.message.name, msg.message.height);
+    } else if (msg.type === 'update width') {
+      this.updateCSSWidth(msg.message.cat, msg.message.name, msg.message.width);
+    } else if (msg.type === 'toggle visibility') {
+      this.toggleElement(msg.message.tag, msg.message.show);
+    } else if (msg.type === 'get other window data') {
+      const data = { main: this.windowService.isMain(), width: window.innerWidth, height: window.innerHeight };
+      this.windowService.sendMessage({ type: 'receive other window data', message: data });
+    } else if (msg.type === 'receive other window data') {
+      this.windowDataSubject.next(msg.message);
+    } else if (msg.type === 'request percent') {
+      this.windowService.sendMessage({ type: 'percent change', message: this.dataTable.year.currentRenewablePercent });
+    } else if (msg.type === 'file information') {
+      msg.message.forEach(d => { // iterate through the loaded files and find the cssdata file.
+        if (d.file === 'cssData') {
+          const css_path = d.css[this.dataTable.plan.name];
+          // The css data needs to have all of these paths.  If it doesn't, the app will make a new css file.
+          if (css_path.charts && css_path.logos && css_path.map && css_path.data) {
+            if (!this.windowService.isMain()) {
+              this.setCSS(d.css);
+              this.windowService.sendMessage({ type: 'css loaded', message: d.css });
+            }
+          } else {
+            // Create New Css File
+            this.createCssData();
+          }
+        }
+      });
+    } else if (msg.type === 'css loaded') {
+      if (this.windowService.isMain()) {
+        this.setCSS(msg.message);
+      }
+    } else if (msg.type === 'update cssData file') {
+      if (!this.windowService.isMain() && msg.message.saveData) {
+        this.storeCssData();
+      } else if (!msg.message.saveData && !this.windowService.isMain()) {
+        const css_path = this.CSS[this.dataTable.plan.name];
+        this.revertPositionsSubject.next(css_path);
+        if (css_path.charts.line.percent && css_path.charts.line.percent > 0) {
+          this.resizeSubject.next(
+            {
+              id: 'resize line',
+              width: css_path.charts.line.width,
+              height: css_path.charts.line.height,
+              percent: css_path.charts.line.percent
+            }
+          );
+        }
+        if (css_path.map.percent && css_path.map.percent > 0) {
+          // tslint:disable-next-line: max-line-length
+          this.resizeSubject.next({ id: 'resize map', width: css_path.map.width, height: css_path.map.height, percent: css_path.map.percent });
+        }
+        if (css_path.charts.pie.percent && css_path.charts.pie.percent > 0) {
+          // tslint:disable-next-line: max-line-length
+          this.resizeSubject.next({ id: 'resize pie', width: css_path.charts.pie.width, height: css_path.charts.pie.height, percent: css_path.charts.pie.percent });
+        }
+      }
+    }
+    return true;
   }
 }
