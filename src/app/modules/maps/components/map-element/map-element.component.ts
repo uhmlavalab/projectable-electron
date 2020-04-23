@@ -18,7 +18,8 @@ export class MapElementComponent implements OnInit {
   height: number;
   rasterBounds: any[];
   baseMapImagePath: string;
-
+  startingWidth: number;
+  startingHeight: number;
   projection: d3.geo.Projection;
   path: d3.geo.Path;
   map: d3.Selection<any>;
@@ -38,6 +39,8 @@ export class MapElementComponent implements OnInit {
     this.scale = this.windowService.isMain() ? mapData.miniScale : mapData.scale;
     this.width = mapData.width * this.scale;
     this.height = mapData.height * this.scale;
+    this.startingWidth = this.width;
+    this.startingHeight = this.height;
     this.rasterBounds = mapData.bounds;
     this.baseMapImagePath = mapData.path;
     setTimeout( () => {
@@ -58,12 +61,15 @@ export class MapElementComponent implements OnInit {
             this.planService.updateCSSWidth(null, 'map', this.width);
             this.planService.updateCSSHeight(null, 'map', this.height);
           }
-          const newWidth = this.width * percentage;
-          const newHeight = this.height * percentage;
-          e.style.width = `${newWidth}px`;
-          image.style.width = `${newWidth}px`;
-          e.style.height = `${newHeight}px`;
-          image.style.height = `${newHeight}px`;
+          const newWidth = this.startingWidth * percentage;
+          const newHeight = this.startingHeight * percentage;
+          // e.style.width = `${newWidth}px`;
+          // image.style.width = `${newWidth}px`;
+          // e.style.height = `${newHeight}px`;
+          // image.style.height = `${newHeight}px`;
+          this.width = newWidth;
+          this.height = newHeight;
+          this.resizeMap();
         }
       }
     });
@@ -112,7 +118,54 @@ export class MapElementComponent implements OnInit {
     });
   }
 
+  private resizeMap(): void {
+    this.projection = d3.geo.mercator()
+      .scale(1)
+      .translate([0, 0]);
+
+    this.path = d3.geo.path()
+      .projection(this.projection);
+
+    this.map = d3.select(this.mapDiv.nativeElement).select('svg')
+      .attr('width', this.width)
+      .attr('height', this.height);
+
+    this.map.select('image')
+      .attr('width', this.width)
+      .attr('height', this.height);
+
+    this.layers.forEach(layer => {
+      if (layer.layer.filePath === null) {
+        return;
+      }
+      d3.json(`${layer.layer.filePath}`, (error, geoData) => {
+        const bounds = [this.projection(this.rasterBounds[0]), this.projection(this.rasterBounds[1])];
+        const scale = 1 / Math.max((bounds[1][0] - bounds[0][0]) / this.width, (bounds[1][1] - bounds[0][1]) / this.height);
+        const transform = [
+          (this.width - scale * (bounds[1][0] + bounds[0][0])) / 2,
+          (this.height - scale * (bounds[1][1] + bounds[0][1])) / 2
+        ] as [number, number];
+
+        const proj = d3.geo.mercator()
+          .scale(scale)
+          .translate(transform);
+
+        const path = d3.geo.path()
+          .projection(proj);
+
+        this.map.selectAll(layer.name)
+          .data(geoData.features)
+          .select('path')
+          .attr('d', path)
+          .each(function (d) {
+            layer.layer.parcels.forEach(l => l.properties = (d.hasOwnProperty(`properties`)) ? d[`properties`] : null);
+          });
+      });
+    });
+  }
+
   private drawMap(): void {
+
     this.projection = d3.geo.mercator()
       .scale(1)
       .translate([0, 0]);
@@ -172,6 +225,7 @@ export class MapElementComponent implements OnInit {
       d3.select(el.path)
         .style('fill', layer.fillColor)
         .style('opacity', state === 1 ? 0.85 : 0.0)
+        .style('display', state === 1 ? 'block' : 'none')
         .style('stroke', layer.borderColor)
         .style('stroke-width', layer.borderWidth + 'px');
     });

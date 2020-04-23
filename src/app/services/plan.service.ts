@@ -336,6 +336,10 @@ export class PlanService {
     }
   }
 
+  public isMainWindow(): boolean {
+    return this.windowService.isMain();
+  }
+
   /** Sets the year to a specific value, plays the year change sound effect and messages the map screen.
    * @param year the year to set
    */
