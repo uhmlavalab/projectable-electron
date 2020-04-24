@@ -60,6 +60,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
           this.resizeElement(this.hecoLogo.nativeElement, 'logos', 'heco', data.width, data.height, data.percent);
         } else if (data.id === 'resize data') {
           this.resizeElement(this.yearData.nativeElement, null, 'data', data.width, data.height, data.percent);
+          this.adjustFontSize(this.yearData.nativeElement, data.percent);
         }
       }
     });
@@ -139,6 +140,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       this.resizeElement(this.lavaLogo.nativeElement, 'logos', 'lava', cssData.logos.lava.width, cssData.logos.lava.height, cssData.logos.lava.percent);
       // tslint:disable-next-line: max-line-length
       this.resizeElement(this.hecoLogo.nativeElement, 'logos', 'heco', cssData.logos.heco.width, cssData.logos.heco.height, cssData.logos.heco.percent);
+      this.adjustFontSize(this.yearData.nativeElement, cssData.data.percent);
     }, 500);
   }
 
@@ -188,6 +190,16 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     } catch (error) {
       console.log('Error.  Failed to find year data element to position.');
     }
+  }
+
+  /** Adjusts font size based on slider percentage.  This is mainly inteted for the year-data-display component.  Changing
+   * the width and height does very little so this will increase the size of the font.  It siply doubles the percentage and
+   * uses that value an em size.
+   * @param percentage the percent as defined in the css data file or manual resizing
+   * @param e the element who will have the font size adjusted. (native element must be passed as argument)
+   */
+  private adjustFontSize(e: any, percentage: any): void {
+      e.style.fontSize = `${percentage / 100 * 2}em`;
   }
 
   /** The application may have two different resolutions between screens.  Therefore, we send the width and height value as

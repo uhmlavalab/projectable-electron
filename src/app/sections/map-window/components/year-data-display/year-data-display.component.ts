@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ElementRef } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
 
 @Component({
@@ -26,7 +26,6 @@ export class YearDataDisplayComponent implements OnInit {
         this.year = 9999;
       }
       this.cdr.detectChanges();
-      this.displayData();
     });
 
     this.planService.precentRenewableByYearSubject.subscribe(percent => {
@@ -37,7 +36,6 @@ export class YearDataDisplayComponent implements OnInit {
         setTimeout(() => this.planService.requestPercentageUpdate(), 500);
       }
       this.cdr.detectChanges();
-      this.displayData();
     });
 
     this.planService.scenarioSubject.subscribe(scenario => {
@@ -48,10 +46,6 @@ export class YearDataDisplayComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
-    this.displayData();
-  }
 
-  public displayData() {
-    
   }
 }

@@ -48,7 +48,7 @@ export const MauiPlan: Plan = {
         included: true,
         iconPath: 'assets/plans/maui/images/icons/TRANSMISSION.png',
         secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/layer-images/transmission.jpg',
-        secondScreenText: 'This layer shows the high-voltage electric transmission system for the island of Oahu. Transmission is important for moving bulk power from utility-scale generation to load centers.',
+        secondScreenText: 'This layer shows the high-voltage electric transmission system for the island of Maui. Transmission is important for moving bulk power from utility-scale generation to load centers.',
         fillColor: mapLayerColors.Transmission.fill,
         borderColor: mapLayerColors.Transmission.border,
         borderWidth: 0.04,
@@ -70,7 +70,7 @@ export const MauiPlan: Plan = {
               .style('opacity', state ? 0.85 : 0.0);
           });
         },
-        legend: null,
+        legend: [{ text: 'Transmission Lines', color: mapLayerColors.Transmission.border }],
       },
       {
         name: 'dod',
@@ -107,7 +107,12 @@ export const MauiPlan: Plan = {
               .style('opacity', state ? 0.85 : 0.0);
           });
         },
-        legend: null,
+        legend: [
+          { text: 'Federal Land', color: '#e60000' },
+          { text: 'State Land', color: '#ff7f7f' },
+          { text: 'Department of Hawaiian Homelands', color: '#895a44' },
+          { text: 'County Land', color: '#00c5ff' },
+        ]
       },
       {
         name: 'parks',
@@ -116,7 +121,7 @@ export const MauiPlan: Plan = {
         included: true,
         iconPath: 'assets/plans/maui/images/icons/PARK.png',
         secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/layer-images/parks.jpg',
-        secondScreenText: 'This layer shows the location of park lands on Oahu.',
+        secondScreenText: 'This layer shows the location of park lands on the island of Maui.',
         fillColor: mapLayerColors.Parks.fill,
         borderColor: mapLayerColors.Parks.border,
         borderWidth: 1,
@@ -125,7 +130,7 @@ export const MauiPlan: Plan = {
         filePath: 'assets/plans/maui/layers/parks.json',
         setupFunction: null,
         updateFunction: null,
-        legend: null,
+        legend: [{ text: 'Park Lands', color: mapLayerColors.Parks.fill }],
       },
       {
         name: 'wind',
@@ -181,7 +186,10 @@ export const MauiPlan: Plan = {
             }
           });
         },
-        legend: null,
+        legend: [
+          { text: 'Viable land for wind energy ', color: 'white' },
+          { text: 'Land Area required to meet wind energy goal', color: mapLayerColors.Wind.fill }
+        ],
       },
       {
         name: 'solar',
@@ -233,7 +241,10 @@ export const MauiPlan: Plan = {
             }
           });
         },
-        legend: null,
+        legend: [
+          { text: 'Viable land for solar energy ', color: 'white' },
+          { text: 'Land Area required to meet solar energy goal', color: mapLayerColors.Solar.fill }
+        ],
       },
       {
         name: 'agriculture',
@@ -271,7 +282,13 @@ export const MauiPlan: Plan = {
               .style('opacity', state ? 0.85 : 0.0);
           });
         },
-        legend: null,
+        legend: [
+          { text: 'Class A Lands', color: '#7de87d' },
+          { text: 'Class B Lands', color: '#2edd2e' },
+          { text: 'Class C Lands', color: '#00d100' },
+          { text: 'Class D Lands', color: '#009300' },
+          { text: 'Class E Lands', color: '#005400' },
+        ],
       },
     ],
   },

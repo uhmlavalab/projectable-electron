@@ -19,21 +19,29 @@ export class SliderComponent implements AfterViewInit {
 
   private dragging: boolean;
 
-  constructor(private planService: PlanService) {
-
-  }
+  constructor(private planService: PlanService) {}
 
   ngAfterViewInit() {
 
+    this.wrapperElement.nativeElement.style.width = `${this.width}%`;
+    this.wrapperElement.nativeElement.style.left = ` ${(100 - this.width) / 2}%`;
+
+    // When css is loaded, move the slide elements to their correct position from the left.
     this.planService.cssSubject.subscribe(cssData => {
       if (cssData) {
         this.setInitialSlidePosition(cssData);
       }
     });
 
-    this.wrapperElement.nativeElement.style.width = `${this.width}%`;
-    this.wrapperElement.nativeElement.style.left = ` ${(100 - this.width) / 2}%`;
+    // If the user cancels the setttings changes, the slide elements on each component must
+    // be returned to their previous position.
+    this.planService.revertPositionsSubject.subscribe(val => {
+      if (val) {
+        this.setInitialSlidePosition(val);
+      }
+    });
 
+    // Mouse Event Listeners
     this.slideElement.nativeElement.addEventListener('mousedown', () => this.startDrag());
     this.slideElement.nativeElement.addEventListener('mouseup', () => this.stopDragging());
     this.slideElement.nativeElement.addEventListener('mouseleave', () => {
@@ -41,26 +49,15 @@ export class SliderComponent implements AfterViewInit {
         this.stopDragging();
       }
     });
-
-    this.planService.revertPositionsSubject.subscribe(val => {
-      if (val) {
-        this.setInitialSlidePosition(val);
-      }
-    });
-
-
     this.slideElement.nativeElement.addEventListener('mousemove', event => {
       if (this.dragging) {
-        //   this.uiService.changeYear(this.drag(event, this.slideElement));
+        this.drag(event, this.slideElement);
       }
     });
 
-    this.slideElement.nativeElement.addEventListener('touchstart', () => {
-      this.startDrag();
-    }, { passive: false });
-    this.slideElement.nativeElement.addEventListener('touchend', () => {
-      this.stopDragging();
-    }, { passive: false });
+    // Touch Event Listeners.
+    this.slideElement.nativeElement.addEventListener('touchstart', () => this.startDrag(), { passive: false });
+    this.slideElement.nativeElement.addEventListener('touchend', () => this.stopDragging(), { passive: false });
     this.slideElement.nativeElement.addEventListener('touchmove', event => {
       if (this.dragging) {
         this.drag(event, this.slideElement);
@@ -106,8 +103,13 @@ export class SliderComponent implements AfterViewInit {
     }
   }
 
+  /** The slideable elements must be positioned to their set position.  For instance, if the user has
+   * already resized an element and increased it to 75%, then the element must be moved 75% away from the
+   * left of the parent div.
+   * @param data this is css data.  It is referenced against the type of the slider.  CSS data paths are hardcoded.
+   */
   private setInitialSlidePosition(data: any): void {
-    let pos = 0;
+    let pos = -1;
     switch (this.type) {
       case 'resize map':
         pos = data.map.percent;
@@ -129,8 +131,7 @@ export class SliderComponent implements AfterViewInit {
         break;
     }
 
-
-    if (pos) {
+    if (pos >= 0) {
       this.slideElement.nativeElement.style.left = `${pos}%`;
     }
   }

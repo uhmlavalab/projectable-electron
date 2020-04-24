@@ -11,6 +11,7 @@
 .year-data {
     position: absolute;
     color: white;
+    font-size: 1em;
 }
 
 .heco-logo, .lava-logo {
