@@ -35,7 +35,7 @@ export interface DataTable {
     layers: {
         all: any[];
     };
-    components: string[];
+    components: {category: string, tag: string}[];
     data: {
         generationPath: any;
         curtailmentPath: any;

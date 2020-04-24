@@ -16,13 +16,10 @@ export class PlanService {
 
   private dataTable: DataTable; // This variable holds all active data.
   private CSS: any;       // Holds the css data for the positioning of the charts and map objects.
-  private plans: Plan[];  // Array holding all plans (memory is cleared when plan is set.
-  private elements: { category: string, tag: string }[];  // Array storing all element tags.
-  private windowData: { main: boolean, width: number, height: number }[];
-  private freshCss: boolean;
+  private freshCss: boolean;    // True when a new css file is loaded, false if data is already in the file.
 
   // Data publishers.
-  public planSetSubject = new BehaviorSubject<boolean>(null);          // Tells components when the plan is set.
+  public planSetSubject = new BehaviorSubject<boolean>(false);          // Tells components when the plan is set.
   public toggleLayerSubject = new BehaviorSubject<any>(null);          // Pubisher for when a layer is toggled
   public layersSubject = new BehaviorSubject<any[]>(null);             // Publishes array of all Layers.
   public layerInfoSubject = new BehaviorSubject<any>(null);            // Publishes the data for the layer info component.
@@ -43,30 +40,18 @@ export class PlanService {
   public cssSubject = new BehaviorSubject<any>(null);                  // Publishes the css data.
   public tooltipSubject = new BehaviorSubject<any>(null);              // Publishes the which tooltip to display.
   public windowDataSubject = new BehaviorSubject<any>(null);           // Publishes the size of the other screen.
-  public toggleElementSubject = new BehaviorSubject<{ tag: string, show: boolean }>(null);
-  public freshCssSubject = new BehaviorSubject<boolean>(null);
-  public getWidthSubject = new BehaviorSubject<boolean>(null);
-  public redrawPathsSubject = new BehaviorSubject<boolean>(false);
-  public settingsModalOpenedSubject = new BehaviorSubject<boolean>(false);
-  public settingsCanceledSubject = new BehaviorSubject<boolean>(false);
+  public toggleElementSubject = new BehaviorSubject<{ tag: string, show: boolean }>(null); // Publishs visibility of elements
+  public freshCssSubject = new BehaviorSubject<boolean>(null);         // Tells components if the css is a new load and needs to be set up.
+  public getWidthSubject = new BehaviorSubject<boolean>(null);         // If the width data is not in css file, requests it from component.
+  public redrawPathsSubject = new BehaviorSubject<boolean>(false);     // If the map is resized and saved, tells map to redraw parcel paths.
+  public settingsModalOpenedSubject = new BehaviorSubject<boolean>(false); // When the modal is opened, the map needs to turn off layers.
+  public settingsCanceledSubject = new BehaviorSubject<boolean>(false); // When modal closed, turn layers back of if they were off.
 
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
-    this.freshCss = true;
-    this.initializeElementsArray();
-    this.initializeDataTable();
+    this.freshCss = true;            // Fresh css is set to true before checking.
+    this.initializeDataTable();      // Set up the data table.
   }
 
-  /** These are the necessary elements that the map uses and will be modified by the css data file. */
-  private initializeElementsArray(): void {
-    this.elements = [
-      { category: null, tag: 'map' },
-      { category: null, tag: 'data' },
-      { category: 'charts', tag: 'line' },
-      { category: 'charts', tag: 'pie' },
-      { category: 'logos', tag: 'lava' },
-      { category: 'logos', tag: 'heco' }
-    ];
-  }
   /** The data table stores the current state of the table. */
   private initializeDataTable(): void {
     // The dataTable stores all relevant data and can be printed to the console using the function printDataTable().
@@ -77,6 +62,7 @@ export class PlanService {
         isSet: false,
         name: ''
       },
+      // Map setup data.
       map: {
         scale: 0,
         miniScale: 0,
@@ -86,7 +72,7 @@ export class PlanService {
         path: ''
       },
       year: {
-        all: [],
+        all: [],  // This array holds all of the years in sorted order.  It is used to populate components.
         current: 0,
         currentRenewablePercent: 0,
         max: 0,
@@ -104,16 +90,28 @@ export class PlanService {
       layers: {
         all: []
       },
-      components: [],
+      // Components array is used to loop through all included map elements.
+      components: [
+        { category: null, tag: 'map' },
+        { category: null, tag: 'data' },
+        { category: 'charts', tag: 'line' },
+        { category: 'charts', tag: 'pie' },
+        { category: 'logos', tag: 'lava' },
+        { category: 'logos', tag: 'heco' }
+      ],
+      // Holds all data for the table
       data: {
+        // Paths hold the path to the csv file containing data.
         generationPath: null,
         curtailmentPath: null,
         capacityPath: null,
+        // Array of the parsed data.
         generation: null,
         capacity: null,
         curtailment: null,
-        tech: null
+        tech: null             // An array of technologies used for looping.
       },
+      // Holds data when elements are repositioned.  If user saves, these are copied to the css file.
       positionData: {
         locations: {},
         percents: {
@@ -124,6 +122,7 @@ export class PlanService {
           data: -1
         }
       },
+      // Holds data when user toggles elements.
       visibility: {
         lava: true,
         map: true,
@@ -154,6 +153,7 @@ export class PlanService {
       this.dataTable.layers.all.push({ layer: layer, state: 0 });
     });
 
+    // map data is loaded from the plan.  The width and height will be overwritten by the css.
     this.dataTable.map.scale = plan.map.scale;
     this.dataTable.map.miniScale = plan.map.miniMapScale;
     this.dataTable.map.width = plan.map.width;
@@ -167,7 +167,6 @@ export class PlanService {
     this.dataTable.scenario.name = plan.scenarios[0].name;
     this.dataTable.scenario.display = plan.scenarios[0].displayName;
     this.dataTable.scenario.currentIndex = 0;
-    this.dataTable.components = ['map', 'pie', 'line'];
     this.dataTable.data.generationPath = plan.data.generationPath;
     this.dataTable.data.curtailmentPath = plan.data.curtailmentPath;
     this.dataTable.data.capacityPath = plan.data.capacityPath;
@@ -553,7 +552,7 @@ export class PlanService {
 
     /* Iterate thorugh the elements array.  Some elements have categories, like charts or logos and others do not.  Toggle the visibility
     of the element based on the saved values in the css file*/
-    this.elements.forEach(e => {
+    this.dataTable.components.forEach(e => {
       // tslint:disable-next-line: no-shadowed-variable
       const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.tag] : this.CSS[this.dataTable.plan.name][e.tag];
       this.dataTable.visibility[e.tag] = css_path.visible;
@@ -614,7 +613,7 @@ export class PlanService {
    * saves that data and writes a file.  The data is saved in the positionData section of the dataTable.
    */
   private storeCssData(): void {
-    this.elements.forEach(e => {
+    this.dataTable.components.forEach(e => {
       // Set the path to the css data based on the plan name and if there is a category associated with the element.
       const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.tag] : this.CSS[this.dataTable.plan.name][e.tag];
 
@@ -639,7 +638,7 @@ export class PlanService {
 
   /** When the app loads the css data from file, if there is nothing there, this file will create a new
    * set of css data and write it to the file.  This can also be called manually, but it will permanently overwrite any saved
-   * CSS data.  The elements that need to be included in the file are found in the local variable, this.elements.  Any changes
+   * CSS data.  The elements that need to be included in the file are found in the local variable, this.dataTable.components.  Any changes
    * will not be seen until the application restarts.
    */
   public createCssData(): void {
@@ -650,7 +649,7 @@ export class PlanService {
       if (!this.CSS[p.name]) {
         this.CSS[p.name] = {};
       }
-      this.elements.forEach(e => {
+      this.dataTable.components.forEach(e => {
         if (e.category) {
           if (!this.CSS[p.name][e.category]) {
             this.CSS[p.name][e.category] = {};
@@ -684,6 +683,10 @@ export class PlanService {
     }
   }
 
+  /** Will turn the visibility of an element on or off.
+   * @param tag the tag of the element to turn on or off.
+   * @param show true if show, false if hide.
+   */
   public toggleElement(tag: string, show: boolean): void {
     this.dataTable.visibility[tag] = show;
     if (this.windowService.isMain()) {
@@ -693,6 +696,14 @@ export class PlanService {
     }
   }
 
+  /** Updates the CSS object with the correct height for a map element
+   * @param elementCategory string that defines the category in the CSS table.
+   * @param elementName string that defines the name of the element to update
+   * @param heightValue the height in pixels.
+   * Not all elements have a category.
+   * example this.css[heco-oahu][charts][pie].height
+   *         this.css[map].height
+   */
   public updateCSSHeight(elementCategory: string, elementName: string, heightValue: number) {
     if (this.CSS) {
       if (elementCategory) {
@@ -705,25 +716,23 @@ export class PlanService {
       this.windowService.sendMessage({ type: 'update height', message: { cat: elementCategory, name: elementName, height: heightValue } });
     }
   }
+
+/** Updates the CSS object with the correct width for a map element.
+ * @param elementCategory string that defines the category in the CSS table.
+ * @param elementName string that defines the name of the element to update
+ * @param widthValue the width in pixels.
+ * Not all elements have a category.
+ * example this.css[heco-oahu][charts][pie].width
+ *         this.css[map].width
+ */
   public updateCSSWidth(elementCategory: string, elementName: string, widthValue: number) {
     if (this.CSS) {
+      // set the path to the correct variable location.
       // tslint:disable-next-line: max-line-length
       const css_path = elementCategory ? this.CSS[this.dataTable.plan.name][elementCategory][elementName] : this.CSS[this.dataTable.plan.name][elementName];
       css_path.width = widthValue;
       if (!this.windowService.isMain()) {
         this.windowService.sendMessage({ type: 'update width', message: { cat: elementCategory, name: elementName, width: widthValue } });
-      }
-      if (this.freshCss) {
-        let allWidthSet = true;
-        this.elements.forEach(e => {
-          const path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.tag] : this.CSS[this.dataTable.plan.name][e.tag];
-          if (path.width === 0) {
-            allWidthSet = false;
-          }
-        });
-        if (allWidthSet) {
-          this.cssSubject.next(this.CSS[this.dataTable.plan.name]);
-        }
       }
     }
   }
@@ -780,10 +789,17 @@ export class PlanService {
     this.windowService.sendMessage(msg);
   }
 
+  /** When user clicks on a button, this function finds the layer to populate the layer info section and publishes it.
+   * @param layerName a string representing the name of the layer to display data for.
+   */
   public handleLayerButtonInfoClick(layerName: string) {
     this.layerInfoSubject.next(this.dataTable.layers.all.find(e => e.layer.name === layerName));
   }
 
+  /** When the user opens the settings modal, the map is notified so that if can turn off any layers that are visible.
+   * This is because if the user resizes the map, the layers will not resize at the same time.  They are resized only
+   * if the user saves the new layout.
+   */
   public settingsModalOpened(): void {
     this.windowService.sendMessage({ type: 'settings opened', message: true});
   }
@@ -793,6 +809,9 @@ export class PlanService {
     console.log(JSON.stringify(this.dataTable));
   }
 
+  /** When positioning elements, I pass a percentage for left and top because you could have two different screen resolutions
+   * running.  Therefore, the components needs to know what the size of the other window is to convert the percentages.
+   */
   public getOtherWindowData(): void {
     this.windowService.sendMessage({ type: 'get other window data', message: this.windowService.isMain() });
   }

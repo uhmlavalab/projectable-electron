@@ -19,24 +19,6 @@ export class DisplayComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.planService.yearSubject.subscribe(year => {
-    //   if (year) {
-    //     this.year = year;
-    //   } else {
-    //     this.year = 9999;
-    //   }
-    //   this.displayData();
-    // });
-
-    // this.planService.precentRenewableByYearSubject.subscribe(percent => {
-    //   if (percent) {
-    //     this.percentRenewable = percent;
-    //   } else {
-    //     this.percentRenewable = 0;
-    //   }
-    //   this.displayData();
-    // });
-
     this.planService.scenarioSubject.subscribe(scenario => {
       if (scenario) {
         this.scenario = scenario.displayName;
