@@ -46,6 +46,9 @@ export class PlanService {
   public toggleElementSubject = new BehaviorSubject<{ tag: string, show: boolean }>(null);
   public freshCssSubject = new BehaviorSubject<boolean>(null);
   public getWidthSubject = new BehaviorSubject<boolean>(null);
+  public redrawPathsSubject = new BehaviorSubject<boolean>(false);
+  public settingsModalOpenedSubject = new BehaviorSubject<boolean>(false);
+  public settingsCanceledSubject = new BehaviorSubject<boolean>(false);
 
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
     this.freshCss = true;
@@ -781,6 +784,10 @@ export class PlanService {
     this.layerInfoSubject.next(this.dataTable.layers.all.find(e => e.layer.name === layerName));
   }
 
+  public settingsModalOpened(): void {
+    this.windowService.sendMessage({ type: 'settings opened', message: true});
+  }
+
   /** Debugging method that will print the datatable in its current state to the console. */
   public printDataTable(): void {
     console.log(JSON.stringify(this.dataTable));
@@ -823,6 +830,8 @@ export class PlanService {
       this.windowDataSubject.next(msg.message);
     } else if (msg.type === 'request percent') {
       this.windowService.sendMessage({ type: 'percent change', message: this.dataTable.year.currentRenewablePercent });
+    } else if (msg.type === 'settings opened') {
+      this.settingsModalOpenedSubject.next(true);
     } else if (msg.type === 'file information') {
       msg.message.forEach(d => { // iterate through the loaded files and find the cssdata file.
         if (d.file === 'cssData') {
@@ -846,9 +855,11 @@ export class PlanService {
     } else if (msg.type === 'update cssData file') {
       if (!this.windowService.isMain() && msg.message.saveData) {
         this.storeCssData();
+        this.redrawPathsSubject.next(true);
       } else if (!msg.message.saveData && !this.windowService.isMain()) {
         const css_path = this.CSS[this.dataTable.plan.name];
         this.revertPositionsSubject.next(css_path);
+        this.settingsCanceledSubject.next(true);
         if (css_path.charts.line.percent && css_path.charts.line.percent > 0) {
           this.resizeSubject.next(
             {

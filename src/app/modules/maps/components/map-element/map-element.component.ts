@@ -10,22 +10,23 @@ import { WindowService } from '@app/modules/window';
   styleUrls: ['./map-element.component.css']
 })
 
+/** This component displays the map and all layers */
 export class MapElementComponent implements OnInit {
 
   @ViewChild('mapDiv', { static: true }) mapDiv: ElementRef;
   scale: number;
-  width: number;
-  height: number;
+  width: number;                  // The current width of the map
+  height: number;                 // The current height of the map
   rasterBounds: any[];
   baseMapImagePath: string;
-  startingWidth: number;
-  startingHeight: number;
+  startingWidth: number;          // The height of the map when the app was started
+  startingHeight: number;         // The width of the map when the app was started
   projection: d3.geo.Projection;
   path: d3.geo.Path;
   map: d3.Selection<any>;
 
-  private drawn: boolean;
-  private layers: any[];
+  private drawn: boolean;         // True once the map is drawn to the display the first time
+  private layers: any[];          // Holds all layers
   private year: number;
   private allReady: any;
 
@@ -43,30 +44,26 @@ export class MapElementComponent implements OnInit {
     this.startingHeight = this.height;
     this.rasterBounds = mapData.bounds;
     this.baseMapImagePath = mapData.path;
-    setTimeout( () => {
+
+    setTimeout(() => {
       this.planService.updateCSSWidth(null, 'map', this.width);
       this.planService.updateCSSHeight(null, 'map', this.height);
-    });
+    }, 100);
   }
 
   ngOnInit() {
+
+    // Subject receives any changes to the percent size of the map and resizes it.
     this.planService.resizeSubject.subscribe(data => {
       if (data) {
-        let e = null;
-        const percentage = data.percent / 100 * 2;
         if (data.id === 'resize map') {
-          e = this.mapDiv.nativeElement.children[0];
-          const image = e.children[0];
+          const percentage = data.percent / 100 * 2;
           if (this.width === 0) {
             this.planService.updateCSSWidth(null, 'map', this.width);
             this.planService.updateCSSHeight(null, 'map', this.height);
           }
           const newWidth = this.startingWidth * percentage;
           const newHeight = this.startingHeight * percentage;
-          // e.style.width = `${newWidth}px`;
-          // image.style.width = `${newWidth}px`;
-          // e.style.height = `${newHeight}px`;
-          // image.style.height = `${newHeight}px`;
           this.width = newWidth;
           this.height = newHeight;
           this.resizeMap();
@@ -74,10 +71,35 @@ export class MapElementComponent implements OnInit {
       }
     });
 
+    // When the settings modal is opened on the GUI, all layers must be hidden because they will not
+    // properly scale with the resizing of the map.
+    this.planService.settingsModalOpenedSubject.subscribe(val => {
+      if (val) {
+        this.hideAllLayers();
+      }
+    });
+
+    // If the resizing settings were not saved, the layers must be reset manually.
+    this.planService.settingsCanceledSubject.subscribe(val => {
+      if (val) {
+        this.resetLayers();
+      }
+    });
+
+    // If the map was resized and saved, redraw all of the parcels.
+    this.planService.redrawPathsSubject.subscribe(val => {
+      if (val) {
+        this.redrawPaths();
+      }
+    });
+
+    // Ture when the plan is set and the map setup can proceed
     this.planService.planSetSubject.subscribe(plan => {
       this.allReady.planSet = plan;
       this.updateMap();
     });
+
+    // When the layers are set, the map setup can proceed.
     this.planService.layersSubject.subscribe(layers => {
       this.layers = layers;
       this.allReady.layersSet = true;
@@ -100,6 +122,7 @@ export class MapElementComponent implements OnInit {
       }
     });
 
+    // Track changes in the current year.
     this.planService.yearSubject.subscribe(year => {
       if (year) {
         if (this.windowService.isMain()) {
@@ -110,6 +133,7 @@ export class MapElementComponent implements OnInit {
       }
     });
 
+    // IF the plan service requests the width, send the data.
     this.planService.getWidthSubject.subscribe((val: boolean) => {
       if (val) {
         this.planService.updateCSSWidth(null, 'map', this.width);
@@ -118,52 +142,37 @@ export class MapElementComponent implements OnInit {
     });
   }
 
-  private resizeMap(): void {
-    this.projection = d3.geo.mercator()
-      .scale(1)
-      .translate([0, 0]);
-
-    this.path = d3.geo.path()
-      .projection(this.projection);
-
-    this.map = d3.select(this.mapDiv.nativeElement).select('svg')
-      .attr('width', this.width)
-      .attr('height', this.height);
-
-    this.map.select('image')
-      .attr('width', this.width)
-      .attr('height', this.height);
-
+  /** Sets all layer display to none. */
+  private hideAllLayers() {
     this.layers.forEach(layer => {
-      if (layer.layer.filePath === null) {
-        return;
-      }
-      d3.json(`${layer.layer.filePath}`, (error, geoData) => {
-        const bounds = [this.projection(this.rasterBounds[0]), this.projection(this.rasterBounds[1])];
-        const scale = 1 / Math.max((bounds[1][0] - bounds[0][0]) / this.width, (bounds[1][1] - bounds[0][1]) / this.height);
-        const transform = [
-          (this.width - scale * (bounds[1][0] + bounds[0][0])) / 2,
-          (this.height - scale * (bounds[1][1] + bounds[0][1])) / 2
-        ] as [number, number];
-
-        const proj = d3.geo.mercator()
-          .scale(scale)
-          .translate(transform);
-
-        const path = d3.geo.path()
-          .projection(proj);
-
-        this.map.selectAll(layer.name)
-          .data(geoData.features)
-          .select('path')
-          .attr('d', path)
-          .each(function (d) {
-            layer.layer.parcels.forEach(l => l.properties = (d.hasOwnProperty(`properties`)) ? d[`properties`] : null);
-          });
+      layer.layer.parcels.forEach(el => {
+        d3.select(el.path).style('display', 'none');
       });
     });
   }
 
+  /** Resets all layers to their visibility before they were hidden */
+  private resetLayers() {
+    this.layers.forEach(layer => {
+      if (layer.layer.updateFunction !== null) {
+        layer.layer.updateFunction(this.planService, layer.state);
+      } else {
+        this.defaultFill(layer.layer, layer.state);
+      }
+    });
+  }
+
+  /** Resizes the actual map image and svg.  Does not change any paths unless changes are saved. */
+  private resizeMap(): void {
+    this.map = d3.select(this.mapDiv.nativeElement).select('svg')
+      .attr('width', this.width)
+      .attr('height', this.height);
+    this.map.select('image')
+      .attr('width', this.width)
+      .attr('height', this.height);
+  }
+
+  /** Draw the map once all data is ready. */
   private drawMap(): void {
 
     this.projection = d3.geo.mercator()
@@ -220,6 +229,51 @@ export class MapElementComponent implements OnInit {
     this.drawn = true;
   }
 
+  /** Clears all paths and recreates them with the new scale */
+  private redrawPaths(): void {
+    this.layers.forEach(layer => {
+      if (layer.layer.filePath === null) {
+        return;
+      }
+      layer.layer.parcels.forEach(el => {
+        d3.select(el.path).style('display', 'none');
+      });
+
+      layer.layer.parcels = [];
+      d3.json(`${layer.layer.filePath}`, (error, geoData) => {
+        const bounds = [this.projection(this.rasterBounds[0]), this.projection(this.rasterBounds[1])];
+        const scale = 1 / Math.max((bounds[1][0] - bounds[0][0]) / this.width, (bounds[1][1] - bounds[0][1]) / this.height);
+        const transform = [
+          (this.width - scale * (bounds[1][0] + bounds[0][0])) / 2,
+          (this.height - scale * (bounds[1][1] + bounds[0][1])) / 2
+        ] as [number, number];
+
+        const proj = d3.geo.mercator()
+          .scale(scale)
+          .translate(transform);
+
+        const path = d3.geo.path()
+          .projection(proj);
+
+        this.map.selectAll(layer.name)
+          .data(geoData.features)
+          .enter().append('path')
+          .attr('d', path)
+          .attr('class', layer.name)
+          .each(function (d) {
+            layer.layer.parcels.push({ path: this, properties: (d.hasOwnProperty(`properties`)) ? d[`properties`] : null } as Parcel);
+          }).call(() => {
+            if (layer.layer.setupFunction !== null) {
+              layer.layer.setupFunction(this.planService, layer.state);
+            } else {
+              this.defaultFill(layer.layer, layer.state);
+            }
+          });
+      });
+    });
+  }
+
+  /** Fills the parcels with the specified color. */
   defaultFill(layer, state) {
     layer.parcels.forEach(el => {
       d3.select(el.path)
@@ -231,18 +285,23 @@ export class MapElementComponent implements OnInit {
     });
   }
 
+  /** True only when they year plan and layers are all received */
   private ready(): boolean {
     return this.allReady.yearSet && this.allReady.planSet && this.allReady.layersSet;
   }
 
+  /** When the year changes, update the map
+   * @param year the current year
+   */
   private updateYear(year: number): void {
     this.year = year;
     if (!this.allReady.yearSet) {
       this.allReady.yearSet = true;
-    } 
+    }
     this.updateMap();
   }
 
+  /** Updates the layers whenever a new year is received. */
   private updateMap(): void {
     if (this.ready() && this.drawn) {
       this.layers.forEach(layer => {

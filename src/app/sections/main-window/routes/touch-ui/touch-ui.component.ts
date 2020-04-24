@@ -113,6 +113,9 @@ export class TouchUiComponent implements AfterViewInit {
   /** opens and closes the settings (positioning) modal. */
   private handleSettingsButtonClick(): void {
     this.showSettingsModal = !this.showSettingsModal;
+    if (this.showSettingsModal) {
+      this.planService.settingsModalOpened();
+    }
   }
 
   /** When a tooltip is clicked, the position and identifying string are passed here and the correct action is taken by the plan service.

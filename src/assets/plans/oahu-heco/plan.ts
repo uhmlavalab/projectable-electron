@@ -58,12 +58,12 @@ export const HecoPlan: Plan = {
         legendColor: mapLayerColors.Transmission.border,
         filePath: 'assets/plans/oahu-heco/layers/transmission.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', this.fillColor)
-              .style('opacity', this.active ? 0.85 : 0.0)
-              .style('display', this.active === 1 ? 'block' : 'none')
+              .style('opacity', state === 1 ? 0.85 : 0.0)
+              .style('display', state === 1 ? 'block' : 'none')
               .style('stroke', this.borderColor)
               .style('stroke-width', (this.borderWidth * parcel.properties.Voltage_kV) + 'px');
           });
@@ -91,7 +91,7 @@ export const HecoPlan: Plan = {
         legendColor: mapLayerColors.Dod.fill,
         filePath: 'assets/plans/oahu-heco/layers/government.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, state) {
           const colors = {
             'Public-Federal': '#e60000',
             'Public-State': '#ff7f7f',
@@ -101,8 +101,8 @@ export const HecoPlan: Plan = {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])
-              .style('display', this.active === 1 ? 'block' : 'none')
-              .style('opacity', this.active ? 0.85 : 0.0)
+              .style('display', state === 1 ? 'block' : 'none')
+              .style('opacity', state === 1 ? 0.85 : 0.0)
               .style('stroke', this.borderColor)
               .style('stroke-width', this.borderWidth + 'px');
           });
@@ -171,7 +171,7 @@ export const HecoPlan: Plan = {
         legendColor: mapLayerColors.Wind.fill,
         filePath: 'assets/plans/oahu-heco/layers/wind.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, state: number) {
           let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']) - 99;
           const dictSort = {
             '8.5+': 0,
@@ -184,16 +184,16 @@ export const HecoPlan: Plan = {
             if (windTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('display', this.active === 1 ? 'block' : 'none')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('display', state === 1 ? 'block' : 'none')
+                .style('opacity', state === 1 ? 0.85 : 0.0)
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
               windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('display', this.active === 1 ? 'block' : 'none')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('display', state === 1 ? 'block' : 'none')
+                .style('opacity', state === 1 ? 0.85 : 0.0)
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
             }
@@ -235,7 +235,7 @@ export const HecoPlan: Plan = {
         legendColor: mapLayerColors.Solar.fill,
         filePath: 'assets/plans/oahu-heco/layers/solar.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, state: number) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
@@ -244,16 +244,16 @@ export const HecoPlan: Plan = {
             if (solarTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('display', this.active === 1 ? 'block' : 'none')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('display', state === 1 ? 'block' : 'none')
+                .style('opacity', state === 1 ? 0.85 : 0.0)
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
               solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('display', this.active === 1 ? 'block' : 'none')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('display', state === 1 ? 'block' : 'none')
+                .style('opacity', state === 1 ? 0.85 : 0.0)
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
             }
@@ -299,7 +299,7 @@ export const HecoPlan: Plan = {
         legendColor: mapLayerColors.Agriculture.fill,
         filePath: 'assets/plans/oahu-heco/layers/lsb2.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, state: number) {
           const colors = {
             'A': '#7de87d',
             'B': '#2edd2e',
@@ -310,8 +310,8 @@ export const HecoPlan: Plan = {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])
-              .style('opacity', this.active ? 0.85 : 0.0)
-              .style('display', this.active === 1 ? 'block' : 'none')
+              .style('opacity', state === 1 ? 0.85 : 0.0)
+              .style('display', state === 1 ? 'block' : 'none')
               .style('stroke', this.borderColor)
               .style('stroke-width', this.borderWidth + 'px');
           });
@@ -345,7 +345,7 @@ export const HecoPlan: Plan = {
         legendColor: mapLayerColors.Solar.fill,
         filePath: 'assets/plans/oahu-heco/layers/solar.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, state: number) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
@@ -354,23 +354,23 @@ export const HecoPlan: Plan = {
             if (parcel.properties.IAL === "Y") {
               d3.select(parcel.path)
                 .style('fill', 'black')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
-                .style('display', (this.active) === 1 ? 'block' : 'none')
+                .style('opacity', state === 1 ? 0.85 : 0.0)
+                .style('display', state === 1 ? 'block' : 'none')
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
             } else if (solarTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('display', this.active === 1 ? 'block' : 'none')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('display', state === 1 ? 'block' : 'none')
+                .style('opacity', state === 1 ? 0.85 : 0.0)
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
               solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('display', this.active === 1 ? 'block' : 'none')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('display', state === 1 ? 'block' : 'none')
+                .style('opacity', state === 1 ? 0.85 : 0.0)
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
             }
@@ -423,7 +423,7 @@ export const HecoPlan: Plan = {
         legendColor: 'orange',
         filePath: 'assets/plans/oahu-heco/layers/DERdata.json',
         parcels: [],
-        setupFunction(planService: PlanService) {
+        setupFunction(planService: PlanService, state: number) {
           this.derColors = [
             {
               minValue: 0.75,
@@ -500,8 +500,8 @@ export const HecoPlan: Plan = {
                   };
                   d3.select(parcel.path)
                     .style('fill', color)
-                    .style('display', this.active === 1 ? 'block' : 'none')
-                    .style('opacity', (this.active) ? 0.85 : 0.0);
+                    .style('display', state === 1 ? 'block' : 'none')
+                    .style('opacity', state === 1 ? 0.85 : 0.0);
                 }
               }
             });

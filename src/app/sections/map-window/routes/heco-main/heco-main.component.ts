@@ -9,19 +9,20 @@ import { Subscription } from 'rxjs';
   templateUrl: './heco-main.component.html',
   styleUrls: ['./heco-main.component.css']
 })
+/** This component is the main map display view.  IT contains maps, charts, and other data displayed by the projector. */
 export class HecoMainComponent implements AfterViewInit, OnDestroy {
 
-  @ViewChild('map', { static: false, read: ElementRef }) mapElement;
-  @ViewChild('pieChart', { static: false, read: ElementRef }) pieChart; // The custom Map component.
+  @ViewChild('map', { static: false, read: ElementRef }) mapElement;      // The actual map and all paths
+  @ViewChild('pieChart', { static: false, read: ElementRef }) pieChart;   // The custom Map component.
   @ViewChild('lineChart', { static: false, read: ElementRef }) lineChart; // The custom Map component.
-  @ViewChild('yearData', { static: false, read: ElementRef }) yearData;
-  @ViewChild('hecoLogo', { static: false, read: ElementRef }) hecoLogo;
-  @ViewChild('lavaLogo', { static: false, read: ElementRef }) lavaLogo;
+  @ViewChild('yearData', { static: false, read: ElementRef }) yearData;   // Component that displays renewable %, year, scenario
+  @ViewChild('hecoLogo', { static: false, read: ElementRef }) hecoLogo;   // The heco logo component
+  @ViewChild('lavaLogo', { static: false, read: ElementRef }) lavaLogo;   // The lava logo component
 
-  private positionData: any;
-  private messageSub = new Subscription();
-  private cssData: any;
-  private elements: { e: ElementRef; tag: string, category: string }[];
+  private positionData: any;      // Object that contains the position data (height, width, percentage) for each object
+  private messageSub = new Subscription();  // Stub that handles all messages coming from the main window.
+  private cssData: any;           // Data used to position the elements in the proper layout.
+  private elements: { e: ElementRef; tag: string, category: string }[];  //  Object that holds all elements for quick access.
 
   constructor(private planService: PlanService, private windowService: WindowService) {
     this.positionData = {};
@@ -35,6 +36,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
+    // Some elements have nested objects, like charts.pie, or logos.lava, some like map do not.
     this.elements = [
       { e: this.mapElement, tag: 'map', category: null },
       { e: this.pieChart, tag: 'pie', category: 'charts' },
@@ -43,10 +45,13 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       { e: this.hecoLogo, tag: 'heco', category: 'logos' },
       { e: this.lavaLogo, tag: 'lava', category: 'logos' }
     ];
+
+    // Pass any messages received to the plan service.
     this.windowService.windowMessageSubject.subscribe(msg => {
       this.planService.handleMessage(msg);
     });
 
+    /** These components are simple and can be resized here.  The charts and map are resized within their own component. */
     this.planService.resizeSubject.subscribe(data => {
       if (data) {
         if (data.id === 'resize lava') {
@@ -59,6 +64,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       }
     });
 
+    /** When elements repositioned in the settings modal of the GUI, the data is sent here for updating. */
     this.planService.positionSubject.subscribe(data => {
       if (data) {
         if (data.x && data.y) {
@@ -74,6 +80,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       }
     });
 
+    // Called if the user made changes to the layout but decided not to save them
     this.planService.revertPositionsSubject.subscribe(val => {
       if (val) {
         if (!this.windowService.isMain()) {
@@ -82,6 +89,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       }
     });
 
+    // Css data is loaded from a file and published
     this.planService.cssSubject.subscribe(cssData => {
       if (cssData) {
         this.cssData = cssData;
@@ -91,12 +99,14 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       }
     });
 
+    // Elements can be hidden or shown in the settings modal.
     this.planService.toggleElementSubject.subscribe(val => {
       if (val) {
         this.elements.find(e => e.tag === val.tag).e.nativeElement.style.display = val.show ? 'block' : 'none';
       }
     });
 
+    // If the plan service requests width data, return it.
     this.planService.getWidthSubject.subscribe((val: boolean) => {
       if (val) {
         this.elements.forEach(e => {
@@ -106,16 +116,23 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       }
     });
   }
+
   ngOnDestroy() {
     this.messageSub.unsubscribe();
   }
 
+  /** positions all elements.  Loops through the elements array and moved all elements according to the data received.
+   * @param cssData object containing the css data for positioning the elements.
+   */
   positionAll(cssData) {
     this.elements.forEach(e => {
+      // Set the path to the correct css values.
       const css = e.category ? cssData[e.category][e.tag] : cssData[e.tag];
-      this.positionElement(css, e.e.nativeElement);
-      e.e.nativeElement.style.display = css.visible ? 'block' : 'none';
+      this.positionElement(css, e.e.nativeElement);    // Each element data is passed to positionElement function
+      e.e.nativeElement.style.display = css.visible ? 'block' : 'none';   // Toggle visibility of each element
     });
+
+    // The timeout is necessary to ensure that all elements are properly positioned before attemting to resize them.
     setTimeout(() => {
       this.resizeElement(this.yearData.nativeElement, null, 'data', cssData.data.width, cssData.data.height, cssData.data.percent);
       // tslint:disable-next-line: max-line-length
@@ -125,11 +142,22 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     }, 500);
   }
 
+  /** Resizes the HTML elements
+   * @param e the element to resize
+   * @param category part of the element path
+   * @param elementName the name of the element to resize.
+   * @param width the width of the element to resize
+   * @param height the height of the element to resize.
+   * @param percentage the percent change in the size of the element.
+   */
   resizeElement(e: any, category: string, elementName: string, width: number, height: number, percentage: any) {
+    // If the width or height are undefined, set them to 0 and continue
     if (!width || !height) {
       width = 0;
       height = 0;
     }
+
+    // If the width or height were undefined, update the data here and in the plan service data table before resizing anything.
     if (width === 0 || height === 0) {
       width = e.getBoundingClientRect().width;
       height = e.getBoundingClientRect().height;
@@ -139,6 +167,8 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       css_path.width = width;
       css_path.height = height;
     }
+
+    // Resize the element if a valid percentage value was received.
     if (percentage && percentage > 0) {
       const newWidth = width * percentage / 100 * 2;
       const newHeight = height * percentage / 100 * 2;
@@ -147,6 +177,10 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  /** Position an element on the dom
+   * @param css the data that holds left and top pixel values (int the form of '20px', ie. strings, not numbers)
+   * @param e the element to position
+   */
   private positionElement(css: any, e: any): void {
     try {
       e.style.left = css.left;
@@ -156,6 +190,11 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  /** The application may have two different resolutions between screens.  Therefore, we send the width and height value as
+   * percentages and convert it to pixel values.
+   * @param percent the width or height in percentage
+   * @param width true if the value is a width value, false if it is a height value.
+    */
   private convertPercentToPixel(percent: number, width: boolean): number {
     return width ? percent / 100 * window.innerWidth : percent / 100 * window.innerHeight;
   }
