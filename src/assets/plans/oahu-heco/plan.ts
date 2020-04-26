@@ -10,6 +10,14 @@ export const HecoPlan: Plan = {
   secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/backgrounds/oahu-heco-renewable-background.jpg',
   includeSecondScreen: false,
   selectedPlan: false,
+  mapElements: [
+    { category: null, name: 'map' },
+    { category: null, name: 'data' },
+    { category: 'charts', name: 'line' },
+    { category: 'charts', name: 'pie' },
+    { category: 'logos', name: 'lava' },
+    { category: 'logos', name: 'heco' }
+  ],
   minYear: 2016,
   maxYear: 2045,
   route: 'heco-main',
@@ -97,7 +105,7 @@ export const HecoPlan: Plan = {
             'Public-State': '#ff7f7f',
             'Public-State DHHL': '#895a44',
             'Public-County': '#00c5ff',
-          }
+          };
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])
@@ -177,7 +185,7 @@ export const HecoPlan: Plan = {
             '8.5+': 0,
             '7.5-8.5': 1,
             '6.5-7.5': 2
-          }
+          };
           this.parcels.sort((a, b) => parseFloat(dictSort[a.properties.SPD_CLS]) - parseFloat(dictSort[b.properties.SPD_CLS]));
           this.parcels.sort((a, b) => parseFloat(b.properties.MWac) - parseFloat(a.properties.MWac));
           this.parcels.forEach(parcel => {
@@ -351,7 +359,7 @@ export const HecoPlan: Plan = {
           solarTotal += curtailmentTotal;
           this.parcels.sort((a, b) => parseFloat(b.properties.cf_1) - parseFloat(a.properties.cf_1));
           this.parcels.forEach(parcel => {
-            if (parcel.properties.IAL === "Y") {
+            if (parcel.properties.IAL === 'Y') {
               d3.select(parcel.path)
                 .style('fill', 'black')
                 .style('opacity', state === 1 ? 0.85 : 0.0)
@@ -382,7 +390,7 @@ export const HecoPlan: Plan = {
           solarTotal += curtailmentTotal;
           this.parcels.forEach((parcel, index) => {
             if (!planService.isMainWindow() || index % 5 === 0) {
-              if (parcel.properties.IAL === "Y") {
+              if (parcel.properties.IAL === 'Y') {
                 d3.select(parcel.path)
                   .style('fill', 'black')
                   .style('opacity', (state === 1) ? 0.85 : 0.0)

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Plan } from '@app/interfaces/plan';
 import { Plans } from '../../assets/plans/plans';
 import { Scenario } from '@app/interfaces';
+import { MapLayer } from '@app/interfaces';
 import { BehaviorSubject } from 'rxjs';
 import { chartColors } from '../../assets/plans/defaultColors';
 import { SoundsService } from '@app/sounds';
@@ -20,26 +21,31 @@ export class PlanService {
 
   // Data publishers.
   public planSetSubject = new BehaviorSubject<boolean>(false);          // Tells components when the plan is set.
-  public toggleLayerSubject = new BehaviorSubject<any>(null);          // Pubisher for when a layer is toggled
-  public layersSubject = new BehaviorSubject<any[]>(null);             // Publishes array of all Layers.
-  public layerInfoSubject = new BehaviorSubject<any>(null);            // Publishes the data for the layer info component.
-  public scrollingMenuSubject = new BehaviorSubject<any>(null);        // Publishes the data used to populate the menus. (scenario, year).
+  public toggleLayerSubject = new BehaviorSubject<{ layer: MapLayer, state: number }>(null); // Pubisher for when a layer is toggled
+  public layersSubject = new BehaviorSubject<{ layer: MapLayer, state: number }[]>(null);    // Publishes array of all Layers.
+  // Publishes the data for the layer info component.
+  public layerInfoSubject = new BehaviorSubject<{ layer: MapLayer, state: number }>(null);
+  // Publishes the data used to populate the menus. (scenario: string, year: number).
+  public scrollingMenuSubject = new BehaviorSubject<[{ type: string, data: number[] }, { type: string, data: string[] }]>(null);
   public scenarioSubject = new BehaviorSubject<Scenario>(null);        // Scenario publisher
   public scenarioListSubject = new BehaviorSubject<Scenario[]>(null);  // Publishes an array of all scenarios.
   public yearSubject = new BehaviorSubject<number>(null);              // Published the current year data.
   public yearsSubject = new BehaviorSubject<number[]>(null);           // Publishes an array of all years.
   public precentRenewableByYearSubject = new BehaviorSubject<number>(null); // Publishes the percent renewable for a single year.
-  public positionSubject = new BehaviorSubject<any>(null);             // Publishes the repositioning data from the position modal.
-  public resizeSubject = new BehaviorSubject<any>(null);               // Publishes the resizing data from the position modal.
-  public closeModalSubject = new BehaviorSubject<any>(null);           // Notifies the position modal to close.
-  public revertPositionsSubject = new BehaviorSubject<any>(null);      // Reverts repositioning on the map screen when changes are canceled.
-  public capDataSubject = new BehaviorSubject<any>(null);              // Publishes capacity data.
-  public genDataSubject = new BehaviorSubject<any>(null);              // Publishes the generation data.
-  public curDataSubject = new BehaviorSubject<any>(null);              // Puslishes the curtailment data.
-  public technologySubject = new BehaviorSubject<any>(null);           // Publishes an array of all technologies and their colors.
-  public cssSubject = new BehaviorSubject<any>(null);                  // Publishes the css data.
-  public tooltipSubject = new BehaviorSubject<any>(null);              // Publishes the which tooltip to display.
-  public windowDataSubject = new BehaviorSubject<any>(null);           // Publishes the size of the other screen.
+  // Publishes the repositioning data from the position modal.
+  public positionSubject = new BehaviorSubject<{ id: string, x: number, y: number }>(null);
+  // Publishes the resizing data from the position modal.
+  public resizeSubject = new BehaviorSubject<{ id: string, width: number, height: number, percent: number }>(null);
+  public closeModalSubject = new BehaviorSubject<{ saveData: boolean }>(null);           // Notifies the position modal to close.
+  public revertPositionsSubject = new BehaviorSubject<object>(null);   // Reverts repositioning on the map screen when changes are canceled.
+  public capDataSubject = new BehaviorSubject<object>(null);           // Publishes capacity data.
+  public genDataSubject = new BehaviorSubject<object>(null);           // Publishes the generation data.
+  public curDataSubject = new BehaviorSubject<object>(null);           // Puslishes the curtailment data.
+  public technologySubject = new BehaviorSubject<string[]>(null);      // Publishes an array of all technologies and their colors.
+  public cssSubject = new BehaviorSubject<object>(null);               // Publishes the css data.
+  public tooltipSubject = new BehaviorSubject<{ x: number, y: number, id: string }>(null); // Publishes the which tooltip to display.
+  // Publishes the size of the other screen.
+  public windowDataSubject = new BehaviorSubject<{ main: boolean, width: number, height: number }>(null);
   public toggleElementSubject = new BehaviorSubject<{ tag: string, show: boolean }>(null); // Publishs visibility of elements
   public freshCssSubject = new BehaviorSubject<boolean>(null);         // Tells components if the css is a new load and needs to be set up.
   public getWidthSubject = new BehaviorSubject<boolean>(null);         // If the width data is not in css file, requests it from component.
@@ -91,14 +97,7 @@ export class PlanService {
         all: []
       },
       // Components array is used to loop through all included map elements.
-      components: [
-        { category: null, tag: 'map' },
-        { category: null, tag: 'data' },
-        { category: 'charts', tag: 'line' },
-        { category: 'charts', tag: 'pie' },
-        { category: 'logos', tag: 'lava' },
-        { category: 'logos', tag: 'heco' }
-      ],
+      components: [],
       // Holds all data for the table
       data: {
         // Paths hold the path to the csv file containing data.
@@ -170,6 +169,7 @@ export class PlanService {
     this.dataTable.data.generationPath = plan.data.generationPath;
     this.dataTable.data.curtailmentPath = plan.data.curtailmentPath;
     this.dataTable.data.capacityPath = plan.data.capacityPath;
+    this.dataTable.components = plan.mapElements;
     this.publishSetupData();
     this.loadAllData();
   }
@@ -378,6 +378,7 @@ export class PlanService {
    */
   private setCurrentPercent(year: number): number {
     this.dataTable.renewableTotals.forEach(e => {
+      // tslint:disable-next-line: triple-equals
       if (e.year == year) {
         this.dataTable.year.currentRenewablePercent = e.total;
       }
@@ -390,6 +391,7 @@ export class PlanService {
    */
   public updateScenario(scenarioName: string): void {
     if (scenarioName !== this.dataTable.scenario.name) {           // Check to make sure the scenario is not already selected.
+      // tslint:disable-next-line: triple-equals
       const scenario = this.dataTable.scenario.all.find(s => s.name == scenarioName);  // Find the correct scenario in the datatable.
       if (scenario) {
         this.dataTable.scenario.currentIndex = this.dataTable.scenario.all.indexOf(scenario);  // Update the scenario index.
@@ -554,9 +556,9 @@ export class PlanService {
     of the element based on the saved values in the css file*/
     this.dataTable.components.forEach(e => {
       // tslint:disable-next-line: no-shadowed-variable
-      const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.tag] : this.CSS[this.dataTable.plan.name][e.tag];
-      this.dataTable.visibility[e.tag] = css_path.visible;
-      this.toggleElement(e.tag, css_path.visible);
+      const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.name] : this.CSS[this.dataTable.plan.name][e.name];
+      this.dataTable.visibility[e.name] = css_path.visible;
+      this.toggleElement(e.name, css_path.visible);
 
       // Check to see if the positons are all equal to 0px.  If they are not, then this is not a fresh install.
       if (css_path.left !== '0px' && css_path.top !== '0px') {
@@ -615,17 +617,17 @@ export class PlanService {
   private storeCssData(): void {
     this.dataTable.components.forEach(e => {
       // Set the path to the css data based on the plan name and if there is a category associated with the element.
-      const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.tag] : this.CSS[this.dataTable.plan.name][e.tag];
+      const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.name] : this.CSS[this.dataTable.plan.name][e.name];
 
       // Check for changes in the data table.  If they exist, write them to the CSS object.
-      if (this.dataTable.positionData.locations[e.tag] && this.dataTable.positionData.locations[e.tag].x) {
-        css_path.left = `${this.dataTable.positionData.locations[e.tag].x}px`;
-        css_path.top = `${this.dataTable.positionData.locations[e.tag].y}px`;
+      if (this.dataTable.positionData.locations[e.name] && this.dataTable.positionData.locations[e.name].x) {
+        css_path.left = `${this.dataTable.positionData.locations[e.name].x}px`;
+        css_path.top = `${this.dataTable.positionData.locations[e.name].y}px`;
       }
-      if (this.dataTable.positionData.percents[e.tag] > 0) {
-        css_path.percent = `${this.dataTable.positionData.percents[e.tag]}`;
+      if (this.dataTable.positionData.percents[e.name] > 0) {
+        css_path.percent = `${this.dataTable.positionData.percents[e.name]}`;
       }
-      css_path.visible = this.dataTable.visibility[e.tag];
+      css_path.visible = this.dataTable.visibility[e.name];
     });
 
     // Save the data to the cssData.json file.
@@ -654,25 +656,25 @@ export class PlanService {
           if (!this.CSS[p.name][e.category]) {
             this.CSS[p.name][e.category] = {};
           }
-          if (!this.CSS[p.name][e.category][e.tag]) {
-            this.CSS[p.name][e.category][e.tag] = {};
+          if (!this.CSS[p.name][e.category][e.name]) {
+            this.CSS[p.name][e.category][e.name] = {};
           }
-          this.CSS[p.name][e.category][e.tag].left = `0px`;
-          this.CSS[p.name][e.category][e.tag].top = `0px`;
-          this.CSS[p.name][e.category][e.tag].percent = 50;
-          this.CSS[p.name][e.category][e.tag].width = 0;
-          this.CSS[p.name][e.category][e.tag].height = 0;
-          this.CSS[p.name][e.category][e.tag].visible = true;
+          this.CSS[p.name][e.category][e.name].left = `0px`;
+          this.CSS[p.name][e.category][e.name].top = `0px`;
+          this.CSS[p.name][e.category][e.name].percent = 50;
+          this.CSS[p.name][e.category][e.name].width = 0;
+          this.CSS[p.name][e.category][e.name].height = 0;
+          this.CSS[p.name][e.category][e.name].visible = true;
         } else {
-          if (!this.CSS[p.name][e.tag]) {
-            this.CSS[p.name][e.tag] = {};
+          if (!this.CSS[p.name][e.name]) {
+            this.CSS[p.name][e.name] = {};
           }
-          this.CSS[p.name][e.tag].left = `0px`;
-          this.CSS[p.name][e.tag].top = `0px`;
-          this.CSS[p.name][e.tag].percent = 50;
-          this.CSS[p.name][e.tag].width = 0;
-          this.CSS[p.name][e.tag].height = 0;
-          this.CSS[p.name][e.tag].visible = true;
+          this.CSS[p.name][e.name].left = `0px`;
+          this.CSS[p.name][e.name].top = `0px`;
+          this.CSS[p.name][e.name].percent = 50;
+          this.CSS[p.name][e.name].width = 0;
+          this.CSS[p.name][e.name].height = 0;
+          this.CSS[p.name][e.name].visible = true;
         }
       });
     });
@@ -717,14 +719,14 @@ export class PlanService {
     }
   }
 
-/** Updates the CSS object with the correct width for a map element.
- * @param elementCategory string that defines the category in the CSS table.
- * @param elementName string that defines the name of the element to update
- * @param widthValue the width in pixels.
- * Not all elements have a category.
- * example this.css[heco-oahu][charts][pie].width
- *         this.css[map].width
- */
+  /** Updates the CSS object with the correct width for a map element.
+   * @param elementCategory string that defines the category in the CSS table.
+   * @param elementName string that defines the name of the element to update
+   * @param widthValue the width in pixels.
+   * Not all elements have a category.
+   * example this.css[heco-oahu][charts][pie].width
+   *         this.css[map].width
+   */
   public updateCSSWidth(elementCategory: string, elementName: string, widthValue: number) {
     if (this.CSS) {
       // set the path to the correct variable location.
@@ -801,7 +803,7 @@ export class PlanService {
    * if the user saves the new layout.
    */
   public settingsModalOpened(): void {
-    this.windowService.sendMessage({ type: 'settings opened', message: true});
+    this.windowService.sendMessage({ type: 'settings opened', message: true });
   }
 
   /** Debugging method that will print the datatable in its current state to the console. */
@@ -841,7 +843,7 @@ export class PlanService {
     } else if (msg.type === 'update width') {
       this.updateCSSWidth(msg.message.cat, msg.message.name, msg.message.width);
     } else if (msg.type === 'toggle visibility') {
-      this.toggleElement(msg.message.tag, msg.message.show);
+      this.toggleElement(msg.message.name, msg.message.show);
     } else if (msg.type === 'get other window data') {
       const data = { main: this.windowService.isMain(), width: window.innerWidth, height: window.innerHeight };
       this.windowService.sendMessage({ type: 'receive other window data', message: data });

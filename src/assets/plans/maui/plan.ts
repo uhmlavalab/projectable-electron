@@ -10,6 +10,14 @@ export const MauiPlan: Plan = {
   secondScreenImagePath: 'assets/plans/maui/images/second-screen-images/backgrounds/maui.jpg',
   includeSecondScreen: false,
   selectedPlan: false,
+  mapElements: [
+    { category: null, name: 'map' },
+    { category: null, name: 'data' },
+    { category: 'charts', name: 'line' },
+    { category: 'charts', name: 'pie' },
+    { category: 'logos', name: 'lava' },
+    { category: 'logos', name: 'heco' }
+  ],
   minYear: 2016,
   maxYear: 2045,
   route: 'map-main',
@@ -92,7 +100,7 @@ export const MauiPlan: Plan = {
             'Public-State': '#ff7f7f',
             'Public-State DHHL': '#895a44',
             'Public-County': '#00c5ff',
-          }
+          };
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])
@@ -152,7 +160,7 @@ export const MauiPlan: Plan = {
             '8.5+': 0,
             '7.5-8.5': 1,
             '6.5-7.5': 2
-          }
+          };
           this.parcels.sort((a, b) => parseFloat(dictSort[a.properties.SPD_CLS]) - parseFloat(dictSort[b.properties.SPD_CLS]));
           this.parcels.forEach(parcel => {
             if (windTotal > 0) {
@@ -267,7 +275,7 @@ export const MauiPlan: Plan = {
             C: '#ffaa00' + 'aa',
             D: '#a87000' + 'aa',
             E: '#895a44' + 'aa',
-          }
+          };
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])

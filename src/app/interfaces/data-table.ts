@@ -1,5 +1,7 @@
 import { Plan } from './plan';
 import { Scenario } from './scenario';
+import { MapLayer } from '@app/interfaces';
+import { MapElement } from './map-element';
 
 export interface DataTable {
 
@@ -33,9 +35,9 @@ export interface DataTable {
         currentIndex: number;
     };
     layers: {
-        all: any[];
+        all: {layer: MapLayer, state: number}[];
     };
-    components: {category: string, tag: string}[];
+    components: MapElement[];
     data: {
         generationPath: any;
         curtailmentPath: any;

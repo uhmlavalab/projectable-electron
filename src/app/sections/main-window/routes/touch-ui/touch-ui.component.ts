@@ -1,8 +1,7 @@
 import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
 import { WindowService } from '@app/modules/window';
-import { Layer } from 'leaflet';
-import { Scenario } from '@app/interfaces';
+import { Scenario, MapLayer } from '@app/interfaces';
 
 @Component({
   selector: 'app-touch-ui',
@@ -14,7 +13,7 @@ export class TouchUiComponent implements AfterViewInit {
   @ViewChild('year', { static: false, read: ElementRef }) yearElement: ElementRef;
   @ViewChild('ttip', { static: false, read: ElementRef }) toolTip: ElementRef;
 
-  private layers: Layer[];              // Array containing all Layers (used to populate toggle buttons).
+  private layers: {layer: MapLayer, state: number}[];              // Array containing all Layers (used to populate toggle buttons).
   private sectionTitles: {layer: string; map: string; scenario: string; };  // Used to label HTML elements.
   private tooltip: { displaying: boolean, path: string; currentlySelected: string; }; // Tooltip data
   private setupComplete: boolean;      // True when all necessary elements are published by the plan service.

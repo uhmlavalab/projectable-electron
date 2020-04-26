@@ -1,5 +1,6 @@
 import { Map } from './map';
 import { Scenario } from './scenario';
+import { MapElement } from './map-element';
 
 export interface Plan {
   name: string;
@@ -8,6 +9,7 @@ export interface Plan {
   secondScreenImagePath: string;
   includeSecondScreen: boolean;
   selectedPlan: boolean;
+  mapElements: MapElement[];
   minYear: number;
   maxYear: number;
   scenarios: Scenario[];

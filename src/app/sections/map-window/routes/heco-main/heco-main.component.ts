@@ -103,7 +103,11 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     // Elements can be hidden or shown in the settings modal.
     this.planService.toggleElementSubject.subscribe(val => {
       if (val) {
-        this.elements.find(e => e.tag === val.tag).e.nativeElement.style.display = val.show ? 'block' : 'none';
+        try {
+          this.elements.find(e => e.tag === val.tag).e.nativeElement.style.display = val.show ? 'block' : 'none';
+        } catch(e) {
+         console.log(e);
+        }
       }
     });
 

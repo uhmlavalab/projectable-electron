@@ -10,6 +10,14 @@ export const BigIslandPlan: Plan = {
   secondScreenImagePath: 'assets/plans/bigisland/images/second-screen-images/backgrounds/bigIsland.jpg',
   includeSecondScreen: false,
   selectedPlan: false,
+  mapElements: [
+    { category: null, name: 'map' },
+    { category: null, name: 'data' },
+    { category: 'charts', name: 'line' },
+    { category: 'charts', name: 'pie' },
+    { category: 'logos', name: 'lava' },
+    { category: 'logos', name: 'heco' }
+  ],
   minYear: 2016,
   maxYear: 2045,
   route: 'map-main',
@@ -91,7 +99,7 @@ export const BigIslandPlan: Plan = {
             'Public-State': '#ff7f7f',
             'Public-State DHHL': '#895a44',
             'Public-County': '#00c5ff',
-          }
+          };
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])
@@ -243,7 +251,7 @@ export const BigIslandPlan: Plan = {
             C: '#ffaa00' + 'aa',
             D: '#a87000' + 'aa',
             E: '#895a44' + 'aa',
-          }
+          };
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])
