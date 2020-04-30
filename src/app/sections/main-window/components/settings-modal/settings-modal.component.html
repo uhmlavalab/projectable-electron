@@ -3,7 +3,7 @@
   <div class="button options" (click)="expand('map')">Map Settings</div>
   <div class="settings-expansion-wrapper" #extraMap>
     <p>Resize Map</p>
-    <app-slider width="90" horizontal="true" type="resize map" category="" name="map"></app-slider>
+    <app-slider width="90" horizontal="true" type="resize map" category="map" name="map"></app-slider>
      <div class="button show-hide" (click)="hide('map')">Hide</div>
      <div class="button show-hide" (click)="show('map')">Show</div>
   </div>
@@ -33,7 +33,7 @@
   <div class="button options" (click)="expand('data')">Data Display Settings</div>
   <div class="settings-expansion-wrapper" #extraData>
     <p>Resize Data Display</p>
-    <app-slider width="90" horizontal="true" type="resize data" category="" name="data"></app-slider>
+    <app-slider width="90" horizontal="true" type="resize data" category="data" name="data"></app-slider>
      <div class="button show-hide" (click)="hide('data')">Hide</div>
      <div class="button show-hide" (click)="show('data')">Show</div>
   </div>

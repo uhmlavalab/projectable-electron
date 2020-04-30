@@ -112,7 +112,7 @@ export class SliderComponent implements AfterViewInit {
     let pos = -1;
     switch (this.type) {
       case 'resize map':
-        pos = data.map.percent;
+        pos = data.map.map.percent;
         break;
       case 'resize pie':
         pos = data.charts.pie.percent;
@@ -121,7 +121,7 @@ export class SliderComponent implements AfterViewInit {
         pos = data.charts.line.percent;
         break;
       case 'resize data':
-        pos = data.data.percent;
+        pos = data.data.data.percent;
         break;
       case 'resize lava':
         pos = data.logos.lava.percent;

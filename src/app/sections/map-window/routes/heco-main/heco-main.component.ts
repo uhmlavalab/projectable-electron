@@ -38,10 +38,10 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     // Some elements have nested objects, like charts.pie, or logos.lava, some like map do not.
     this.elements = [
-      { e: this.mapElement, tag: 'map', category: null },
+      { e: this.mapElement, tag: 'map', category: 'map' },
       { e: this.pieChart, tag: 'pie', category: 'charts' },
       { e: this.lineChart, tag: 'line', category: 'charts' },
-      { e: this.yearData, tag: 'data', category: null },
+      { e: this.yearData, tag: 'data', category: 'data' },
       { e: this.hecoLogo, tag: 'heco', category: 'logos' },
       { e: this.lavaLogo, tag: 'lava', category: 'logos' }
     ];
@@ -59,7 +59,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
         } else if (data.id === 'resize heco') {
           this.resizeElement(this.hecoLogo.nativeElement, 'logos', 'heco', data.width, data.height, data.percent);
         } else if (data.id === 'resize data') {
-          this.resizeElement(this.yearData.nativeElement, null, 'data', data.width, data.height, data.percent);
+          this.resizeElement(this.yearData.nativeElement, 'data', 'data', data.width, data.height, data.percent);
           this.adjustFontSize(this.yearData.nativeElement, data.percent);
         }
       }
@@ -132,14 +132,14 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
   positionAll(cssData) {
     this.elements.forEach(e => {
       // Set the path to the correct css values.
-      const css = e.category ? cssData[e.category][e.tag] : cssData[e.tag];
+      const css = cssData[e.category][e.tag];
       this.positionElement(css, e.e.nativeElement);    // Each element data is passed to positionElement function
       e.e.nativeElement.style.display = css.visible ? 'block' : 'none';   // Toggle visibility of each element
     });
 
     // The timeout is necessary to ensure that all elements are properly positioned before attemting to resize them.
     setTimeout(() => {
-      this.resizeElement(this.yearData.nativeElement, null, 'data', cssData.data.width, cssData.data.height, cssData.data.percent);
+      this.resizeElement(this.yearData.nativeElement, 'data', 'data', cssData.data.width, cssData.data.height, cssData.data.percent);
       // tslint:disable-next-line: max-line-length
       this.resizeElement(this.lavaLogo.nativeElement, 'logos', 'lava', cssData.logos.lava.width, cssData.logos.lava.height, cssData.logos.lava.percent);
       // tslint:disable-next-line: max-line-length
@@ -169,7 +169,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       height = e.getBoundingClientRect().height;
       this.planService.updateCSSHeight(category, elementName, height);
       this.planService.updateCSSWidth(category, elementName, width);
-      const css_path = category ? this.cssData[category][elementName] : this.cssData[elementName];
+      const css_path = this.cssData[category][elementName];
       css_path.width = width;
       css_path.height = height;
     }

@@ -11,8 +11,8 @@ export const HecoPlan: Plan = {
   includeSecondScreen: false,
   selectedPlan: false,
   mapElements: [
-    { category: null, name: 'map' },
-    { category: null, name: 'data' },
+    { category: 'map', name: 'map' },
+    { category: 'data', name: 'data' },
     { category: 'charts', name: 'line' },
     { category: 'charts', name: 'pie' },
     { category: 'logos', name: 'lava' },

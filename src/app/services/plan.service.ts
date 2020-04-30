@@ -96,7 +96,7 @@ export class PlanService {
       layers: {
         all: []
       },
-      // Components array is used to loop through all included map elements.
+      // Components array is used to loop through all included map elements.  (loaded from the plan)
       components: [],
       // Holds all data for the table
       data: {
@@ -556,7 +556,7 @@ export class PlanService {
     of the element based on the saved values in the css file*/
     this.dataTable.components.forEach(e => {
       // tslint:disable-next-line: no-shadowed-variable
-      const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.name] : this.CSS[this.dataTable.plan.name][e.name];
+      const css_path = this.CSS[this.dataTable.plan.name][e.category][e.name];
       this.dataTable.visibility[e.name] = css_path.visible;
       this.toggleElement(e.name, css_path.visible);
 
@@ -617,7 +617,7 @@ export class PlanService {
   private storeCssData(): void {
     this.dataTable.components.forEach(e => {
       // Set the path to the css data based on the plan name and if there is a category associated with the element.
-      const css_path = e.category ? this.CSS[this.dataTable.plan.name][e.category][e.name] : this.CSS[this.dataTable.plan.name][e.name];
+      const css_path = this.CSS[this.dataTable.plan.name][e.category][e.name];
 
       // Check for changes in the data table.  If they exist, write them to the CSS object.
       if (this.dataTable.positionData.locations[e.name] && this.dataTable.positionData.locations[e.name].x) {
@@ -651,8 +651,7 @@ export class PlanService {
       if (!this.CSS[p.name]) {
         this.CSS[p.name] = {};
       }
-      this.dataTable.components.forEach(e => {
-        if (e.category) {
+      p.mapElements.forEach(e => {
           if (!this.CSS[p.name][e.category]) {
             this.CSS[p.name][e.category] = {};
           }
@@ -665,17 +664,6 @@ export class PlanService {
           this.CSS[p.name][e.category][e.name].width = 0;
           this.CSS[p.name][e.category][e.name].height = 0;
           this.CSS[p.name][e.category][e.name].visible = true;
-        } else {
-          if (!this.CSS[p.name][e.name]) {
-            this.CSS[p.name][e.name] = {};
-          }
-          this.CSS[p.name][e.name].left = `0px`;
-          this.CSS[p.name][e.name].top = `0px`;
-          this.CSS[p.name][e.name].percent = 50;
-          this.CSS[p.name][e.name].width = 0;
-          this.CSS[p.name][e.name].height = 0;
-          this.CSS[p.name][e.name].visible = true;
-        }
       });
     });
     if (this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) })) {
@@ -691,6 +679,7 @@ export class PlanService {
    */
   public toggleElement(tag: string, show: boolean): void {
     this.dataTable.visibility[tag] = show;
+    console.log(tag, show);
     if (this.windowService.isMain()) {
       this.windowService.sendMessage({ type: 'toggle visibility', message: { tag: tag, show: show } });
     } else {
@@ -730,8 +719,7 @@ export class PlanService {
   public updateCSSWidth(elementCategory: string, elementName: string, widthValue: number) {
     if (this.CSS) {
       // set the path to the correct variable location.
-      // tslint:disable-next-line: max-line-length
-      const css_path = elementCategory ? this.CSS[this.dataTable.plan.name][elementCategory][elementName] : this.CSS[this.dataTable.plan.name][elementName];
+      const css_path = this.CSS[this.dataTable.plan.name][elementCategory][elementName];
       css_path.width = widthValue;
       if (!this.windowService.isMain()) {
         this.windowService.sendMessage({ type: 'update width', message: { cat: elementCategory, name: elementName, width: widthValue } });
@@ -772,7 +760,7 @@ export class PlanService {
   public handleSliderChange(percentFromLeft: number, id: string, category: string, name: string) {
     let width = 0;
     let height = 0;
-    const css_path = category === '' ? this.CSS[this.dataTable.plan.name][name] : this.CSS[this.dataTable.plan.name][category][name];
+    const css_path = this.CSS[this.dataTable.plan.name][category][name];
     this.dataTable.positionData.percents[name] = percentFromLeft;
     width = css_path.width;
     height = css_path.height;
@@ -843,7 +831,7 @@ export class PlanService {
     } else if (msg.type === 'update width') {
       this.updateCSSWidth(msg.message.cat, msg.message.name, msg.message.width);
     } else if (msg.type === 'toggle visibility') {
-      this.toggleElement(msg.message.name, msg.message.show);
+      this.toggleElement(msg.message.tag, msg.message.show);
     } else if (msg.type === 'get other window data') {
       const data = { main: this.windowService.isMain(), width: window.innerWidth, height: window.innerHeight };
       this.windowService.sendMessage({ type: 'receive other window data', message: data });

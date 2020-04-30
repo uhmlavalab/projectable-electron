@@ -50,10 +50,10 @@ export class SettingsModalComponent implements AfterViewInit {
     this.planService.getOtherWindowData();
 
     this.elements = [
-      { tag: 'map', category: null, e: this.mapElement, extraE: this.extraMap, top: 0, left: 0, extra: false },
+      { tag: 'map', category: 'map', e: this.mapElement, extraE: this.extraMap, top: 0, left: 0, extra: false },
       { tag: 'pie', category: 'charts', e: this.pieElement, extraE: this.extraPie, top: 0, left: 0, extra: false },
       { tag: 'line', category: 'charts', e: this.lineElement, extraE: this.extraLine, top: 0, left: 0, extra: false },
-      { tag: 'data', category: null, e: this.displayDataElement, extraE: this.extraData, top: 0, left: 0, extra: false },
+      { tag: 'data', category: 'data', e: this.displayDataElement, extraE: this.extraData, top: 0, left: 0, extra: false },
       { tag: 'heco', category: 'logos', e: this.hecoLogoElement, extraE: this.extraHeco, top: 0, left: 0, extra: false },
       { tag: 'lava', category: 'logos', e: this.lavaLogoElement, extraE: this.extraLava, top: 0, left: 0, extra: false }
     ];

@@ -46,8 +46,8 @@ export class MapElementComponent implements OnInit {
     this.baseMapImagePath = mapData.path;
 
     setTimeout(() => {
-      this.planService.updateCSSWidth(null, 'map', this.width);
-      this.planService.updateCSSHeight(null, 'map', this.height);
+      this.planService.updateCSSWidth('map', 'map', this.width);
+      this.planService.updateCSSHeight('map', 'map', this.height);
     }, 100);
   }
 
@@ -59,8 +59,8 @@ export class MapElementComponent implements OnInit {
         if (data.id === 'resize map') {
           const percentage = data.percent / 100 * 2;
           if (this.width === 0) {
-            this.planService.updateCSSWidth(null, 'map', this.width);
-            this.planService.updateCSSHeight(null, 'map', this.height);
+            this.planService.updateCSSWidth('map', 'map', this.width);
+            this.planService.updateCSSHeight('map', 'map', this.height);
           }
           const newWidth = this.startingWidth * percentage;
           const newHeight = this.startingHeight * percentage;
@@ -136,8 +136,8 @@ export class MapElementComponent implements OnInit {
     // IF the plan service requests the width, send the data.
     this.planService.getWidthSubject.subscribe((val: boolean) => {
       if (val) {
-        this.planService.updateCSSWidth(null, 'map', this.width);
-        this.planService.updateCSSHeight(null, 'map', this.height);
+        this.planService.updateCSSWidth('map', 'map', this.width);
+        this.planService.updateCSSHeight('map', 'map', this.height);
       }
     });
   }
