@@ -1,1 +1,12 @@
 
+.laserPointer {
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    border: 1px solid red;
+    border-radius: 50%;
+    position: absolute;
+    left: -1000;
+    top: -1000;
+    display: none;
+}

@@ -52,6 +52,7 @@ export class PlanService {
   public redrawPathsSubject = new BehaviorSubject<boolean>(false);     // If the map is resized and saved, tells map to redraw parcel paths.
   public settingsModalOpenedSubject = new BehaviorSubject<boolean>(false); // When the modal is opened, the map needs to turn off layers.
   public settingsCanceledSubject = new BehaviorSubject<boolean>(false); // When modal closed, turn layers back of if they were off.
+  public laserPointerSubject = new BehaviorSubject<{x: number, y: number, start: boolean, end: boolean}>(null);
 
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
     this.freshCss = true;            // Fresh css is set to true before checking.
@@ -652,18 +653,18 @@ export class PlanService {
         this.CSS[p.name] = {};
       }
       p.mapElements.forEach(e => {
-          if (!this.CSS[p.name][e.category]) {
-            this.CSS[p.name][e.category] = {};
-          }
-          if (!this.CSS[p.name][e.category][e.name]) {
-            this.CSS[p.name][e.category][e.name] = {};
-          }
-          this.CSS[p.name][e.category][e.name].left = `0px`;
-          this.CSS[p.name][e.category][e.name].top = `0px`;
-          this.CSS[p.name][e.category][e.name].percent = 50;
-          this.CSS[p.name][e.category][e.name].width = 0;
-          this.CSS[p.name][e.category][e.name].height = 0;
-          this.CSS[p.name][e.category][e.name].visible = true;
+        if (!this.CSS[p.name][e.category]) {
+          this.CSS[p.name][e.category] = {};
+        }
+        if (!this.CSS[p.name][e.category][e.name]) {
+          this.CSS[p.name][e.category][e.name] = {};
+        }
+        this.CSS[p.name][e.category][e.name].left = `0px`;
+        this.CSS[p.name][e.category][e.name].top = `0px`;
+        this.CSS[p.name][e.category][e.name].percent = 50;
+        this.CSS[p.name][e.category][e.name].width = 0;
+        this.CSS[p.name][e.category][e.name].height = 0;
+        this.CSS[p.name][e.category][e.name].visible = true;
       });
     });
     if (this.windowService.saveFile({ filename: 'cssData.json', file: JSON.stringify({ file: 'cssData', css: this.CSS }) })) {
@@ -679,7 +680,6 @@ export class PlanService {
    */
   public toggleElement(tag: string, show: boolean): void {
     this.dataTable.visibility[tag] = show;
-    console.log(tag, show);
     if (this.windowService.isMain()) {
       this.windowService.sendMessage({ type: 'toggle visibility', message: { tag: tag, show: show } });
     } else {
@@ -799,6 +799,10 @@ export class PlanService {
     console.log(JSON.stringify(this.dataTable));
   }
 
+  public handleLaserPointer(x: number, y: number, start: boolean, end: boolean) {
+    this.windowService.sendMessage({ type: 'laser pointer', message: { x: x, y: y, start: start, end: end } });
+  }
+
   /** When positioning elements, I pass a percentage for left and top because you could have two different screen resolutions
    * running.  Therefore, the components needs to know what the size of the other window is to convert the percentages.
    */
@@ -841,6 +845,8 @@ export class PlanService {
       this.windowService.sendMessage({ type: 'percent change', message: this.dataTable.year.currentRenewablePercent });
     } else if (msg.type === 'settings opened') {
       this.settingsModalOpenedSubject.next(true);
+    } else if (msg.type === 'laser pointer') {
+      this.laserPointerSubject.next(msg.message);
     } else if (msg.type === 'file information') {
       msg.message.forEach(d => { // iterate through the loaded files and find the cssdata file.
         if (d.file === 'cssData') {

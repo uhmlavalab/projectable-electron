@@ -14,6 +14,8 @@ import { WindowService } from '@app/modules/window';
 export class MapElementComponent implements OnInit {
 
   @ViewChild('mapDiv', { static: true }) mapDiv: ElementRef;
+  @ViewChild('pointer', { static: true}) pointer: ElementRef;
+
   scale: number;
   width: number;                  // The current width of the map
   height: number;                 // The current height of the map
@@ -30,6 +32,8 @@ export class MapElementComponent implements OnInit {
   private year: number;
   private allReady: any;
 
+  private isMiniMap: boolean;     // Tells if it is the mini map or main map (used for pointer)
+
   constructor(private planService: PlanService, private windowService: WindowService) {
     this.allReady = {};
     this.allReady.planSet = false;
@@ -38,6 +42,7 @@ export class MapElementComponent implements OnInit {
     this.drawn = false;
     const mapData = planService.getMapData();
     this.scale = this.windowService.isMain() ? mapData.miniScale : mapData.scale;
+    this.isMiniMap = this.windowService.isMain();
     this.width = mapData.width * this.scale;
     this.height = mapData.height * this.scale;
     this.startingWidth = this.width;
@@ -52,6 +57,24 @@ export class MapElementComponent implements OnInit {
   }
 
   ngOnInit() {
+
+    if (this.isMiniMap) {
+      this.mapDiv.nativeElement.addEventListener('touchstart', event => {
+        this.passPointerLocation(event, true, true, false);
+      }, { passive: false });
+      this.mapDiv.nativeElement.addEventListener('touchend', event => {
+        this.passPointerLocation(event, true, false, true);
+      }, { passive: false });
+      this.mapDiv.nativeElement.addEventListener('touchmove', event => {
+        this.passPointerLocation(event, true, false, false);
+      }, { passive: false });
+    }
+
+    this.planService.laserPointerSubject.subscribe(data => {
+      if (data) {
+        this.showLaserPointer(data.x, data.y, data.start, data.end);
+      }
+    });
 
     // Subject receives any changes to the percent size of the map and resizes it.
     this.planService.resizeSubject.subscribe(data => {
@@ -312,5 +335,46 @@ export class MapElementComponent implements OnInit {
     } else if (this.ready() && !this.drawn) {
       this.drawMap();
     }
+  }
+
+  /** This function takes the x and y position of a touch and notifies the plan service
+   * The plan service will then notify the map screen to display the location of the point on
+   * the map.  Locations are defined as the percent from the left and percent from the top.
+   * @param event: either a touch or mouse event containing the x and y position of the event.
+   * @param isTouch: true if it is a touch event, false if it is a mouse event.
+   */
+  private passPointerLocation(event, isTouch: boolean, start: boolean, end: boolean): void {
+    let x = null;
+    let y = null;
+    const img = this.mapDiv.nativeElement.children[0];
+    if (isTouch) {
+      x = event.changedTouches[0].screenX;
+      y = event.changedTouches[0].screenY;
+      x = x - img.getBoundingClientRect().left;
+      y = y - img.getBoundingClientRect().top;
+    }
+
+    const left = x / img.getBoundingClientRect().width;
+    const top = y / img.getBoundingClientRect().height;
+    this.planService.handleLaserPointer(left, top, start, end);
+  }
+
+  /** Takes the percentages for x and y passed by the main window and displays a pointer on the map
+   * in a cooresponding location.
+   * @param x the percentage from the left of the div
+   * @param y the percentage from the top of the div.
+   */
+  private showLaserPointer(x: number, y: number, start: boolean, end: boolean): void {
+    if (start) {
+      this.pointer.nativeElement.style.display = 'block';
+    } else if (end) {
+      this.pointer.nativeElement.style.display = 'none';
+    }
+    const rect = this.mapDiv.nativeElement.children[0].getBoundingClientRect();
+    const left = x * rect.width;
+    const top = y * rect.height;
+
+    this.pointer.nativeElement.style.left = `${left}px`;
+    this.pointer.nativeElement.style.top = `${top}px`;
   }
 }
