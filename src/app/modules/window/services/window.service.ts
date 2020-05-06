@@ -18,7 +18,7 @@ export class WindowService {
     this.windowName = '';
     this.fileData = [];
     ipcRenderer.on('window-is-set', (event, message) => {
-      if (message.windowName === 'main') {
+      if (message.windowName == 'main') {
         this.setAsMainWindow();
       } else if (message.windowName == 'map') {
         this.setAsMapWindow();

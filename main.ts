@@ -18,7 +18,7 @@ function createWindows() {
   screen.getAllDisplays().forEach(el => {
     const window = setupWindow(el);
     windows.push(window);
-  })
+  });
 
   ipcMain.on('set-main-window', (evt, msg) => {
     windows.forEach(el => {
@@ -26,7 +26,7 @@ function createWindows() {
         mainWindow = el;
         mainWindow.webContents.send('main-window-confirmation', 'Main Window successfully set.');
       }
-    })
+    });
     if (mainWindow && mapWindow) {
       closeExtraWindows();
     }
@@ -91,7 +91,6 @@ function createWindows() {
     } else if (mainWindow && mainWindow.webContents === evt.sender) {
       functions.loadFile(mainWindow, msg);
     }
-   
   });
   ipcMain.on('close', () => closeProgram());
 }
