@@ -68,6 +68,19 @@ export class MapElementComponent implements OnInit {
       this.mapDiv.nativeElement.addEventListener('touchmove', event => {
         this.passPointerLocation(event, true, false, false);
       }, { passive: false });
+
+      this.mapDiv.nativeElement.addEventListener('mousedown', event => {
+        this.passPointerLocation(event, false, true, false);
+      });
+      this.mapDiv.nativeElement.addEventListener('mousemove', event => {
+        this.passPointerLocation(event, false, false, false);
+      });
+      this.mapDiv.nativeElement.addEventListener('mouseup', event => {
+        this.passPointerLocation(event, false, false, true);
+      });
+      this.mapDiv.nativeElement.addEventListener('mouseleave', event => {
+        this.passPointerLocation(event, false, false, true);
+      });
     }
 
     this.planService.laserPointerSubject.subscribe(data => {
@@ -344,15 +357,17 @@ export class MapElementComponent implements OnInit {
    * @param isTouch: true if it is a touch event, false if it is a mouse event.
    */
   private passPointerLocation(event, isTouch: boolean, start: boolean, end: boolean): void {
-    let x = null;
-    let y = null;
+    let x = event.screenX;
+    let y = event.screenY;
+
     const img = this.mapDiv.nativeElement.children[0];
     if (isTouch) {
       x = event.changedTouches[0].screenX;
       y = event.changedTouches[0].screenY;
-      x = x - img.getBoundingClientRect().left;
-      y = y - img.getBoundingClientRect().top;
     }
+
+    x = x - img.getBoundingClientRect().left;
+    y = y - img.getBoundingClientRect().top;
 
     const left = x / img.getBoundingClientRect().width;
     const top = y / img.getBoundingClientRect().height;
