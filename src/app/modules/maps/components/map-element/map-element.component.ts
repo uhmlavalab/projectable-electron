@@ -341,7 +341,7 @@ export class MapElementComponent implements OnInit {
   private updateMap(): void {
     if (this.ready() && this.drawn) {
       this.layers.forEach(layer => {
-        if (layer.layer.updateFunction !== null && layer.state === 1) {
+        if (layer.layer.updateFunction !== null && layer.state === 1 && !this.windowService.isMain()) {
           layer.layer.updateFunction(this.planService, layer.state);
         }
       });
