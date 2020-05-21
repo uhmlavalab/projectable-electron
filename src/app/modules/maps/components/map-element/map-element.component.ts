@@ -49,7 +49,6 @@ export class MapElementComponent implements OnInit {
     this.startingHeight = this.height;
     this.rasterBounds = mapData.bounds;
     this.baseMapImagePath = this.windowService.isMain() ? mapData.miniMapPath : mapData.path;
-    this.bigIsland = false;
 
     setTimeout(() => {
       this.planService.updateCSSWidth('map', 'map', this.width);
