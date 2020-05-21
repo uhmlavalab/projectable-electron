@@ -49,7 +49,7 @@ export class MapElementComponent implements OnInit {
     this.startingHeight = this.height;
     this.rasterBounds = mapData.bounds;
     this.baseMapImagePath = this.windowService.isMain() ? mapData.miniMapPath : mapData.path;
-    console.log(this.baseMapImagePath);
+    this.bigIsland = false;
 
     setTimeout(() => {
       this.planService.updateCSSWidth('map', 'map', this.width);
@@ -340,7 +340,7 @@ export class MapElementComponent implements OnInit {
 
   /** Updates the layers whenever a new year is received. */
   private updateMap(): void {
-    if (this.ready() && this.drawn) {
+    if (this.ready() && this.drawn && !this.isMiniMap) {
       this.layers.forEach(layer => {
         if (layer.layer.updateFunction !== null && layer.state === 1 && !this.windowService.isMain()) {
           layer.layer.updateFunction(this.planService, layer.state);

@@ -51,7 +51,7 @@ export const HecoPlan: Plan = {
     height: 2794,
     bounds: [[-158.281, 21.710], [-157.647, 21.252]],
     baseMapPath: 'assets/plans/oahu-heco/images/oahu-satellite5.png',
-    baseMiniMapPath: 'assets/plans/oahu-heco/images/oahu-grid-map.png',
+    baseMiniMapPath: 'assets/plans/oahu-heco/images/Oahu-mini.png',
     mapLayers: [
       {
         name: 'transmission',
@@ -71,8 +71,8 @@ export const HecoPlan: Plan = {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', this.fillColor)
-              .style('opacity', state === 1 ? 0.85 : 0.0)
-              .style('display', state === 1 ? 'block' : 'none')
+              .style('opacity', 0.85)
+              .style('display', 'none')
               .style('stroke', this.borderColor)
               .style('stroke-width', (this.borderWidth * parcel.properties.Voltage_kV) + 'px');
           });
@@ -80,8 +80,7 @@ export const HecoPlan: Plan = {
         updateFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('display', state === 1 ? 'block' : 'none')
-              .style('opacity', state ? 0.85 : 0.0);
+              .style('display', state === 1 ? 'block' : 'none');
           });
         },
         legend: [{ text: 'Transmission Lines', color: mapLayerColors.Transmission.border }],
@@ -110,8 +109,8 @@ export const HecoPlan: Plan = {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])
-              .style('display', state === 1 ? 'block' : 'none')
-              .style('opacity', state === 1 ? 0.85 : 0.0)
+              .style('display', 'none')
+              .style('opacity', 0.85)
               .style('stroke', this.borderColor)
               .style('stroke-width', this.borderWidth + 'px');
           });
@@ -119,8 +118,7 @@ export const HecoPlan: Plan = {
         updateFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('display', state === 1 ? 'block' : 'none')
-              .style('opacity', state ? 0.85 : 0.0);
+              .style('display', state === 1 ? 'block' : 'none');
           });
         },
         legend: [
@@ -193,16 +191,16 @@ export const HecoPlan: Plan = {
               if (windTotal > 0) {
                 d3.select(parcel.path)
                   .style('fill', this.fillColor)
-                  .style('display', state === 1 ? 'block' : 'none')
-                  .style('opacity', state === 1 ? 0.85 : 0.0)
+                  .style('display', 'none')
+                  .style('opacity', 0.85)
                   .style('stroke', this.borderColor)
                   .style('stroke-width', this.borderWidth + 'px');
                 windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
               } else {
                 d3.select(parcel.path)
                   .style('fill', 'transparent')
-                  .style('display', state === 1 ? 'block' : 'none')
-                  .style('opacity', state === 1 ? 0.85 : 0.0)
+                  .style('display', 'none')
+                  .style('opacity', 0.85)
                   .style('stroke', this.borderColor)
                   .style('stroke-width', this.borderWidth + 'px');
               }
@@ -216,13 +214,12 @@ export const HecoPlan: Plan = {
                 d3.select(parcel.path)
                   .style('fill', this.fillColor)
                   .style('display', state === 1 ? 'block' : 'none')
-                  .style('opacity', state ? 0.85 : 0.0);
+                  .style('opacity', 0.85);
                 windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
               } else {
                 d3.select(parcel.path)
                   .style('fill', 'transparent')
-                  .style('display', state === 1 ? 'block' : 'none')
-                  .style('opacity', state === 1 ? 0.85 : 0.0);
+                  .style('display', state === 1 ? 'block' : 'none');
               }
             }
           });
@@ -255,16 +252,16 @@ export const HecoPlan: Plan = {
               if (solarTotal > 0) {
                 d3.select(parcel.path)
                   .style('fill', this.fillColor)
-                  .style('display', state === 1 ? 'block' : 'none')
-                  .style('opacity', state === 1 ? 0.85 : 0.0)
+                  .style('display', 'none')
+                  .style('opacity', 0.85)
                   .style('stroke', this.borderColor)
                   .style('stroke-width', this.borderWidth + 'px');
                 solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
               } else {
                 d3.select(parcel.path)
                   .style('fill', 'transparent')
-                  .style('display', state === 1 ? 'block' : 'none')
-                  .style('opacity', state === 1 ? 0.85 : 0.0)
+                  .style('display', 'none')
+                  .style('opacity', 0.85)
                   .style('stroke', this.borderColor)
                   .style('stroke-width', this.borderWidth + 'px');
               }
@@ -279,14 +276,12 @@ export const HecoPlan: Plan = {
               if (solarTotal > 0) {
                 d3.select(parcel.path)
                   .style('fill', this.fillColor)
-                  .style('display', state === 1 ? 'block' : 'none')
-                  .style('opacity', state === 1 ? 0.85 : 0.0);
+                  .style('display', state === 1 ? 'block' : 'none');
                 solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
               } else {
                 d3.select(parcel.path)
                   .style('fill', 'transparent')
-                  .style('display', state === 1 ? 'block' : 'none')
-                  .style('opacity', state === 1 ? 0.85 : 0.0);
+                  .style('display', state === 1 ? 'block' : 'none');
               }
             }
           });
@@ -321,8 +316,8 @@ export const HecoPlan: Plan = {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])
-              .style('opacity', state === 1 ? 0.85 : 0.0)
-              .style('display', state === 1 ? 'block' : 'none')
+              .style('opacity', 0.8)
+              .style('display', 'none')
               .style('stroke', this.borderColor)
               .style('stroke-width', this.borderWidth + 'px');
           });
@@ -330,8 +325,7 @@ export const HecoPlan: Plan = {
         updateFunction(planService: PlanService, state: number) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('display', state === 1 ? 'block' : 'none')
-              .style('opacity', state === 1 ? 0.85 : 0.0);
+              .style('display', state === 1 ? 'block' : 'none');
           });
         },
         legend: [
@@ -366,21 +360,21 @@ export const HecoPlan: Plan = {
                 d3.select(parcel.path)
                   .style('fill', 'black')
                   .style('opacity', state === 1 ? 0.85 : 0.0)
-                  .style('display', state === 1 ? 'block' : 'none')
+                  .style('display', 'none')
                   .style('stroke', this.borderColor)
                   .style('stroke-width', this.borderWidth + 'px');
               } else if (solarTotal > 0) {
                 d3.select(parcel.path)
                   .style('fill', this.fillColor)
-                  .style('display', state === 1 ? 'block' : 'none')
-                  .style('opacity', state === 1 ? 0.85 : 0.0)
+                  .style('display', 'none')
+                  .style('opacity', 0.85)
                   .style('stroke', this.borderColor)
                   .style('stroke-width', this.borderWidth + 'px');
                 solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
               } else {
                 d3.select(parcel.path)
                   .style('fill', 'transparent')
-                  .style('display', state === 1 ? 'block' : 'none')
+                  .style('display', 'none')
                   .style('opacity', state === 1 ? 0.85 : 0.0)
                   .style('stroke', this.borderColor)
                   .style('stroke-width', this.borderWidth + 'px');
@@ -396,21 +390,18 @@ export const HecoPlan: Plan = {
               if (parcel.properties.IAL === 'Y') {
                 d3.select(parcel.path)
                   .style('fill', 'black')
-                  .style('opacity', (state === 1) ? 0.85 : 0.0)
                   .style('display', state === 1 ? 'block' : 'none')
                   .style('stroke', this.borderColor)
                   .style('stroke-width', this.borderWidth + 'px');
               } else if (solarTotal > 0) {
                 d3.select(parcel.path)
                   .style('fill', this.fillColor)
-                  .style('display', state === 1 ? 'block' : 'none')
-                  .style('opacity', (state === 1) ? 0.85 : 0.0);
+                  .style('display', state === 1 ? 'block' : 'none');
                 solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
               } else {
                 d3.select(parcel.path)
                   .style('fill', 'transparent')
-                  .style('display', state === 1 ? 'block' : 'none')
-                  .style('opacity', state === 1 ? 0.85 : 0.0);
+                  .style('display', state === 1 ? 'block' : 'none');
               }
             }
           });
@@ -511,8 +502,8 @@ export const HecoPlan: Plan = {
                   };
                   d3.select(parcel.path)
                     .style('fill', color)
-                    .style('display', state === 1 ? 'block' : 'none')
-                    .style('opacity', state === 1 ? 0.85 : 0.0);
+                    .style('display', 'none')
+                    .style('opacity', 0.85);
                 }
               }
             });
@@ -539,8 +530,7 @@ export const HecoPlan: Plan = {
                 };
                 d3.select(parcel.path)
                   .style('fill', color)
-                  .style('display', state === 1 ? 'block' : 'none')
-                  .style('opacity', state === 1 ? 1.00 : 0.0);
+                  .style('display', state === 1 ? 'block' : 'none');
               }
             }
           });

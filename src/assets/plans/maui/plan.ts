@@ -48,7 +48,7 @@ export const MauiPlan: Plan = {
     height: 2794,
     bounds: [[-156.6969, 21.03142], [-155.9788, 20.5746]],
     baseMapPath: 'assets/plans/maui/images/base-map.png',
-    baseMiniMapPath: 'assets/plans/maui/images/base-map.png',
+    baseMiniMapPath: 'assets/plans/maui/images/Maui-mini.png',
     mapLayers: [
       {
         name: 'transmission',
@@ -68,7 +68,8 @@ export const MauiPlan: Plan = {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', this.fillColor)
-              .style('opacity', this.active ? 0.85 : 0.0)
+              .style('opacity', 0.85)
+              .style('display', 'none')
               .style('stroke', this.borderColor)
               .style('stroke-width', (this.borderWidth * parcel.properties.Voltage_kV) + 'px');
           });
@@ -76,7 +77,7 @@ export const MauiPlan: Plan = {
         updateFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('opacity', state ? 0.85 : 0.0);
+              .style('display', state === 1 ? 'block' : 'none');
           });
         },
         legend: [{ text: 'Transmission Lines', color: mapLayerColors.Transmission.border }],
@@ -105,7 +106,8 @@ export const MauiPlan: Plan = {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])
-              .style('opacity', this.active ? 0.85 : 0.0)
+              .style('opacity', 0.85)
+              .style('display', 'none')
               .style('stroke', this.borderColor)
               .style('stroke-width', this.borderWidth + 'px');
           });
@@ -113,7 +115,7 @@ export const MauiPlan: Plan = {
         updateFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('opacity', state ? 0.85 : 0.0);
+              .style('display', state === 1 ? 'block' : 'none');
           });
         },
         legend: [
@@ -167,14 +169,16 @@ export const MauiPlan: Plan = {
             if (windTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('opacity', 0.85)
+                .style('display', 'none')
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
               windTotal -= (parcel.properties.MWac);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('opacity', 0.85)
+                .style('display', 'none')
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
             }
@@ -186,12 +190,12 @@ export const MauiPlan: Plan = {
             if (windTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('opacity', state ? 0.85 : 0.0);
+                .style('display', state === 1 ? 'block' : 'none');
               windTotal -= (parcel.properties.MWac);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('opacity', state ? 0.85 : 0.0);
+                .style('display', state === 1 ? 'block' : 'none');
             }
           });
         },
@@ -221,14 +225,16 @@ export const MauiPlan: Plan = {
             if (solarTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('opacity', 0.85)
+                .style('display', 'none')
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
               solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('opacity', 0.85)
+                .style('display', 'none')
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
             }
@@ -241,12 +247,12 @@ export const MauiPlan: Plan = {
             if (solarTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('opacity', state ? 0.85 : 0.0);
+                .style('display', state === 1 ? 'block' : 'none');
               solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('opacity', state ? 0.85 : 0.0);
+                .style('display', state === 1 ? 'block' : 'none');
             }
           });
         },
@@ -280,7 +286,8 @@ export const MauiPlan: Plan = {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])
-              .style('opacity', this.active ? 0.85 : 0.0)
+              .style('opacity', 0.85)
+              .style('display', 'none')
               .style('stroke', this.borderColor)
               .style('stroke-width', this.borderWidth + 'px');
           });
@@ -288,7 +295,7 @@ export const MauiPlan: Plan = {
         updateFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('opacity', state ? 0.85 : 0.0);
+              .style('display', state === 1 ? 'block' : 'none');
           });
         },
         legend: [

@@ -42,12 +42,12 @@ export const BigIslandPlan: Plan = {
   },
   map: {
     scale: 0.26,
-    miniMapScale: 0.1,
+    miniMapScale: 0.15,
     width: 2179,
     height: 2479,
     bounds: [[-156.0618, 20.2696], [-154.8067, 18.9105]],
     baseMapPath: 'assets/plans/bigisland/images/base-map.png',
-    baseMiniMapPath: 'assets/plans/bigisland/images/base-map.png',
+    baseMiniMapPath: 'assets/plans/bigisland/images/bi-mini.png',
     mapLayers: [
       {
         name: 'transmission',
@@ -67,7 +67,8 @@ export const BigIslandPlan: Plan = {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', this.fillColor)
-              .style('opacity', this.active ? 0.85 : 0.0)
+              .style('opacity', 0.85)
+              .style('display', 'none')
               .style('stroke', this.borderColor)
               .style('stroke-width', (this.borderWidth * parcel.properties.Voltage_kV) + 'px');
           });
@@ -75,7 +76,7 @@ export const BigIslandPlan: Plan = {
         updateFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('opacity', state ? 0.85 : 0.0);
+              .style('display', state ? 'block' : 'none');
           });
         },
         legend: [{ text: 'Transmission Lines', color: mapLayerColors.Transmission.border }]
@@ -104,7 +105,8 @@ export const BigIslandPlan: Plan = {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])
-              .style('opacity', this.active ? 0.85 : 0.0)
+              .style('opacity', 0.85)
+              .style('display', 'none')
               .style('stroke', this.borderColor)
               .style('stroke-width', this.borderWidth + 'px');
           });
@@ -112,7 +114,7 @@ export const BigIslandPlan: Plan = {
         updateFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('opacity', state ? 0.85 : 0.0);
+              .style('display', state ? 'block' : 'none');
           });
         },
         legend: [
@@ -143,14 +145,16 @@ export const BigIslandPlan: Plan = {
             if (solarTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('opacity', 0.85)
+                .style('display', 'none')
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
               solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('display', 'none')
+                .style('opacity', 0.85)
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
             }
@@ -163,12 +167,12 @@ export const BigIslandPlan: Plan = {
             if (solarTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('opacity', state ? 0.85 : 0.0);
+                .style('display', state ? 'block' : 'none');
               solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('opacity', state ? 0.85 : 0.0);
+                .style('display', state ? 'block' : 'none');
             }
           });
         },
@@ -198,14 +202,16 @@ export const BigIslandPlan: Plan = {
             if (windTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('opacity', 0.85)
+                .style('display', 'none')
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
               windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('opacity', (this.active) ? 0.85 : 0.0)
+                .style('opacity', 0.85)
+                .style('display', 'none')
                 .style('stroke', this.borderColor)
                 .style('stroke-width', this.borderWidth + 'px');
             }
@@ -217,12 +223,12 @@ export const BigIslandPlan: Plan = {
             if (windTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
-                .style('opacity', state ? 0.85 : 0.0);
+                .style('display', state ? 'block' : 'none');
               windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
             } else {
               d3.select(parcel.path)
                 .style('fill', 'transparent')
-                .style('opacity', state ? 0.85 : 0.0);
+                .style('display', state ? 'block' : 'none');
             }
           });
         },
@@ -256,7 +262,8 @@ export const BigIslandPlan: Plan = {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])
-              .style('opacity', this.active ? 0.85 : 0.0)
+              .style('opacity', 0.85)
+              .style('display', 'none')
               .style('stroke', this.borderColor)
               .style('stroke-width', this.borderWidth + 'px');
           });
@@ -264,7 +271,7 @@ export const BigIslandPlan: Plan = {
         updateFunction(planService: PlanService, state) {
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
-              .style('opacity', state ? 0.85 : 0.0);
+              .style('display', state ? 'block' : 'none');
           });
         },
         legend: [
