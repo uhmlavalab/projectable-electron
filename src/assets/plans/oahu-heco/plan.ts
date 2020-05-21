@@ -51,6 +51,7 @@ export const HecoPlan: Plan = {
     height: 2794,
     bounds: [[-158.281, 21.710], [-157.647, 21.252]],
     baseMapPath: 'assets/plans/oahu-heco/images/oahu-satellite5.png',
+    baseMiniMapPath: 'assets/plans/oahu-heco/images/oahu-grid-map.png',
     mapLayers: [
       {
         name: 'transmission',
@@ -188,39 +189,41 @@ export const HecoPlan: Plan = {
           };
           this.parcels.sort((a, b) => parseFloat(dictSort[a.properties.SPD_CLS]) - parseFloat(dictSort[b.properties.SPD_CLS]));
           this.parcels.sort((a, b) => parseFloat(b.properties.MWac) - parseFloat(a.properties.MWac));
-          this.parcels.forEach(parcel => {
-            if (windTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('display', state === 1 ? 'block' : 'none')
-                .style('opacity', state === 1 ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
-              windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
-            } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('display', state === 1 ? 'block' : 'none')
-                .style('opacity', state === 1 ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
-            }
+          this.parcels.forEach((parcel, index) => {
+              if (windTotal > 0) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('display', state === 1 ? 'block' : 'none')
+                  .style('opacity', state === 1 ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+                windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
+              } else {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('display', state === 1 ? 'block' : 'none')
+                  .style('opacity', state === 1 ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+              }
           });
         },
         updateFunction(planService: PlanService, state: number) {
           let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']) - 99;
-          this.parcels.forEach(parcel => {
-            if (windTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('display', state === 1 ? 'block' : 'none')
-                .style('opacity', state ? 0.85 : 0.0);
-              windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
-            } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('display', state === 1 ? 'block' : 'none')
-                .style('opacity', state === 1 ? 0.85 : 0.0);
+          this.parcels.forEach((parcel, index) => {
+            if (!planService.isMainWindow() || index % 5 === 0) {
+              if (windTotal > 0) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('display', state === 1 ? 'block' : 'none')
+                  .style('opacity', state ? 0.85 : 0.0);
+                windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
+              } else {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('display', state === 1 ? 'block' : 'none')
+                  .style('opacity', state === 1 ? 0.85 : 0.0);
+              }
             }
           });
         },
@@ -248,23 +251,23 @@ export const HecoPlan: Plan = {
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
           this.parcels.sort((a, b) => parseFloat(b.properties.cf_1) - parseFloat(a.properties.cf_1));
-          this.parcels.forEach(parcel => {
-            if (solarTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('display', state === 1 ? 'block' : 'none')
-                .style('opacity', state === 1 ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
-              solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
-            } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('display', state === 1 ? 'block' : 'none')
-                .style('opacity', state === 1 ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
-            }
+          this.parcels.forEach((parcel, index) => {
+              if (solarTotal > 0) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('display', state === 1 ? 'block' : 'none')
+                  .style('opacity', state === 1 ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+                solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
+              } else {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('display', state === 1 ? 'block' : 'none')
+                  .style('opacity', state === 1 ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+              }
           });
         },
         updateFunction(planService: PlanService, state: number) {
@@ -358,30 +361,30 @@ export const HecoPlan: Plan = {
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
           this.parcels.sort((a, b) => parseFloat(b.properties.cf_1) - parseFloat(a.properties.cf_1));
-          this.parcels.forEach(parcel => {
-            if (parcel.properties.IAL === 'Y') {
-              d3.select(parcel.path)
-                .style('fill', 'black')
-                .style('opacity', state === 1 ? 0.85 : 0.0)
-                .style('display', state === 1 ? 'block' : 'none')
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
-            } else if (solarTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('display', state === 1 ? 'block' : 'none')
-                .style('opacity', state === 1 ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
-              solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
-            } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('display', state === 1 ? 'block' : 'none')
-                .style('opacity', state === 1 ? 0.85 : 0.0)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
-            }
+          this.parcels.forEach((parcel, index) => {
+              if (parcel.properties.IAL === 'Y') {
+                d3.select(parcel.path)
+                  .style('fill', 'black')
+                  .style('opacity', state === 1 ? 0.85 : 0.0)
+                  .style('display', state === 1 ? 'block' : 'none')
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+              } else if (solarTotal > 0) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('display', state === 1 ? 'block' : 'none')
+                  .style('opacity', state === 1 ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+                solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
+              } else {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('display', state === 1 ? 'block' : 'none')
+                  .style('opacity', state === 1 ? 0.85 : 0.0)
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+              }
           });
         },
         updateFunction(planService: PlanService, state: number) {

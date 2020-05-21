@@ -36,10 +36,14 @@ app-border-line {
 }
 
 .pie {
-  padding-left: 8%;
-  padding-top: 8%;
+      padding-left: 17%;
+      padding-top: 10%;
 }
 
+.pie-3d {
+  position: relative;
+  top: -20px;
+}
 .line {
   margin-left: -12%;
   margin-top: -7%;
@@ -62,11 +66,31 @@ app-border-line {
   text-align: center;
 }
 
+.center-container>.top>.left-column {
+  width: 20%;
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  left: 12%;
+  padding-top: 0;
+}
+
+.center-container>.top>.right-column {
+  width: 20%;
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  left: 62%;
+  padding-top: 0;
+}
+
 
 .map-container {
-  width: 100%;
+  width: 60%;
   padding-top: 5%;
   position: relative;
+  display: inline-block;
+  left: -21%;
 }
 
 

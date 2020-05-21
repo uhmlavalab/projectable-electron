@@ -1,17 +1,19 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Scenario } from '@app/interfaces';
 import { PlanService } from '@app/services/plan.service';
-import { Scenario } from '@app/interfaces/scenario';
-import { chartColors } from '../../../../../assets/plans/defaultColors';
 
 @Component({
-  selector: 'app-pie-three-d',
-  templateUrl: './pie-three-d.component.html',
-  styleUrls: ['./pie-three-d.component.css']
+  selector: 'app-bar',
+  templateUrl: './bar.component.html',
+  styleUrls: ['./bar.component.css']
 })
-export class PieThreeDComponent implements AfterViewInit {
+export class BarComponent implements AfterViewInit {
+
+  @ViewChild('fossil', {static: false}) fosEl: ElementRef;
+  @ViewChild('renew', {static: false}) renEl: ElementRef;
   title: string;
   type: string;
-  data: any[];
+  data: any;
   columnNames: string[];
   options: any;
   width: number;
@@ -24,36 +26,9 @@ export class PieThreeDComponent implements AfterViewInit {
   myData: any;
   year: number;
   colors: string[];
+  text: string;
 
   constructor(private planService: PlanService) {
-    this.type = 'PieChart';
-    this.data = [
-
-    ];
-    this.columnNames = ['Browser', 'Percentage'];
-    this.options = {
-      width: 300,
-      height: 300,
-      backgroundColor: 'black',
-      color: 'white',
-      is3D: true,
-      animation: {
-        duration: 1000,
-        easing: 'out',
-        startup: true
-      },
-      legend: {
-        textStyle: {
-          color: 'white'
-        },
-        alignment: 'center'
-      },
-      chartArea: { left: 0, top: 0, width: '130%', height: '130%' },
-      title: 'Energy Generation',
-      titleTextStyle: {
-        color: 'white'
-      }
-    };
     this.allReady = {};
     this.allReady.planSet = false;
     this.allReady.scenarioSet = false;
@@ -61,20 +36,12 @@ export class PieThreeDComponent implements AfterViewInit {
     this.allReady.dataSet = false;
     this.width = 0;
     this.height = 0;
+    this.text = '';
   }
 
   ngAfterViewInit() {
-
-    // setTimeout( () => {
-    //   this.data = [
-    //     ['Firefox', 0.7],
-    //     ['IE', 26.8],
-    //     ['Chrome', 12.8],
-    //     ['Safari', 8.5],
-    //     ['Opera', 6.2],
-    //     ['Others', 45.0]
-    //   ];
-    // }, 10000);
+    this.fosEl.nativeElement.style.backgroundColor = 'red';
+    this.renEl.nativeElement.style.backgroundColor = 'green';
 
     this.planService.planSetSubject.subscribe(plan => {
       if (plan) {
@@ -174,7 +141,6 @@ export class PieThreeDComponent implements AfterViewInit {
       Object.keys(this.planData[scenario]).forEach(tech => {
 
         this.myData.generation[scenario].data.labels.push(tech);
-        this.myData.generation[scenario].data.datasets[0].backgroundColor.push(chartColors[tech]);
         this.myData.generation[scenario].data.datasets[0].borderColor.push('rgba(255,255,255,1)');
 
         Object.keys(this.planData[scenario][tech]).forEach(el => {
@@ -194,17 +160,25 @@ export class PieThreeDComponent implements AfterViewInit {
   private setData(): void {
     let total = 0;
     const curData = [];
-    const curLabels = [];
     this.myData.generation[this.scenario.name].yearlyData[this.year].forEach((d, index) => {
-      total += d;
       curData.push({ label: this.myData.generation[this.scenario.name].data.labels[index], val: d });
+      total += d;
     });
-    this.options.colors = this.myData.generation[this.scenario.name].data.datasets[0].backgroundColor;
     const tempData = [];
+    let renewTotal = 0;
     curData.forEach(d => {
-      tempData.push([d.label, d.val]);
+     if (d.label === 'Fossil') {
+       tempData.push([d.label, Math.round(d.val / total * 100)]);
+     } else {
+       renewTotal += d.val;
+     }
     });
-    this.data = tempData;
+
+    tempData.push(['Renewable Energy', Math.round(renewTotal / total * 100)]);
+
+    this.fosEl.nativeElement.style.height = tempData[0][1] + '%';
+    this.renEl.nativeElement.style.height = tempData[1][1] + '%';
+    this.text = `${tempData[1][1]}%`;
   }
 
 }

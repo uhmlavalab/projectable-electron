@@ -76,7 +76,8 @@ export class PlanService {
         width: 0,
         height: 0,
         bounds: null,
-        path: ''
+        path: '',
+        miniMapPath: ''
       },
       year: {
         all: [],  // This array holds all of the years in sorted order.  It is used to populate components.
@@ -160,6 +161,7 @@ export class PlanService {
     this.dataTable.map.height = plan.map.height;
     this.dataTable.map.bounds = plan.map.bounds;
     this.dataTable.map.path = plan.map.baseMapPath;
+    this.dataTable.map.miniMapPath = plan.map.baseMiniMapPath;
     this.dataTable.year.min = plan.minYear;
     this.dataTable.year.max = plan.maxYear;
     this.dataTable.year.current = plan.minYear;
@@ -439,7 +441,8 @@ export class PlanService {
       width: this.dataTable.map.width,
       height: this.dataTable.map.height,
       bounds: this.dataTable.map.bounds,
-      path: this.dataTable.map.path
+      path: this.dataTable.map.path,
+      miniMapPath: this.dataTable.map.miniMapPath
     };
   }
 

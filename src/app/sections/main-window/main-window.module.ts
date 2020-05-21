@@ -60,8 +60,8 @@ import { TooltipComponent } from './components/tooltip/tooltip.component';
       radius: 40,
       outerStrokeWidth: 4,
       innerStrokeWidth: 0,
-      outerStrokeColor: "#78C000",
-      innerStrokeColor: "#C7E596",
+      outerStrokeColor: '#78C000',
+      innerStrokeColor: '#C7E596',
       animationDuration: 700
     })
   ],

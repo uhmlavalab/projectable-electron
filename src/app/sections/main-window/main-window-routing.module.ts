@@ -15,7 +15,6 @@ const mainRoutes: Routes = [
       {
         path: 'plan-selection',
         component: PlanSelectionComponent,
-        
       },
       {
         path: 'touch-ui',

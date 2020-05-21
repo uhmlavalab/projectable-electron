@@ -18,6 +18,7 @@ export interface DataTable {
         height: number;
         bounds: any;
         path: string;
+        miniMapPath: string;
     };
     year: {
         all: number[];

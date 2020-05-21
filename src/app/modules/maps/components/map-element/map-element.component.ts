@@ -48,7 +48,8 @@ export class MapElementComponent implements OnInit {
     this.startingWidth = this.width;
     this.startingHeight = this.height;
     this.rasterBounds = mapData.bounds;
-    this.baseMapImagePath = mapData.path;
+    this.baseMapImagePath = this.windowService.isMain() ? mapData.miniMapPath : mapData.path;
+    console.log(this.baseMapImagePath);
 
     setTimeout(() => {
       this.planService.updateCSSWidth('map', 'map', this.width);
@@ -251,8 +252,8 @@ export class MapElementComponent implements OnInit {
           .enter().append('path')
           .attr('d', path)
           .attr('class', layer.name)
-          .each(function (d) {
-            layer.layer.parcels.push({ path: this, properties: (d.hasOwnProperty(`properties`)) ? d[`properties`] : null } as Parcel);
+          .each(function (d, index) {
+              layer.layer.parcels.push({ path: this, properties: (d.hasOwnProperty(`properties`)) ? d[`properties`] : null } as Parcel);
           }).call(() => {
             if (layer.layer.setupFunction !== null) {
               layer.layer.setupFunction(this.planService, layer.state);

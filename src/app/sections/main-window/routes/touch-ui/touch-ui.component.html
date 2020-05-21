@@ -4,7 +4,7 @@
 <div class="left-container">
   <div class="chart pie">
     <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Generation Chart')">
-    <app-pie-chart></app-pie-chart>
+    <app-pie-three-d class="pie-3d"></app-pie-three-d>
     
   </div>
   <div class="chart line">
@@ -18,8 +18,19 @@
   <div class="top">
     <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Mini Map')">
     <div class="section-title">{{sectionTitles.map}}</div>
+    <div class="left-column">
+      <app-gague-chart dataType="Fossil"></app-gague-chart>
+      <app-gague-chart dataType="DER"></app-gague-chart>
+      <app-gague-chart dataType="PV"></app-gague-chart>
+      <app-gague-chart dataType="Wind"></app-gague-chart>
+      <app-gague-chart dataType="Offshore"></app-gague-chart>
+    </div>
+    <div class="right-column">
+      <app-bar></app-bar>
+    </div>
     <app-map-element class="map-container" cdkDrag #map>
     </app-map-element>
+    
   </div>
   <div class="middle">
     <div class="left">

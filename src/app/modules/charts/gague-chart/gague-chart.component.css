@@ -1,0 +1,28 @@
+.gauge {
+    width: 40px;
+    height: 40px;
+    margin: 2px;
+    border: 1px solid black;
+    border-color: var(--menu-blue);
+    border-radius: 50%;
+    transition: background-image 0.5s ease-in-out;
+}
+
+.text {
+    font-size: 9px;
+    color: var(--main-text-color);
+    width: 40px;
+    position: relative;
+    text-align: center;
+    left: 3px;
+}
+
+.percentage {
+    font-size: 9px;
+    color: var(--main-text-color);
+    width: 40px;
+    text-align: center;
+    position: relative;
+    top: 6px;
+    
+}

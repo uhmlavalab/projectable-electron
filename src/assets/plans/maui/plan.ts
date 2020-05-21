@@ -48,6 +48,7 @@ export const MauiPlan: Plan = {
     height: 2794,
     bounds: [[-156.6969, 21.03142], [-155.9788, 20.5746]],
     baseMapPath: 'assets/plans/maui/images/base-map.png',
+    baseMiniMapPath: 'assets/plans/maui/images/base-map.png',
     mapLayers: [
       {
         name: 'transmission',

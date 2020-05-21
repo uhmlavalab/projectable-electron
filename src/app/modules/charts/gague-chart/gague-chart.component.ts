@@ -1,14 +1,17 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { Scenario } from '@app/interfaces';
 import { PlanService } from '@app/services/plan.service';
-import { Scenario } from '@app/interfaces/scenario';
-import { chartColors } from '../../../../../assets/plans/defaultColors';
+import { chartColors } from '../../../../assets/plans/defaultColors';
 
 @Component({
-  selector: 'app-pie-three-d',
-  templateUrl: './pie-three-d.component.html',
-  styleUrls: ['./pie-three-d.component.css']
+  selector: 'app-gague-chart',
+  templateUrl: './gague-chart.component.html',
+  styleUrls: ['./gague-chart.component.css']
 })
-export class PieThreeDComponent implements AfterViewInit {
+export class GagueChartComponent implements AfterViewInit {
+
+  @Input() dataType: string;
+  @ViewChild('gauge', {static: false}) el: ElementRef;
   title: string;
   type: string;
   data: any[];
@@ -24,36 +27,10 @@ export class PieThreeDComponent implements AfterViewInit {
   myData: any;
   year: number;
   colors: string[];
+  percentage: string;
 
   constructor(private planService: PlanService) {
-    this.type = 'PieChart';
-    this.data = [
 
-    ];
-    this.columnNames = ['Browser', 'Percentage'];
-    this.options = {
-      width: 300,
-      height: 300,
-      backgroundColor: 'black',
-      color: 'white',
-      is3D: true,
-      animation: {
-        duration: 1000,
-        easing: 'out',
-        startup: true
-      },
-      legend: {
-        textStyle: {
-          color: 'white'
-        },
-        alignment: 'center'
-      },
-      chartArea: { left: 0, top: 0, width: '130%', height: '130%' },
-      title: 'Energy Generation',
-      titleTextStyle: {
-        color: 'white'
-      }
-    };
     this.allReady = {};
     this.allReady.planSet = false;
     this.allReady.scenarioSet = false;
@@ -195,16 +172,23 @@ export class PieThreeDComponent implements AfterViewInit {
     let total = 0;
     const curData = [];
     const curLabels = [];
+    let color = '';
+
     this.myData.generation[this.scenario.name].yearlyData[this.year].forEach((d, index) => {
       total += d;
       curData.push({ label: this.myData.generation[this.scenario.name].data.labels[index], val: d });
+      if (curData[curData.length - 1].label === this.dataType) {
+      color = this.myData.generation[this.scenario.name].data.datasets[0].backgroundColor[index];
+      }
     });
-    this.options.colors = this.myData.generation[this.scenario.name].data.datasets[0].backgroundColor;
+
     const tempData = [];
     curData.forEach(d => {
-      tempData.push([d.label, d.val]);
+      if (d.label === this.dataType) {
+        tempData.push([d.label, Math.round(d.val / total * 100)]);
+      }
     });
-    this.data = tempData;
+    this.el.nativeElement.style.backgroundImage = `linear-gradient(to right, ${color} ${tempData[0][1]}%, rgba(155, 155, 155, 0.2) ${tempData[0][1] + .001}%`;
+    this.percentage = `${tempData[0][1]}%`;
   }
-
 }

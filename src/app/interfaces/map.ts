@@ -7,5 +7,6 @@ export interface Map {
   height: number;
   bounds: [[number, number], [number, number]];
   baseMapPath: string;
+  baseMiniMapPath: string;
   mapLayers: MapLayer[];
 }

@@ -1,7 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ChartModule } from 'angular-highcharts';
 
 // Modules
 import { SectionsModule } from '@app/sections';
@@ -22,8 +21,7 @@ import { PlanService } from './services/plan.service';
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    SectionsModule,
-    ChartModule
+    SectionsModule
   ],
   providers: [
     ContentDeliveryService,

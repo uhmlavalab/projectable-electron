@@ -96,6 +96,7 @@
     "node": ">=10.9.0"
   },
   "dependencies": {
+    "angular-google-charts": "^1.1.4",
     "angular-highcharts": "^9.0.9",
     "highcharts": "^8.1.0",
     "ng-circle-progress": "^1.5.1"
