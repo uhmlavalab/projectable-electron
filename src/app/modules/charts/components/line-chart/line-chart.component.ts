@@ -144,6 +144,13 @@ export class LineChartComponent implements AfterViewInit {
   createLineChart(labels: any[], datasets: any[]) {
     this.ctx = this.chartDiv.nativeElement.getContext('2d');
     this.myChart = new Chart(this.ctx, {
+      plugins: [{
+        beforeInit: function (chart, options) {
+          chart.legend.afterFit = function () {
+            this.height = this.height + 40;
+          };
+        }
+      }],
       type: 'line',
       options: {
         responsive: false,
@@ -170,7 +177,8 @@ export class LineChartComponent implements AfterViewInit {
           labels: {
             fontColor: 'rgb(209, 235, 236)',
             fontStyle: 'bold',
-            fontSize: 12
+            fontSize: 12,
+            padding: 20
           }
         },
         scales: {

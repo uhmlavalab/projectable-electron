@@ -43,10 +43,7 @@ export class PieThreeDComponent implements AfterViewInit {
         startup: true
       },
       legend: {
-        textStyle: {
-          color: 'white'
-        },
-        alignment: 'center'
+        position: 'none'
       },
       chartArea: { left: 0, top: 0, width: '130%', height: '130%' },
       title: 'Energy Generation',

@@ -47,9 +47,10 @@ export class LayerButtonComponent implements OnInit, AfterViewInit {
 
   /** Positions the block.  These values are hard coded and changing them will mess up the positioning. */
   private positionBlock() {
-    this.block.nativeElement.style.width = `${this.progressRadius + 25}px`;
-    this.block.nativeElement.style.height = `${this.progressRadius + 25}px`;
-    this.block.nativeElement.style.left = '9px';
+    this.block.nativeElement.style.width = `${this.progressRadius + 34}px`;
+    this.block.nativeElement.style.height = `${this.progressRadius + 34}px`;
+    this.block.nativeElement.style.left = '7px';
+    this.block.nativeElement.style.top = '-5px';
   }
 
   /** The block constatly rotates whether it is visible or not.  To stop the animation the opacity is toggled. */
