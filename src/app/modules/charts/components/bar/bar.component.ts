@@ -40,8 +40,8 @@ export class BarComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.fosEl.nativeElement.style.backgroundColor = 'red';
-    this.renEl.nativeElement.style.backgroundColor = 'green';
+    this.fosEl.nativeElement.style.backgroundColor = 'rgba(209, 235, 236, 0.3)';
+    this.renEl.nativeElement.style.backgroundColor = 'rgb(156, 210, 207)';
 
     this.planService.planSetSubject.subscribe(plan => {
       if (plan) {

@@ -12,6 +12,8 @@ export class GagueChartComponent implements AfterViewInit {
 
   @Input() dataType: string;
   @ViewChild('gauge', {static: false}) el: ElementRef;
+  @ViewChild('percentageText', {static: false}) perText: ElementRef;
+
   title: string;
   type: string;
   data: any[];
@@ -171,14 +173,11 @@ export class GagueChartComponent implements AfterViewInit {
   private setData(): void {
     let total = 0;
     const curData = [];
-    const curLabels = [];
-    let color = '';
 
     this.myData.generation[this.scenario.name].yearlyData[this.year].forEach((d, index) => {
       total += d;
       curData.push({ label: this.myData.generation[this.scenario.name].data.labels[index], val: d });
       if (curData[curData.length - 1].label === this.dataType) {
-      color = this.myData.generation[this.scenario.name].data.datasets[0].backgroundColor[index];
       }
     });
 
@@ -188,7 +187,12 @@ export class GagueChartComponent implements AfterViewInit {
         tempData.push([d.label, Math.round(d.val / total * 100)]);
       }
     });
-    this.el.nativeElement.style.backgroundImage = `linear-gradient(to right, ${color} ${tempData[0][1]}%, rgba(155, 155, 155, 0.2) ${tempData[0][1] + .001}%`;
+    this.el.nativeElement.style.backgroundImage = `linear-gradient(to right, rgb(156, 210, 207) ${tempData[0][1]}%, rgba(255, 255, 255, 0.2) ${tempData[0][1] + .001}%`;
     this.percentage = `${tempData[0][1]}%`;
+    if (tempData[0][1] > 55) {
+      this.perText.nativeElement.style.color = 'black';
+    } else {
+      this.perText.nativeElement.style.color = 'rgb(209, 235, 236)';
+    }
   }
 }

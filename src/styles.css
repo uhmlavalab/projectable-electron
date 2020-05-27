@@ -11,6 +11,7 @@
   --main-text-color: rgb(209, 235, 236);
   --menu-blue: rgb(156, 210, 207);
 }
+
 body {
   font-family: 'Dalton Maag - Elevon OneG', Arial, sans-serif;
   width: 100%;
@@ -19,6 +20,7 @@ body {
   background-color: black;
   color: var(--main-text-color);
 }
+
 .hidden {
   display: none;
 }

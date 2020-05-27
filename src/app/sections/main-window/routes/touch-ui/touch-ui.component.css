@@ -73,6 +73,7 @@ app-border-line {
   vertical-align: top;
   left: 12%;
   padding-top: 0;
+  margin-top: -2%;
 }
 
 .center-container>.top>.right-column {
@@ -80,8 +81,9 @@ app-border-line {
   position: relative;
   display: inline-block;
   vertical-align: top;
-  left: 62%;
+  left: 60%;
   padding-top: 0;
+  margin-top: -3%;
 }
 
 

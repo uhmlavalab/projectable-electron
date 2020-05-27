@@ -9,12 +9,13 @@
 }
 
 .text {
-    font-size: 9px;
+    font-size: 10px;
     color: var(--main-text-color);
-    width: 40px;
+    width: 60px;
     position: relative;
     text-align: center;
-    left: 3px;
+    left: -5px;
+    letter-spacing: 1.3px;
 }
 
 .percentage {
@@ -24,5 +25,5 @@
     text-align: center;
     position: relative;
     top: 6px;
-    
+    font-weight: bold;
 }
