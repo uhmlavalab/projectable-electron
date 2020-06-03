@@ -38,8 +38,7 @@ export class PieThreeDComponent implements AfterViewInit {
       color: 'white',
       is3D: true,
       animation: {
-        duration: 1000,
-        easing: 'out',
+        duration: 300,
         startup: true
       },
       legend: {

@@ -93,6 +93,7 @@ export class MapElementComponent implements OnInit {
     this.planService.resizeSubject.subscribe(data => {
       if (data) {
         if (data.id === 'resize map') {
+          console.log(data.percent);
           const percentage = data.percent / 100 * 2;
           if (this.width === 0) {
             this.planService.updateCSSWidth('map', 'map', this.width);

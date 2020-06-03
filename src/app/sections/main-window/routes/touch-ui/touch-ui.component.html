@@ -19,11 +19,7 @@
     <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Mini Map')">
     <div class="section-title">{{sectionTitles.map}}</div>
     <div class="left-column">
-      <app-gague-chart dataType="Fossil"></app-gague-chart>
-      <app-gague-chart dataType="DER"></app-gague-chart>
-      <app-gague-chart dataType="PV"></app-gague-chart>
-      <app-gague-chart dataType="Wind"></app-gague-chart>
-      <app-gague-chart dataType="Offshore"></app-gague-chart>
+      <app-gague-chart *ngFor="let tech of technologies" dataType={{tech.name}} class="gauge"></app-gague-chart>
     </div>
     <div class="right-column">
       <app-bar></app-bar>

@@ -4,6 +4,10 @@
   <div class="settings-expansion-wrapper" #extraMap>
     <p>Resize Map</p>
     <app-slider width="90" horizontal="true" type="resize map" category="map" name="map"></app-slider>
+    <div class="small-adjustment-wrapper">
+      <div class="minus" (click)="shrink('map')">-</div>
+      <div class="plus" (click)="grow('map')">+</div>
+    </div>
      <div class="button show-hide" (click)="hide('map')">Hide</div>
      <div class="button show-hide" (click)="show('map')">Show</div>
   </div>
@@ -14,6 +18,10 @@
   <div class="settings-expansion-wrapper" #extraPie>
     <p>Resize Pie Chart</p>
     <app-slider width="90" horizontal="true" type="resize pie" category="charts" name="pie"></app-slider>
+    <div class="small-adjustment-wrapper">
+      <div class="minus" (click)="shrink('pie')">-</div>
+      <div class="plus" (click)="grow('pie')">+</div>
+    </div>
      <div class="button show-hide" (click)="hide('pie')">Hide</div>
      <div class="button show-hide" (click)="show('pie')">Show</div>
   </div>
@@ -24,6 +32,10 @@
   <div class="settings-expansion-wrapper" #extraLine>
     <p>Resize Line Chart</p>
     <app-slider width="90" horizontal="true" type="resize line" category="charts" name="line"></app-slider>
+      <div class="small-adjustment-wrapper">
+        <div class="minus" (click)="shrink('line')">-</div>
+        <div class="plus" (click)="grow('line')">+</div>
+      </div>
      <div class="button show-hide" (click)="hide('line')">Hide</div>
      <div class="button show-hide" (click)="show('line')">Show</div>
   </div>
@@ -34,6 +46,10 @@
   <div class="settings-expansion-wrapper" #extraData>
     <p>Resize Data Display</p>
     <app-slider width="90" horizontal="true" type="resize data" category="data" name="data"></app-slider>
+    <div class="small-adjustment-wrapper">
+      <div class="minus" (click)="shrink('data')">-</div>
+      <div class="plus" (click)="grow('data')">+</div>
+    </div>
      <div class="button show-hide" (click)="hide('data')">Hide</div>
      <div class="button show-hide" (click)="show('data')">Show</div>
   </div>
@@ -44,6 +60,10 @@
   <div class="settings-expansion-wrapper" #extraLava>
     <p>Resize Lava Logo</p>
     <app-slider width="90" horizontal="true" type="resize lava" category="logos" name="lava"></app-slider>
+    <div class="small-adjustment-wrapper">
+      <div class="minus" (click)="shrink('lava')">-</div>
+      <div class="plus" (click)="grow('lava')">+</div>
+    </div>
     <div class="button show-hide" (click)="hide('lava')">Hide</div>
     <div class="button show-hide" (click)="show('lava')">Show</div>
   </div>
@@ -54,6 +74,10 @@
   <div class="settings-expansion-wrapper" #extraHeco>
     <p>Resize Heco Logo</p>
     <app-slider width="90" horizontal="true" type="resize heco" category="logos" name="heco"></app-slider>
+    <div class="small-adjustment-wrapper">
+      <div class="minus" (click)="shrink('heco')">-</div>
+      <div class="plus" (click)="grow('heco')">+</div>
+    </div>
     <div class="button show-hide" (click)="hide('heco')">Hide</div>
     <div class="button show-hide" (click)="show('heco')">Show</div>
   </div>

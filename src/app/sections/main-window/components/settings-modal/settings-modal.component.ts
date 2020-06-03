@@ -30,7 +30,8 @@ export class SettingsModalComponent implements AfterViewInit {
   private touchId: number;
   private isSet: boolean;
   private z: number;
-  private elements: { tag: string; category: string; e: ElementRef; extraE: ElementRef; top: number; left: number, extra: boolean }[];
+  // tslint:disable-next-line: max-line-length
+  private elements: { tag: string; category: string; e: ElementRef; extraE: ElementRef; top: number; left: number, extra: boolean, id: string }[];
   private cssData: any;
   private windowData: any;
   private positionHistory: { x: number, y: number }[];
@@ -50,12 +51,13 @@ export class SettingsModalComponent implements AfterViewInit {
     this.planService.getOtherWindowData();
 
     this.elements = [
-      { tag: 'map', category: 'map', e: this.mapElement, extraE: this.extraMap, top: 0, left: 0, extra: false },
-      { tag: 'pie', category: 'charts', e: this.pieElement, extraE: this.extraPie, top: 0, left: 0, extra: false },
-      { tag: 'line', category: 'charts', e: this.lineElement, extraE: this.extraLine, top: 0, left: 0, extra: false },
-      { tag: 'data', category: 'data', e: this.displayDataElement, extraE: this.extraData, top: 0, left: 0, extra: false },
-      { tag: 'heco', category: 'logos', e: this.hecoLogoElement, extraE: this.extraHeco, top: 0, left: 0, extra: false },
-      { tag: 'lava', category: 'logos', e: this.lavaLogoElement, extraE: this.extraLava, top: 0, left: 0, extra: false }
+      { tag: 'map', category: 'map', e: this.mapElement, extraE: this.extraMap, top: 0, left: 0, extra: false, id: 'resize map' },
+      { tag: 'pie', category: 'charts', e: this.pieElement, extraE: this.extraPie, top: 0, left: 0, extra: false, id: 'resize pie' },
+      { tag: 'line', category: 'charts', e: this.lineElement, extraE: this.extraLine, top: 0, left: 0, extra: false, id: 'resize line' },
+      // tslint:disable-next-line: max-line-length
+      { tag: 'data', category: 'data', e: this.displayDataElement, extraE: this.extraData, top: 0, left: 0, extra: false, id: 'resize data' },
+      { tag: 'heco', category: 'logos', e: this.hecoLogoElement, extraE: this.extraHeco, top: 0, left: 0, extra: false, id: 'resize heco' },
+      { tag: 'lava', category: 'logos', e: this.lavaLogoElement, extraE: this.extraLava, top: 0, left: 0, extra: false, id: 'resize lava' }
     ];
 
     this.planService.cssSubject.subscribe(data => {
@@ -156,7 +158,7 @@ export class SettingsModalComponent implements AfterViewInit {
             identifier,
             this.convertPixelToPercentage(element.left, true),
             this.convertPixelToPercentage(element.top, false)
-            );
+          );
           this.positionHistory = [this.positionHistory[this.positionHistory.length - 1]];
         }
       }
@@ -184,21 +186,16 @@ export class SettingsModalComponent implements AfterViewInit {
   }
 
   private convertPixelToPercentage(pixelValue: number, width: boolean): number {
-      return width ? pixelValue / window.innerWidth * 100 : pixelValue / window.innerHeight * 100;
+    return width ? pixelValue / window.innerWidth * 100 : pixelValue / window.innerHeight * 100;
   }
   // tslint:disable-next-line: max-line-length
   private positionElement(css: any, e: { tag: string; category: string; e: ElementRef; extraE: ElementRef, top: number, left: number }): void {
     try {
-      const percentage = e.category ? css[e.category][e.tag].percent / 100 * 2 : css[e.tag].percent / 100 * 2;
-      // tslint:disable-next-line: max-line-length
-      const widthPercent = e.category ? css[e.category][e.tag].width * percentage / this.windowData.width * 100 : css[e.tag].width * percentage / this.windowData.width * 100;
-      // tslint:disable-next-line: max-line-length
-      const heightPercent = e.category ? css[e.category][e.tag].height * percentage / this.windowData.height * 100 : css[e.tag].height * percentage / this.windowData.height * 100;
-      e.e.nativeElement.style.width = widthPercent < 10 ? `200px` : `${widthPercent}%`;
-      e.e.nativeElement.style.height = widthPercent < 20 ? `200px` : `${heightPercent}%`;
-      e.top = this.convertCoordinates(e.category ? parseInt(css[e.category][e.tag].top.split('px')[0], 10) : parseInt(css[e.tag].top.split('px')[0], 10), true);
-      // tslint:disable-next-line: max-line-length
-      e.left = this.convertCoordinates(e.category ? parseInt(css[e.category][e.tag].left.split('px')[0], 10) : parseInt(css[e.tag].left.split('px')[0], 10), false);
+      const percentage = css[e.category][e.tag].percent / 100 * 2;
+      e.e.nativeElement.style.width = `200px`;
+      e.e.nativeElement.style.height = `200px`;
+      e.top = this.convertCoordinates(parseInt(css[e.category][e.tag].top.split('px')[0], 10), true);
+      e.left = this.convertCoordinates(parseInt(css[e.category][e.tag].left.split('px')[0], 10), false);
       e.e.nativeElement.style.left = `${e.left}px`;
       e.e.nativeElement.style.top = `${e.top}px`;
 
@@ -208,7 +205,7 @@ export class SettingsModalComponent implements AfterViewInit {
   }
 
   private convertCoordinates(val: number, top: boolean): number {
-    const percent =  top ? val / this.windowData.height : val / this.windowData.width;
+    const percent = top ? val / this.windowData.height : val / this.windowData.width;
     return top ? percent * window.innerHeight : percent * window.innerWidth;
   }
 
@@ -232,5 +229,15 @@ export class SettingsModalComponent implements AfterViewInit {
 
   private proceed(): void {
     this.instructionsView.nativeElement.style.display = 'none';
+  }
+
+  private shrink(tag: string): void {
+    const el = this.elements.find( e => e.tag === tag);
+    this.planService.handleSizeAdjustmentClick(-0.3, el.category, tag, el.id);
+  }
+
+  private grow(tag: string): void {
+    const el = this.elements.find(e => e.tag === tag);
+    this.planService.handleSizeAdjustmentClick(0.3, el.category, tag, el.id);
   }
 }

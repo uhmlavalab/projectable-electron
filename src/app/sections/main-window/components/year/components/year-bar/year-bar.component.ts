@@ -11,7 +11,7 @@ export class YearBarComponent implements AfterViewInit {
 
   @Input() data: number;
   @ViewChildren('rectangle', { read: ElementRef }) rects: QueryList<ElementRef>;
-  
+
   private year: number;
   private techArray: any[];
   private inputData: any;
@@ -37,7 +37,7 @@ export class YearBarComponent implements AfterViewInit {
         this.scenario = scenario;
         this.allReady.scenarioSet = true;
         if (this.set || (!this.set && this.componentIsReady())) {
-          this.setBarLength();
+          setTimeout(() => this.setBarLength(), 600);
         }
       }
     });

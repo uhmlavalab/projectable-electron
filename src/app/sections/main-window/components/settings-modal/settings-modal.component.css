@@ -163,3 +163,24 @@
 .finish {
   z-index: 100000000;
 }
+
+.small-adjustment-wrapper {
+  width: 100%;
+  position: relative;
+  text-align: center;
+}
+
+.plus {
+  width: 30px;
+  border: 1px solid purple;
+  padding: 10px;
+  display: inline-block;
+  margin: 10px 10px 5px 10px;
+}
+.minus {
+  width: 30px;
+  border: 1px solid purple;
+  padding: 10px;
+  display: inline-block;
+ margin: 10px 10px 5px 10px;
+}

@@ -20,6 +20,7 @@ export class TouchUiComponent implements AfterViewInit {
   private allReady: {layersSet: boolean; planSet: boolean; yearSet: boolean; scenarioSet: boolean; };  // Necessary elements.
   private settingsIconPath: string;    // Path to the settings icon.
   private showSettingsModal: boolean;  // True, show the reposition modal, false hide it.
+  private technologies: {name: string; color: string}[];
 
   constructor( private planService: PlanService, private windowService: WindowService) {
     this.setupComplete = false;
@@ -29,6 +30,7 @@ export class TouchUiComponent implements AfterViewInit {
     this.layers = [];
     this.tooltip = { displaying: false, path: '../../../../../assets/images/tooltip.png',  currentlySelected: 'none'};
     this.settingsIconPath = '../../../../../assets/images/gear-icon.png';
+    this.technologies = [];
   }
 
   ngAfterViewInit() {
@@ -84,6 +86,13 @@ export class TouchUiComponent implements AfterViewInit {
         this.showSettingsModal = val;
       }
     });
+
+    this.planService.technologySubject.subscribe((val: any) => {
+      if (val) {
+        this.technologies = val;
+        console.log(this.technologies);
+      }
+    })
 
     this.windowService.getFileData();  // Nptifies the window service to get the data from any files and publish it.
 

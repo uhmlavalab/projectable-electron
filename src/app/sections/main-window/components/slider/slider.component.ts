@@ -41,6 +41,14 @@ export class SliderComponent implements AfterViewInit {
       }
     });
 
+    this.planService.adjustSliderPositionSubject.subscribe(val => {
+      if (val) {
+        if (val.id === this.type) {
+          this.updateSlidePosition(val.percent);
+        }
+      }
+    });
+
     // Mouse Event Listeners
     this.slideElement.nativeElement.addEventListener('mousedown', () => this.startDrag());
     this.slideElement.nativeElement.addEventListener('mouseup', () => this.stopDragging());
@@ -134,5 +142,12 @@ export class SliderComponent implements AfterViewInit {
     if (pos >= 0) {
       this.slideElement.nativeElement.style.left = `${pos}%`;
     }
+  }
+
+  /** Moves the slider tab when plus or minus is clicked.
+   * @param data this is css data.  It is referenced against the type of the slider.  CSS data paths are hardcoded.
+   */
+  private updateSlidePosition(pos: number): void {
+      this.slideElement.nativeElement.style.left = `${pos}%`;
   }
 }

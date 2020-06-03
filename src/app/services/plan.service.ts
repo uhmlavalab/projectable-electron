@@ -9,6 +9,8 @@ import { SoundsService } from '@app/sounds';
 import * as d3 from 'd3/d3.min';
 import { WindowService } from '@app/modules/window';
 import { DataTable } from '@app/interfaces/data-table';
+import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
+import { Message } from '@angular/compiler/src/i18n/i18n_ast';
 
 @Injectable({
   providedIn: 'root'
@@ -38,6 +40,8 @@ export class PlanService {
   public resizeSubject = new BehaviorSubject<{ id: string, width: number, height: number, percent: number }>(null);
   public closeModalSubject = new BehaviorSubject<{ saveData: boolean }>(null);           // Notifies the position modal to close.
   public revertPositionsSubject = new BehaviorSubject<object>(null);   // Reverts repositioning on the map screen when changes are canceled.
+  // changes slider tab when plus or minus is clicked.
+  public adjustSliderPositionSubject = new BehaviorSubject<{ percent: number, id: string }>(null);
   public capDataSubject = new BehaviorSubject<object>(null);           // Publishes capacity data.
   public genDataSubject = new BehaviorSubject<object>(null);           // Publishes the generation data.
   public curDataSubject = new BehaviorSubject<object>(null);           // Puslishes the curtailment data.
@@ -52,7 +56,7 @@ export class PlanService {
   public redrawPathsSubject = new BehaviorSubject<boolean>(false);     // If the map is resized and saved, tells map to redraw parcel paths.
   public settingsModalOpenedSubject = new BehaviorSubject<boolean>(false); // When the modal is opened, the map needs to turn off layers.
   public settingsCanceledSubject = new BehaviorSubject<boolean>(false); // When modal closed, turn layers back of if they were off.
-  public laserPointerSubject = new BehaviorSubject<{x: number, y: number, start: boolean, end: boolean}>(null);
+  public laserPointerSubject = new BehaviorSubject<{ x: number, y: number, start: boolean, end: boolean }>(null);
 
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
     this.freshCss = true;            // Fresh css is set to true before checking.
@@ -478,6 +482,14 @@ export class PlanService {
     this.closeModalSubject.next({ saveData: save });
     if (this.windowService.isMain() && !save) {
       this.revertPositionsSubject.next(this.CSS[this.dataTable.plan.name]);
+      // Reset Data table
+      this.dataTable.positionData.percents = {
+        lava: -1,
+        map: -1,
+        pie: -1,
+        heco: -1,
+        data: -1
+      };
     }
   }
 
@@ -584,13 +596,13 @@ export class PlanService {
           }
         );
       }
-      if (css_path.map.percent && css_path.map.percent > 0) {
+      if (css_path.map.map.percent && css_path.map.map.percent > 0) {
         this.resizeSubject.next(
           {
             id: 'resize map',
-            width: css_path.map.width,
-            height: css_path.map.height,
-            percent: css_path.map.percent
+            width: css_path.map.map.width,
+            height: css_path.map.map.height,
+            percent: css_path.map.map.percent
           }
         );
       }
@@ -761,16 +773,32 @@ export class PlanService {
    * @param id a string that identifies the slider.  ie. Map resize, etc.
    */
   public handleSliderChange(percentFromLeft: number, id: string, category: string, name: string) {
-    let width = 0;
-    let height = 0;
     const css_path = this.CSS[this.dataTable.plan.name][category][name];
     this.dataTable.positionData.percents[name] = percentFromLeft;
-    width = css_path.width;
-    height = css_path.height;
+    const width = css_path.width;
+    const height = css_path.height;
     if (this.windowService.isMain()) {
       // tslint:disable-next-line: max-line-length
       this.windowService.sendMessage({ type: 'resize', message: { percent: percentFromLeft, id: id, width: width, height: height, category: category, name: name } });
     }
+  }
+
+  /** The setting modal has the option to increase or decrease the scale by small increments.  This is essentially the
+   * same function as the handleSliderChange except it changes the percentage by 0.5% in either direction.
+   */
+  public handleSizeAdjustmentClick(val: number, category: string, name: string, id: string) {
+    const css_path = this.CSS[this.dataTable.plan.name][category][name];
+    if (this.dataTable.positionData.percents[name] === -1 || !this.dataTable.positionData.percents[name]) {
+      this.dataTable.positionData.percents[name] = parseFloat(css_path.percent);
+    }
+    this.dataTable.positionData.percents[name] += val;
+    const width = css_path.width;
+    const height = css_path.height;
+    if (this.windowService.isMain()) {
+      // tslint:disable-next-line: max-line-length
+      this.windowService.sendMessage({ type: 'resize', message: { percent: this.dataTable.positionData.percents[name], id: id, width: width, height: height, category: category, name: name } });
+    }
+    this.adjustSliderPositionSubject.next({ percent: this.dataTable.positionData.percents[name], id: id });
   }
 
   /** Toggles the selected layer and messages the other window.
@@ -888,9 +916,9 @@ export class PlanService {
             }
           );
         }
-        if (css_path.map.percent && css_path.map.percent > 0) {
+        if (css_path.map.map.percent && css_path.map.map.percent > 0) {
           // tslint:disable-next-line: max-line-length
-          this.resizeSubject.next({ id: 'resize map', width: css_path.map.width, height: css_path.map.height, percent: css_path.map.percent });
+          this.resizeSubject.next({ id: 'resize map', width: css_path.map.map.width, height: css_path.map.map.height, percent: css_path.map.map.percent });
         }
         if (css_path.charts.pie.percent && css_path.charts.pie.percent > 0) {
           // tslint:disable-next-line: max-line-length

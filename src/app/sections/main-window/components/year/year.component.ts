@@ -49,7 +49,9 @@ export class YearComponent implements AfterViewInit {
     this.planService.scenarioSubject.subscribe(scenario => {
       if (scenario) {
         this.displayData.scenario = scenario.displayName;
-      }
+        const waitTime = this.fadeYearBars(true);
+        setTimeout(() => this.fadeYearBars(false), waitTime);
+        }
     });
 
 
@@ -86,5 +88,20 @@ export class YearComponent implements AfterViewInit {
       currentPosition += angle;
     });
     this.planService.finishedYearBarSetup(); // Set the data in the plan Service.
+  }
+
+  /** When a scenario is changed, the years are faded out one at a time then faded back in.
+   * @param out true if fading out, false if fading in.
+   */
+  private fadeYearBars(out: boolean): number {
+    const multiplier = 20;
+    const opacity = out ? 0 : 1;
+    const elements = this.yearBars.toArray();
+    elements.forEach((e, index) => {
+      setTimeout(() => {
+        e.nativeElement.style.opacity = opacity;
+      }, index * multiplier);
+    });
+    return multiplier * elements.length - 1;
   }
 }

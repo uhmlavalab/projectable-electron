@@ -441,16 +441,16 @@ export class ScrollingMenuComponent implements AfterViewInit {
       this.intervalRunning = true;
       this.speedInterval = setInterval(() => {
         if (this.optionsData[this.getCenterIndex()].value != this.selectedOption.value) {
-          this.moveEachOption(5);            // Move each element 5 pixels at a time.
+          this.moveEachOption(30);            // Move each element 5 pixels at a time.
           this.positionOptions();
-          this.runningTotal = this.checkRunningTotal(5);
+          this.runningTotal = this.checkRunningTotal(30);
         } else {  // When the correct element is in the center, stop the animation and update the correct values.
           clearInterval(this.speedInterval);
           this.intervalRunning = false;
           this.selectedValue = this.selectedOption.value;
           this.centerSelectedValue();
         }
-      }, 4);
+      }, 5);
     }
   }
 
