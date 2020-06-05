@@ -1,7 +1,8 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
 import { Scenario } from '@app/interfaces/scenario';
 import { chartColors } from '../../../../../assets/plans/defaultColors';
+
 
 @Component({
   selector: 'app-pie-three-d',
@@ -9,9 +10,12 @@ import { chartColors } from '../../../../../assets/plans/defaultColors';
   styleUrls: ['./pie-three-d.component.css']
 })
 export class PieThreeDComponent implements AfterViewInit {
+
+  @ViewChild('testChart', { static: false }) testChart: ElementRef;
+
   title: string;
   type: string;
-  data: any[];
+  data: any;
   columnNames: string[];
   options: any;
   width: number;
@@ -24,13 +28,10 @@ export class PieThreeDComponent implements AfterViewInit {
   myData: any;
   year: number;
   colors: string[];
+  chart: any;
 
   constructor(private planService: PlanService) {
-    this.type = 'PieChart';
-    this.data = [
 
-    ];
-    this.columnNames = ['Browser', 'Percentage'];
     this.options = {
       width: 300,
       height: 300,
@@ -59,18 +60,11 @@ export class PieThreeDComponent implements AfterViewInit {
     this.height = 0;
   }
 
-  ngAfterViewInit() {
 
-    // setTimeout( () => {
-    //   this.data = [
-    //     ['Firefox', 0.7],
-    //     ['IE', 26.8],
-    //     ['Chrome', 12.8],
-    //     ['Safari', 8.5],
-    //     ['Opera', 6.2],
-    //     ['Others', 45.0]
-    //   ];
-    // }, 10000);
+
+  ngAfterViewInit() {
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(this.drawChart);
 
     this.planService.planSetSubject.subscribe(plan => {
       if (plan) {
@@ -197,10 +191,23 @@ export class PieThreeDComponent implements AfterViewInit {
     });
     this.options.colors = this.myData.generation[this.scenario.name].data.datasets[0].backgroundColor;
     const tempData = [];
+    tempData.push(['Tech', 'Val']);
     curData.forEach(d => {
       tempData.push([d.label, d.val]);
     });
     this.data = tempData;
+    this.drawChart();
+  }
+
+  drawChart = () => {
+    try {
+      const data = google.visualization.arrayToDataTable(this.data);
+      const chart = new google.visualization.PieChart(this.testChart.nativeElement);
+      chart.draw(data, this.options);
+    } catch (e) {
+      // Fail
+    }
+
   }
 
 }

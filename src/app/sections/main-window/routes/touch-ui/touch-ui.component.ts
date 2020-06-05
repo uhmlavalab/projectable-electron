@@ -13,22 +13,22 @@ export class TouchUiComponent implements AfterViewInit {
   @ViewChild('year', { static: false, read: ElementRef }) yearElement: ElementRef;
   @ViewChild('ttip', { static: false, read: ElementRef }) toolTip: ElementRef;
 
-  private layers: {layer: MapLayer, state: number}[];              // Array containing all Layers (used to populate toggle buttons).
-  private sectionTitles: {layer: string; map: string; scenario: string; };  // Used to label HTML elements.
+  private layers: { layer: MapLayer, state: number }[];              // Array containing all Layers (used to populate toggle buttons).
+  private sectionTitles: { layer: string; map: string; scenario: string; };  // Used to label HTML elements.
   private tooltip: { displaying: boolean, path: string; currentlySelected: string; }; // Tooltip data
   private setupComplete: boolean;      // True when all necessary elements are published by the plan service.
-  private allReady: {layersSet: boolean; planSet: boolean; yearSet: boolean; scenarioSet: boolean; };  // Necessary elements.
+  private allReady: { layersSet: boolean; planSet: boolean; yearSet: boolean; scenarioSet: boolean; };  // Necessary elements.
   private settingsIconPath: string;    // Path to the settings icon.
   private showSettingsModal: boolean;  // True, show the reposition modal, false hide it.
-  private technologies: {name: string; color: string}[];
+  private technologies: { name: string; color: string }[];
 
-  constructor( private planService: PlanService, private windowService: WindowService) {
+  constructor(private planService: PlanService, private windowService: WindowService) {
     this.setupComplete = false;
     this.showSettingsModal = false;
-    this.sectionTitles = {layer: 'Layer Toggles', map: 'Mini Map', scenario: 'Scenario'};
-    this.allReady = {layersSet: false, planSet: false, yearSet: false, scenarioSet: false};
+    this.sectionTitles = { layer: 'Layer Toggles', map: 'Mini Map', scenario: 'Scenario' };
+    this.allReady = { layersSet: false, planSet: false, yearSet: false, scenarioSet: false };
     this.layers = [];
-    this.tooltip = { displaying: false, path: '../../../../../assets/images/tooltip.png',  currentlySelected: 'none'};
+    this.tooltip = { displaying: false, path: '../../../../../assets/images/tooltip.png', currentlySelected: 'none' };
     this.settingsIconPath = '../../../../../assets/images/gear-icon.png';
     this.technologies = [];
   }
@@ -43,7 +43,7 @@ export class TouchUiComponent implements AfterViewInit {
     // Stores the layers to populate the layer toggle buttons.
     this.planService.layersSubject.subscribe(layers => {
       if (layers) {
-        this.layers = layers;
+        setTimeout(() => { this.layers = layers; });
         if (!this.allReady.layersSet) {
           this.allReady.layersSet = true;
           this.isSetupComplete();
@@ -90,9 +90,8 @@ export class TouchUiComponent implements AfterViewInit {
     this.planService.technologySubject.subscribe((val: any) => {
       if (val) {
         this.technologies = val;
-        console.log(this.technologies);
       }
-    })
+    });
 
     this.windowService.getFileData();  // Nptifies the window service to get the data from any files and publish it.
 

@@ -31,9 +31,6 @@ export class YearDataDisplayComponent implements OnInit {
     this.planService.precentRenewableByYearSubject.subscribe(percent => {
       if (percent) {
         this.percentRenewable = percent;
-      } else {
-        this.percentRenewable = 0;
-        setTimeout(() => this.planService.requestPercentageUpdate(), 500);
       }
       this.cdr.detectChanges();
     });

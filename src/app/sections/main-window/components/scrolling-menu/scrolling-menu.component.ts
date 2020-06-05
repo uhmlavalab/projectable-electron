@@ -28,7 +28,7 @@ export class ScrollingMenuComponent implements AfterViewInit {
   private speedDecayRate: number;
   private speedInterval: any;
   private repeatRate: number;
-   // Sentinal that detects if there is an interval associated with this menu.  Prevents losing track of any intervals.
+  // Sentinal that detects if there is an interval associated with this menu.  Prevents losing track of any intervals.
   private intervalRunning: boolean;
   private center: number; // Holds the value of the center of the visible menu div.
   private dividedHeight: number;
@@ -68,11 +68,13 @@ export class ScrollingMenuComponent implements AfterViewInit {
       if (value) {
         value.forEach(val => {
           if (val.type === this.type) {
-            this.options = val.data;
-            if (this.options.length < this.numberVisible) {
-              this.scrolling = false;
-            }
-            this.selectedValue = val.data[0];
+            setTimeout(() => {
+              this.options = val.data;
+              if (this.options.length < this.numberVisible) {
+                this.scrolling = false;
+              }
+              this.selectedValue = val.data[0];
+            });
             // Wait 100 ms for the ngfor to update the dom.
             setTimeout(() => {
               this.center = this.findCenter();  // Set the center of the visible menu window.
@@ -321,7 +323,6 @@ export class ScrollingMenuComponent implements AfterViewInit {
   private updateSelectedOption(): void {
     const centerIndex = this.getCenterIndex();  // Gets the index of the array that is in the center of the window.
     // Make certain the index is valid and the value at this index is different than the current value.
-    console.log(this.stopped);
     if ((centerIndex >= 0 && (this.optionsData[centerIndex].value !== this.selectedValue)) || this.stopped) {
       this.selectedOption = this.optionsData[centerIndex];                        // Update the selected option
       this.planService.handleMenuChange(this.type, this.selectedOption.value, this.stopped);    // Notify plan service of the change.

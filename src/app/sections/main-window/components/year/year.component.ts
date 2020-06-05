@@ -16,14 +16,14 @@ export class YearComponent implements AfterViewInit {
   @ViewChild('yearWrapper', { static: false }) yearWrapperElement: ElementRef;     // A wrapper around the year bars.
   @ViewChildren('yearBar', { read: ElementRef }) yearBars: QueryList<ElementRef>;  // QueryList containing the year bars.
 
-  private displayData: {year: number; percentRenewable: number; scenario: string; };  // All Display Data
+  private displayData: { year: number; percentRenewable: number; scenario: string; };  // All Display Data
   private years: number[];           // Array for all possible years. (used to populate year-bar components.)
   private barLength: number;         // Length of the year bar.
 
   constructor(private planService: PlanService) {
     this.years = [];
     this.barLength = 40;
-    this.displayData = {year: 2016, percentRenewable: 0, scenario: ''};
+    this.displayData = { year: 2016, percentRenewable: 0, scenario: '' };
   }
 
   ngAfterViewInit() {
@@ -31,7 +31,7 @@ export class YearComponent implements AfterViewInit {
 
     this.planService.yearSubject.subscribe(year => {
       if (year) {
-        this.displayData.year = year;
+        setTimeout(() => this.displayData.year = year);
       }
     });
 
@@ -39,7 +39,7 @@ export class YearComponent implements AfterViewInit {
       if (percent) {
         this.displayData.percentRenewable = percent;
         if (percent === 0) {
-          setTimeout( () => {
+          setTimeout(() => {
             this.planService.updateYear(this.displayData.year, false);
           }, 5000);
         }
@@ -48,16 +48,16 @@ export class YearComponent implements AfterViewInit {
 
     this.planService.scenarioSubject.subscribe(scenario => {
       if (scenario) {
-        this.displayData.scenario = scenario.displayName;
+        setTimeout(() => this.displayData.scenario = scenario.displayName);
         const waitTime = this.fadeYearBars(true);
         setTimeout(() => this.fadeYearBars(false), waitTime);
-        }
+      }
     });
 
 
     this.planService.yearsSubject.subscribe(years => {
       if (years) {
-        this.years = years;  // Sets years.  It is used to populate the year-bars.
+        setTimeout(() => this.years = years);  // Sets years.  It is used to populate the year-bars.
         setTimeout(() => {
           this.positionElements();
         }, 500);

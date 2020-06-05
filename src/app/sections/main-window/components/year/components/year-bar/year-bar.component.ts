@@ -85,7 +85,6 @@ export class YearBarComponent implements AfterViewInit {
     const sizes = [];
     let total = 0;
     let values = 0;
-    let fossil = 0;
     Object.keys(this.inputData[this.scenario.name]).forEach(tech => {
       this.inputData[this.scenario.name][tech].forEach(year => {
         if (year.year == this.data) {

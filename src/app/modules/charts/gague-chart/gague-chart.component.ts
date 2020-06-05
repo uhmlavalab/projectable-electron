@@ -11,8 +11,8 @@ import { chartColors } from '../../../../assets/plans/defaultColors';
 export class GagueChartComponent implements AfterViewInit {
 
   @Input() dataType: string;
-  @ViewChild('gauge', {static: false}) el: ElementRef;
-  @ViewChild('percentageText', {static: false}) perText: ElementRef;
+  @ViewChild('gauge', { static: false }) el: ElementRef;
+  @ViewChild('percentageText', { static: false }) perText: ElementRef;
 
   title: string;
   type: string;
@@ -44,17 +44,6 @@ export class GagueChartComponent implements AfterViewInit {
 
   ngAfterViewInit() {
 
-    // setTimeout( () => {
-    //   this.data = [
-    //     ['Firefox', 0.7],
-    //     ['IE', 26.8],
-    //     ['Chrome', 12.8],
-    //     ['Safari', 8.5],
-    //     ['Opera', 6.2],
-    //     ['Others', 45.0]
-    //   ];
-    // }, 10000);
-
     this.planService.planSetSubject.subscribe(plan => {
       if (plan) {
         this.allReady.planSet = true;
@@ -64,22 +53,28 @@ export class GagueChartComponent implements AfterViewInit {
 
     this.planService.scenarioSubject.subscribe(scenario => {
       if (scenario) {
-        this.updateScenario(scenario);
-        this.checkReadyState();
+        setTimeout(() => {
+          this.updateScenario(scenario);
+          this.checkReadyState();
+        });
       }
     });
 
     this.planService.yearSubject.subscribe(year => {
       if (year) {
-        this.updateYear(year);
-        this.checkReadyState();
+        setTimeout(() => {
+          this.updateYear(year);
+          this.checkReadyState();
+        });
       }
     });
 
     this.planService.genDataSubject.subscribe(value => {
       if (value) {
-        this.updateData(value);
-        this.checkReadyState();
+        setTimeout(() => {
+          this.updateData(value);
+          this.checkReadyState();
+        });
       }
     });
 

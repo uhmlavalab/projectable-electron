@@ -169,6 +169,7 @@ export class PlanService {
     this.dataTable.year.min = plan.minYear;
     this.dataTable.year.max = plan.maxYear;
     this.dataTable.year.current = plan.minYear;
+    this.getYears();  // Loads all years into the datatable
     this.dataTable.scenario.all = plan.scenarios;  // Load array with all scenarios associated with this plan
     this.dataTable.scenario.name = plan.scenarios[0].name;
     this.dataTable.scenario.display = plan.scenarios[0].displayName;
@@ -190,6 +191,7 @@ export class PlanService {
     this.scenarioSubject.next(this.dataTable.scenario.all[this.dataTable.scenario.currentIndex]); // Publish current scenario
     this.layersSubject.next(this.dataTable.layers.all);      // Publish all layers used in the application.
     this.publishScrollingMenuData();                         // Populate the scrolling menus.
+    this.updateNewPercentage();
   }
 
   /** Loads all data (Curtailment, Generation, Capacity) into the data table.
@@ -228,7 +230,7 @@ export class PlanService {
     try {
       technologies.forEach(tech => {
         this.dataTable.data.generation[this.dataTable.scenario.name][tech].forEach(el => {
-          if (el.year === this.dataTable.year.current) {
+          if (el.year == this.dataTable.year.current) {
             generationTotal += el.value;
           }
         });
@@ -243,8 +245,9 @@ export class PlanService {
   public getCapacityTotalForCurrentYear(technologies: string[]): number {
     let capacityTotal = 0;
     technologies.forEach(tech => {
+      console.log(this.dataTable.data.capacity[this.dataTable.scenario.name][tech]);
       this.dataTable.data.capacity[this.dataTable.scenario.name][tech].forEach(el => {
-        if (el.year === this.dataTable.year.current) {
+        if (el.year == this.dataTable.year.current) {
           capacityTotal += el.value;
         }
       });
@@ -256,7 +259,7 @@ export class PlanService {
     let curtailmentTotal = 0;
     technologies.forEach(tech => {
       this.dataTable.data.curtailment[this.dataTable.scenario.name][tech].forEach(el => {
-        if (el.year === this.dataTable.year.current) {
+        if (el.year == this.dataTable.year.current) {
           curtailmentTotal += el.value;
         }
       });
@@ -401,15 +404,34 @@ export class PlanService {
       // tslint:disable-next-line: triple-equals
       const scenario = this.dataTable.scenario.all.find(s => s.name == scenarioName);  // Find the correct scenario in the datatable.
       if (scenario) {
+        this.dataTable.renewableTotals = [];
         this.dataTable.scenario.currentIndex = this.dataTable.scenario.all.indexOf(scenario);  // Update the scenario index.
         this.dataTable.scenario.name = scenario.name;                                          // Update Scenario Name
         this.dataTable.scenario.display = scenario.displayName;                                // Update the Scenario display name.
         this.scenarioSubject.next(scenario);                                                   // Publish scenairo
         this.yearSubject.next(this.dataTable.year.current);                  // Force app to update data by resending year.
-        this.precentRenewableByYearSubject.next(this.setCurrentPercent(this.dataTable.year.current));  // Update renewable precentage.
+        this.updateNewPercentage();
         if (this.windowService.isMain()) {
           this.soundsService.playScenario(scenarioName);
         }
+      }
+    }
+  }
+
+  /** When the scenario is changed, we need to update the data displaying the renewable percentage.  The renewable percentages
+   * are stored in the datatable.renewableTotals.  These values are populated by the year-bars so there must be enough time for 
+   * all data to be calculated.  This function checkes every 100 seconds to make sure the correct number of data points is
+   * avalible before seeing the value.
+   */
+  private updateNewPercentage() {
+    if (this.dataTable.renewableTotals.length !== this.dataTable.year.all.length) {
+      setTimeout(() => {
+        this.updateNewPercentage();
+      }, 200);
+    } else {
+      this.precentRenewableByYearSubject.next(this.setCurrentPercent(this.dataTable.year.current));  // Update renewable precentage.
+      if (this.windowService.isMain) {
+        this.windowService.sendMessage({ type: 'percent change', message: this.dataTable.year.currentRenewablePercent });
       }
     }
   }
@@ -518,6 +540,7 @@ export class PlanService {
     for (let i = this.dataTable.year.min; i <= this.dataTable.year.max; i++) {
       arr.push(i);
     }
+    this.dataTable.year.all = arr;
     return arr;
   }
 

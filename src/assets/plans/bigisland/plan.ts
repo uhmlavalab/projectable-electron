@@ -162,17 +162,18 @@ export const BigIslandPlan: Plan = {
         },
         updateFunction(planService: PlanService, state) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
-          console.log(solarTotal);
-          this.parcels.forEach(parcel => {
-            if (solarTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('display', state ? 'block' : 'none');
-              solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
-            } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('display', state ? 'block' : 'none');
+          this.parcels.forEach((parcel, index) => {
+            if (!planService.isMainWindow() || index % 7 === 0) {
+              if (solarTotal > 0) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('display', state ? 'block' : 'none');
+                solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
+              } else {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('display', state ? 'block' : 'none');
+              }
             }
           });
         },
@@ -219,16 +220,18 @@ export const BigIslandPlan: Plan = {
         },
         updateFunction(planService: PlanService, state) {
           let windTotal = planService.getGenerationTotalForCurrentYear(['Wind']);
-          this.parcels.forEach(parcel => {
-            if (windTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('display', state ? 'block' : 'none');
-              windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
-            } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('display', state ? 'block' : 'none');
+          this.parcels.forEach((parcel, index) => {
+            if (!planService.isMainWindow() || index % 7 === 0) {
+              if (windTotal > 0) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('display', state ? 'block' : 'none');
+                windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
+              } else {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('display', state ? 'block' : 'none');
+              }
             }
           });
         },

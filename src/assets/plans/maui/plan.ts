@@ -158,7 +158,8 @@ export const MauiPlan: Plan = {
         filePath: 'assets/plans/maui/layers/wind.json',
         parcels: [],
         setupFunction(planService: PlanService) {
-          let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']) / 3 - 72;
+          //let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']) / 3 - 72;
+          let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']);
           const dictSort = {
             '8.5+': 0,
             '7.5-8.5': 1,
@@ -185,17 +186,20 @@ export const MauiPlan: Plan = {
           });
         },
         updateFunction(planService: PlanService, state) {
-          let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']) / 3 - 72;
-          this.parcels.forEach(parcel => {
-            if (windTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('display', state === 1 ? 'block' : 'none');
-              windTotal -= (parcel.properties.MWac);
-            } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('display', state === 1 ? 'block' : 'none');
+          //let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']) / 3 - 72;
+          let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']);
+          this.parcels.forEach((parcel, index) => {
+            if (!planService.isMainWindow() || index % 7 === 0) {
+              if (windTotal > 0) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('display', state === 1 ? 'block' : 'none');
+                windTotal -= (parcel.properties.MWac);
+              } else {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('display', state === 1 ? 'block' : 'none');
+              }
             }
           });
         },
@@ -242,17 +246,18 @@ export const MauiPlan: Plan = {
         },
         updateFunction(planService: PlanService, state) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
-          console.log(solarTotal);
-          this.parcels.forEach(parcel => {
-            if (solarTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('display', state === 1 ? 'block' : 'none');
-              solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
-            } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('display', state === 1 ? 'block' : 'none');
+          this.parcels.forEach((parcel, index) => {
+            if (!planService.isMainWindow() || index % 7 === 0) {
+              if (solarTotal > 0) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('display', state === 1 ? 'block' : 'none');
+                solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
+              } else {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('display', state === 1 ? 'block' : 'none');
+              }
             }
           });
         },
