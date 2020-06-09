@@ -245,7 +245,6 @@ export class PlanService {
   public getCapacityTotalForCurrentYear(technologies: string[]): number {
     let capacityTotal = 0;
     technologies.forEach(tech => {
-      console.log(this.dataTable.data.capacity[this.dataTable.scenario.name][tech]);
       this.dataTable.data.capacity[this.dataTable.scenario.name][tech].forEach(el => {
         if (el.year == this.dataTable.year.current) {
           capacityTotal += el.value;

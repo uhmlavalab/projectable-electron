@@ -42,12 +42,12 @@ app-border-line {
 
 .pie-3d {
   position: relative;
-  top: -20px;
+  top: 40px;
 }
 
 .line {
-  margin-left: -12%;
-  margin-top: -25%;
+  margin-left: -2%;
+  margin-top: -4%;
 }
 
 .gauge {
@@ -250,37 +250,37 @@ app-border-line {
 }
 
 .center-container>.top>.tooltip {
-  left: 7%;
-  top: 8%;
+  left: 42%;
+  top: 9.5%;
 }
 
 .line>.tooltip {
-  left: 11%;
-  top: -4%;
+  left: -3%;
+  top: 24%;
 }
 
 .pie>.tooltip {
-  left: -1%;
-  top: 1%;
+  left: 10%;
+  top: 21%;
 }
 
 .right-container>.top>.tooltip {
-  left: 15%;
+  left: 32%;
 }
 
 .middle>.left>.tooltip {
-  left: 10%;
-  top: 25%;
+  left: 11%;
+  top: 24%;
 }
 
 .middle>.middle>.tooltip {
   left: 42%;
-  top: 38%;
+  top: 35%;
 }
 
 .middle>.right>.tooltip {
-  left: 92%;
-  top: 47%;
+  left: 89%;
+  top: 47.8%;
 }
 
 .right>.top>.tooltip {
