@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, screen } from 'electron';
 import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -17,20 +17,18 @@ export class WindowService {
   constructor(private router: Router, private ngZone: NgZone) {
     this.windowName = '';
     this.fileData = [];
-    ipcRenderer.on('window-is-set', (event, message) => {
-      if (message.windowName == 'main') {
-        this.setAsMainWindow();
-      } else if (message.windowName == 'map') {
-        this.setAsMapWindow();
-      }
-    });
+    ipcRenderer.on('message-for-unset-window', (event, message) => this.unsetWindowMessage(event, message));
+  }
+
+  private newMsg(data: any) {
+    console.log(data);
   }
 
   public setAsMainWindow() {
     this.windowName = 'main';
-    ipcRenderer.removeListener('window-is-set', () => { });
+    ipcRenderer.removeListener('message-for-unset-window', () => { });
+    ipcRenderer.send('message-to-unset-window', { type: 'set-window', windowName: 'map' });
     ipcRenderer.send('set-main-window');
-    ipcRenderer.on('message-for-main-window', (event, message) => this.mainWindowMessage(event, message));
     this.ngZone.run(() => {
       this.router.navigate(['main-window']);
     });
@@ -38,7 +36,8 @@ export class WindowService {
 
   public setAsMapWindow() {
     this.windowName = 'map';
-    ipcRenderer.removeListener('window-is-set', () => { });
+    ipcRenderer.removeListener('message-for-unset-window', () => { });
+    ipcRenderer.send('message-to-unset-window', { type: 'set-window', windowName: 'main' });
     ipcRenderer.send('set-map-window');
     ipcRenderer.on('message-for-map-window', (event, message) => this.mapWindowMessage(event, message));
     this.ngZone.run(() => {
@@ -61,6 +60,18 @@ export class WindowService {
     this.windowMessageSubject.next(data);
     //console.log(data);
   }
+
+  private unsetWindowMessage(event: Electron.IpcRendererEvent, data: any) {
+    this.resetCheck(data.reset);
+    if (data.type === 'set-window' && this.windowName === '') {
+      if (data.windowName === 'map') {
+        this.setAsMapWindow();
+      } else if (data.windowNAme === 'main') {
+        this.setAsMainWindow();
+      }
+    }
+  }
+
 
   public sendMessage(data: any) {
     if (this.windowName == 'map') {
@@ -98,12 +109,12 @@ export class WindowService {
     ipcRenderer.on('fileLoaded', (event, message) => {
       this.fileData.push(JSON.parse(message));
       ipcRenderer.removeListener('fileLoaded', () => { });
-     }
+    }
     );
   }
 
   public getFileData(): void {
-    this.sendMessage({type: 'file information', message: this.fileData});
+    this.sendMessage({ type: 'file information', message: this.fileData });
   }
 
   public getCssFileData(): any {
