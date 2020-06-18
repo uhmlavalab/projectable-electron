@@ -161,11 +161,7 @@ export class MapElementComponent implements OnInit {
     // Track changes in the current year.
     this.planService.yearSubject.subscribe(year => {
       if (year) {
-        if (this.windowService.isMain()) {
-          this.updateYear(year);
-        } else {
-          this.updateYear(year);
-        }
+        this.updateYear(year);
       }
     });
 
@@ -314,7 +310,6 @@ export class MapElementComponent implements OnInit {
     layer.parcels.forEach(el => {
       d3.select(el.path)
         .style('fill', layer.fillColor)
-        .style('opacity', state === 1 ? 0.85 : 0.0)
         .style('display', state === 1 ? 'block' : 'none')
         .style('stroke', layer.borderColor)
         .style('stroke-width', layer.borderWidth + 'px');
@@ -339,9 +334,9 @@ export class MapElementComponent implements OnInit {
 
   /** Updates the layers whenever a new year is received. */
   private updateMap(): void {
-    if (this.ready() && this.drawn && !this.isMiniMap) {
+    if (this.ready() && this.drawn) {
       this.layers.forEach(layer => {
-        if (layer.layer.updateFunction !== null && layer.state === 1 && !this.windowService.isMain()) {
+        if (layer.layer.updateFunction !== null && layer.state === 1) {
           layer.layer.updateFunction(this.planService, layer.state);
         }
       });

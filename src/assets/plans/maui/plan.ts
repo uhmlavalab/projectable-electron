@@ -46,7 +46,7 @@ export const MauiPlan: Plan = {
     miniMapScale: 0.1,
     width: 3613,
     height: 2794,
-    bounds: [[-156.6969, 21.03142], [-155.9788, 20.5746]],
+    bounds: [[-156.73638889, 21.06722222], [-155.94361111, 20.46472222]],
     baseMapPath: 'assets/plans/maui/images/base-map.png',
     baseMiniMapPath: 'assets/plans/maui/images/Maui-mini.png',
     mapLayers: [
@@ -187,9 +187,9 @@ export const MauiPlan: Plan = {
         },
         updateFunction(planService: PlanService, state) {
           //let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']) / 3 - 72;
-          let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']);
+          let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']) - 72;
           this.parcels.forEach((parcel, index) => {
-            if (!planService.isMainWindow() || index % 7 === 0) {
+            if (!planService.isMainWindow() || index % 3 === 0) {
               if (windTotal > 0) {
                 d3.select(parcel.path)
                   .style('fill', this.fillColor)
