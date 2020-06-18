@@ -11,7 +11,7 @@ const args = process.argv.slice(1);
 const serve = args.some(val => val === '--serve');
 
 function createWindows() {
-  
+
   mapWindow = null;
   mainWindow = null;
 
@@ -38,7 +38,7 @@ function createWindows() {
         mapWindow = el;
         mapWindow.webContents.send('map-window-confirmation', 'Map Window successfully set.');
       }
-    })
+    });
     if (mainWindow && mapWindow) {
       closeExtraWindows();
     }
@@ -63,6 +63,12 @@ function createWindows() {
     if (mapWindow) {
       mapWindow.webContents.send('message-for-map-window', msg);
     }
+  });
+
+  ipcMain.on('message-to-unset-window', (evt, msg) => {
+    windows.forEach(el => {
+      el.webContents.send('message-for-unset-window', msg);
+    });
   });
 
   ipcMain.on('clear-window-selections', (evt, msg) => {
@@ -113,7 +119,7 @@ function setupWindow(display: Display): BrowserWindow {
       hardResetMethod: 'exit'
     });
     window.loadURL('http://localhost:4200');
-    // window.webContents.openDevTools();
+
   } else {
     window.loadURL(url.format({
       pathname: path.join(__dirname, 'dist/index.html'),
