@@ -1,11 +1,18 @@
-.grid-container {
-  display: grid;
-  grid-template-columns: 15vw 25vw 20vw 25vw 15vw;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+.container {
+  width: 100%;
+  position: relative;
+  text-align: center;
 }
 
-.grid-item {
-  width: 100%;
+.start-text {
+  font-size: 30px;
+  width: 60%;
+  left: 20%;
+  position: relative;
+  top: 10%;
+}
+.spinning-button {
+  margin-top: 6%;
+  position: relative;
+  left: 38%;
 }

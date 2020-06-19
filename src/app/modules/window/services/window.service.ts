@@ -12,16 +12,30 @@ export class WindowService {
 
   windowName: string;
   windowMessageSubject = new Subject<any>();
+  numWindowsSubject = new Subject<any>();
   fileData: string[];
+  numWindows: any;
+  checkNumWindowsInterval: any;
 
   constructor(private router: Router, private ngZone: NgZone) {
     this.windowName = '';
     this.fileData = [];
     ipcRenderer.on('message-for-unset-window', (event, message) => this.unsetWindowMessage(event, message));
+    ipcRenderer.on('num-windows', (event, arg) => {
+      this.numWindows = arg;
+      this.numWindowsSubject.next(this.numWindows);
+    });
+    this.checkNumWindowsInterval = setInterval(() => {
+      if (this.numWindows === 2) {
+        clearInterval(this.checkNumWindowsInterval); 
+      } else {
+        ipcRenderer.send('check-num-windows');
+      }
+    }, 100);
   }
 
-  private newMsg(data: any) {
-    console.log(data);
+  public getNumWindows(): any {
+    return this.numWindows;
   }
 
   public setAsMainWindow() {
@@ -43,6 +57,11 @@ export class WindowService {
     this.ngZone.run(() => {
       this.router.navigate(['map-window']);
     });
+  }
+
+  public removeWindow() {
+    ipcRenderer.send('remove-window', 'remove');
+    
   }
 
   public isMain(): boolean {

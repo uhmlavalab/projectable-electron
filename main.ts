@@ -47,11 +47,15 @@ function createWindows() {
   ipcMain.on('remove-window', (evt, msg) => {
     for (let i = 0; i < windows.length; i++) {
       if (windows[i].webContents === evt.sender) {
+        windows[i].close();
         windows.splice(i, 1);
       }
     }
   });
 
+  ipcMain.on('check-num-windows', (event) => {
+    event.reply('num-windows', windows.length);
+  });
 
   ipcMain.on('message-to-main-window', (evt, msg) => {
     if (mainWindow) {
@@ -98,6 +102,8 @@ function createWindows() {
       functions.loadFile(mainWindow, msg);
     }
   });
+
+
   ipcMain.on('close', () => closeProgram());
 }
 
@@ -107,7 +113,7 @@ function setupWindow(display: Display): BrowserWindow {
     y: 0 + display.bounds.y,
     width: display.workAreaSize.width * display.scaleFactor,
     height: display.workAreaSize.height * display.scaleFactor,
-    fullscreen: false,
+    fullscreen: true,
     frame: false,
     webPreferences: {
       nodeIntegration: true,

@@ -1,17 +1,15 @@
-<div class="grid-container">
-
-  <div class="grid-item"></div>
-
-  <div class="grid-item">
-    <app-spinning-button text="Main" color="#00d2ff" (click)="setAsMainWindow()"></app-spinning-button>
+<div class="container">
+<span *ngIf="numWindows <= 2">
+  <div class="start-text">Press Start on the Touch Screen to begin.</div>
+  <div class="spinning-button">
+    <app-spinning-button text="Start" color="#00d2ff" (click)="setAsMainWindow()"></app-spinning-button>
   </div>
+</span>
 
-  <div class="grid-item"></div>
-
-  <div class="grid-item">
-    <app-spinning-button text="Map" color="#00d2ff" (click)="setAsMapWindow()"></app-spinning-button>
+<span *ngIf="numWindows > 2">
+  <div class="start-text">We have detected more than 2 displays. Click 'Remove' on any screen that will not be used by the application.</div>
+  <div class="spinning-button">
+    <app-spinning-button text="Remove" color="#00d2ff" (click)="removeWindow()"></app-spinning-button>
   </div>
-
-  <div class="grid-item"></div>
-
+</span>
 </div>
