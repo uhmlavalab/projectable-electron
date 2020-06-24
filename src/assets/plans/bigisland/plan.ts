@@ -4,7 +4,7 @@ import { PlanService } from '@app/services/plan.service';
 import * as d3 from 'd3';
 
 export const BigIslandPlan: Plan = {
-  name: 'bigisland',
+  name: 'Big Island',
   displayName: 'Big Island',
   landingImagePath: 'assets/plans/bigisland/images/landing-image.jpg',
   secondScreenImagePath: 'assets/plans/bigisland/images/second-screen-images/backgrounds/bigIsland.jpg',

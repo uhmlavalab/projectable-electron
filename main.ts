@@ -7,13 +7,12 @@ import * as functions from './electron-functions';
 let windows: BrowserWindow[] = [];
 let mainWindow: BrowserWindow;
 let mapWindow: BrowserWindow;
+let planSelected: number = -1;
+
 const args = process.argv.slice(1);
 const serve = args.some(val => val === '--serve');
 
 function createWindows() {
-
-  mapWindow = null;
-  mainWindow = null;
 
   screen.getAllDisplays().forEach(el => {
     const window = setupWindow(el);
@@ -24,11 +23,18 @@ function createWindows() {
     windows.forEach(el => {
       if (el.webContents === evt.sender) {
         mainWindow = el;
-        mainWindow.webContents.send('main-window-confirmation', 'Main Window successfully set.');
+        console.log('setMain');
       }
     });
-    if (mainWindow && mapWindow) {
-      closeExtraWindows();
+  });
+
+  ipcMain.on('main-plan-listener', (evt, msg) => {
+    try {
+      planSelected = msg;
+      console.log(msg);
+      console.log('Plan Set on Main Process');
+    } catch (e) {
+      console.log(`${e} is an invalid plan id number.`);
     }
   });
 
@@ -36,12 +42,9 @@ function createWindows() {
     windows.forEach(el => {
       if (el.webContents === evt.sender) {
         mapWindow = el;
-        mapWindow.webContents.send('map-window-confirmation', 'Map Window successfully set.');
+        console.log('mapSet');
       }
     });
-    if (mainWindow && mapWindow) {
-      closeExtraWindows();
-    }
   });
 
   ipcMain.on('remove-window', (evt, msg) => {
@@ -55,6 +58,26 @@ function createWindows() {
 
   ipcMain.on('check-num-windows', (event) => {
     event.reply('num-windows', windows.length);
+  });
+
+  ipcMain.on('get-plan-id', event => {
+    event.reply('plan-id-from-main', planSelected);
+  });
+
+  ipcMain.on('is-this-main', event => {
+    try {
+      event.reply('is-main', mainWindow.webContents === event.sender);
+    } catch(e) {
+
+    }
+  });
+
+  ipcMain.on('is-this-map', event => {
+    try {
+      event.reply('is-map', mapWindow.webContents === event.sender);
+    } catch(e) {
+
+    }
   });
 
   ipcMain.on('message-to-main-window', (evt, msg) => {
@@ -82,8 +105,6 @@ function createWindows() {
     if (mainWindow) {
       mainWindow.webContents.send('message-for-main-window', { reset: true });
     }
-    mapWindow = null;
-    mainWindow = null;
   });
 
   ipcMain.on('is-window-set', (evt, msg) => {
@@ -134,14 +155,7 @@ function setupWindow(display: Display): BrowserWindow {
     }));
   }
   return window;
-}
 
-function closeExtraWindows() {
-  windows.forEach(el => {
-    if (el !== mainWindow && el !== mapWindow) {
-      el.close();
-    }
-  });
 }
 
 function closeProgram() {

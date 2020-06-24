@@ -29,6 +29,8 @@ import { YearDisplayComponent } from './components/year-display/year-display.com
 import { SettingsModalComponent } from './components/settings-modal/settings-modal.component';
 import { LayerInfoComponent } from './components/layer-info/layer-info.component';
 import { TooltipComponent } from './components/tooltip/tooltip.component';
+import { IslandSelectionButtonsComponent } from './components/island-selection-buttons/island-selection-buttons.component';
+import { IslandButtonComponent } from './components/island-selection-buttons/components/island-button/island-button.component';
 
 
 @NgModule({
@@ -46,7 +48,9 @@ import { TooltipComponent } from './components/tooltip/tooltip.component';
     YearDisplayComponent,
     SettingsModalComponent,
     LayerInfoComponent,
-    TooltipComponent
+    TooltipComponent,
+    IslandSelectionButtonsComponent,
+    IslandButtonComponent
   ],
   imports: [
     CommonModule,

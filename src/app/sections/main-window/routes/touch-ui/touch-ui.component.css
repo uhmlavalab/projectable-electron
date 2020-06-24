@@ -84,6 +84,11 @@ app-border-line {
   margin-top: 1%;
 }
 
+.island-selection-buttons {
+  position: relative;
+  top: -44px;
+}
+
 .center-container>.top>.right-column {
   width: 20%;
   position: relative;

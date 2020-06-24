@@ -17,15 +17,21 @@ export class PlanSelectionComponent implements OnInit {
   plans: Plan[];
 
   constructor(private windowService: WindowService, private planService: PlanService, private router: Router, private activeRoute: ActivatedRoute, private ngZone: NgZone, private contentDeliveryService: ContentDeliveryService) {
-
     this.windowService.loadFile('cssData.json');
-   }
+    this.windowService.getPlanID();
+  }
 
    ngOnInit(): void {
     this.plans = this.planService.getAllPlans();
     this.windowService.windowMessageSubject.subscribe(msg => {
       this.planService.handleMessage(msg);
     });
+    this.windowService.planIdSubject.subscribe(val => {
+      console.log(val);
+      if (val > -1 && val < 4 && val !== 2) {
+        this.startPlan(val);
+      }
+    })
   }
 
 
@@ -35,6 +41,7 @@ export class PlanSelectionComponent implements OnInit {
 
   startPlan(plan) {
     this.planService.startTheMap(this.plans[plan]);
+    this.windowService.notifyMain_planIsSet(plan);
     this.ngZone.run(() => {
       this.reRoute('touch-ui');
     });

@@ -1,0 +1,17 @@
+.island-button {
+    height: 70px;
+    width: 70px;
+    text-align: center;
+    font-size: 10px;
+    border: 2px solid var(--menu-blue);
+    border-radius: 50%;
+    color: var(--main-text-color);
+    margin: 8px 8px 8px 14px;
+}
+
+.island-button>p {
+    position: relative;
+    top: 30%;
+    width: 100%;
+    text-align: center;
+}

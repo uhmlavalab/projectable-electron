@@ -1,6 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 import { ipcRenderer, screen } from 'electron';
-import { Subject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 
 
@@ -16,6 +16,7 @@ export class WindowService {
   fileData: string[];
   numWindows: any;
   checkNumWindowsInterval: any;
+  public planIdSubject = new Subject<number>();
 
   constructor(private router: Router, private ngZone: NgZone) {
     this.windowName = '';
@@ -32,12 +33,38 @@ export class WindowService {
         ipcRenderer.send('check-num-windows');
       }
     }, 100);
+
+    ipcRenderer.on('is-main', (event, arg) => {
+      if (arg) {
+        this.setAsMainWindow();
+      }
+    });
+
+    ipcRenderer.on('is-map', (event, arg) => {
+      if (arg) {
+        this.setAsMapWindow();
+      }
+    });
+    ipcRenderer.send('is-this-main');
+    ipcRenderer.send('is-this-map');
+    ipcRenderer.on('plan-id-from-main', (event, arg) => {
+      this.planIdSubject.next(arg);
+    });
   }
 
   public getNumWindows(): any {
     return this.numWindows;
   }
 
+  public notifyMain_planIsSet(plan: number) {
+    ipcRenderer.send('main-plan-listener', plan);
+  }
+
+  public changeIsland(islandId: number) {
+    this.notifyMain_planIsSet(islandId);
+    this.resetAllWindows();
+  }
+ 
   public setAsMainWindow() {
     this.windowName = 'main';
     ipcRenderer.removeListener('message-for-unset-window', () => { });
@@ -66,6 +93,11 @@ export class WindowService {
 
   public isMain(): boolean {
     return this.windowName === 'main';
+  }
+
+  public getPlanID(): void {
+    ipcRenderer.send('get-plan-id');
+    console.log('test');
   }
 
   private mapWindowMessage(event: Electron.IpcRendererEvent, data: any) {
@@ -101,6 +133,7 @@ export class WindowService {
   }
 
   public resetAllWindows() {
+    this.resetCheck(true);
     ipcRenderer.send('clear-window-selections', {});
   }
 

@@ -23,6 +23,7 @@ export class PlanService {
 
   // Data publishers.
   public planSetSubject = new BehaviorSubject<boolean>(false);          // Tells components when the plan is set.
+  public islandNameSubject = new BehaviorSubject<string>(null);         // Publishes the name of the selected island.
   public toggleLayerSubject = new BehaviorSubject<{ layer: MapLayer, state: number }>(null); // Pubisher for when a layer is toggled
   public layersSubject = new BehaviorSubject<{ layer: MapLayer, state: number }[]>(null);    // Publishes array of all Layers.
   // Publishes the data for the layer info component.
@@ -151,7 +152,7 @@ export class PlanService {
    */
   public setupSelectedPlan(plan: Plan): void {
     this.dataTable.plan.current = plan;
-    this.dataTable.plan.name = plan.name;
+    this.dataTable.plan.name = plan.displayName;
     this.dataTable.plan.isSet = true;
     // Store all layers into an array.
     plan.map.mapLayers.forEach(layer => {
@@ -185,6 +186,7 @@ export class PlanService {
   /** Once all of the data is properly initialized, this function will publish the data. */
   private publishSetupData(): void {
     this.planSetSubject.next(this.dataTable.plan.isSet);     // Notify components that the plan is set.
+    this.islandNameSubject.next(this.dataTable.plan.name);
     this.yearSubject.next(this.dataTable.year.current);      // Publish current year
     this.yearsSubject.next(this.getYears());                 // Publish the array of all years used in the application.
     this.scenarioListSubject.next(this.dataTable.scenario.all); // Publish a list of scenarios.
