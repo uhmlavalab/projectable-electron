@@ -31,6 +31,7 @@ import { LayerInfoComponent } from './components/layer-info/layer-info.component
 import { TooltipComponent } from './components/tooltip/tooltip.component';
 import { IslandSelectionButtonsComponent } from './components/island-selection-buttons/island-selection-buttons.component';
 import { IslandButtonComponent } from './components/island-selection-buttons/components/island-button/island-button.component';
+import { SettingsSlideOutComponent } from './components/settings-slide-out/settings-slide-out.component';
 
 
 @NgModule({
@@ -50,7 +51,8 @@ import { IslandButtonComponent } from './components/island-selection-buttons/com
     LayerInfoComponent,
     TooltipComponent,
     IslandSelectionButtonsComponent,
-    IslandButtonComponent
+    IslandButtonComponent,
+    SettingsSlideOutComponent
   ],
   imports: [
     CommonModule,

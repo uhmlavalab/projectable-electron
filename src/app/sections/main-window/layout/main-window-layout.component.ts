@@ -21,7 +21,7 @@ export class MainWindowLayoutComponent {
   resetCSS() {
     if (confirm('Resetting CSS Data is permanent.  Click confirm to proceed.')){
       this.planService.createCssData();
-      alert('CSS File Reset.  Restart application to view changes.');
+      this.windowService.resetAllWindows();
     }
   }
 

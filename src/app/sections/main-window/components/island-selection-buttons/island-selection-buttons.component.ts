@@ -13,7 +13,7 @@ export class IslandSelectionButtonsComponent implements OnInit{
     private islands: string[];
     private selectedIsland: string;
     constructor(private windowService: WindowService, private planService: PlanService ) {
-      this.islands = ['Oahu', 'Maui', 'Molokai', 'Big Island'];
+      this.islands = ['Oahu', 'Maui', 'Big Island', 'Molokai'];
       this.selectedIsland = this.islands[0];
     }
     ngOnInit() {
@@ -25,6 +25,12 @@ export class IslandSelectionButtonsComponent implements OnInit{
     }
 
     private changeIsland(island: string) {
-      this.windowService.changeIsland(this.islands.indexOf(island));
+      if (island !== 'Molokai'){
+        if (confirm('Changing Island to ' + island + '.')){
+          this.windowService.changeIsland(this.islands.indexOf(island));
+        }
+      } else {
+        alert('Molokai is currently unavailable.')
+      }
     }
 }

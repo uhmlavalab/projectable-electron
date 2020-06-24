@@ -23,7 +23,6 @@ function createWindows() {
     windows.forEach(el => {
       if (el.webContents === evt.sender) {
         mainWindow = el;
-        console.log('setMain');
       }
     });
   });
@@ -31,8 +30,6 @@ function createWindows() {
   ipcMain.on('main-plan-listener', (evt, msg) => {
     try {
       planSelected = msg;
-      console.log(msg);
-      console.log('Plan Set on Main Process');
     } catch (e) {
       console.log(`${e} is an invalid plan id number.`);
     }
@@ -42,7 +39,6 @@ function createWindows() {
     windows.forEach(el => {
       if (el.webContents === evt.sender) {
         mapWindow = el;
-        console.log('mapSet');
       }
     });
   });

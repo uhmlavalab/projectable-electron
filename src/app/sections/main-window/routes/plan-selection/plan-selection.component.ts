@@ -28,10 +28,10 @@ export class PlanSelectionComponent implements OnInit {
     });
     this.windowService.planIdSubject.subscribe(val => {
       console.log(val);
-      if (val > -1 && val < 4 && val !== 2) {
+      if (val > -1 && val < 3) {
         this.startPlan(val);
       }
-    })
+    });
   }
 
 
