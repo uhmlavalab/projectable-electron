@@ -4,7 +4,7 @@
 <div class="left-container">
   <div class="chart pie">
     <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Generation Chart')">
-    <app-pie-three-d class="pie-3d"></app-pie-three-d>
+    <app-pie-chart></app-pie-chart>
     
   </div>
   <div class="chart line">
@@ -24,6 +24,7 @@
     <div class="right-column">
       <app-bar></app-bar>
     </div>
+    <!-- <img src="../../../../../assets/images/grid.png" class="grid"> -->
     <app-map-element class="map-container" cdkDrag #map>
     </app-map-element>
     

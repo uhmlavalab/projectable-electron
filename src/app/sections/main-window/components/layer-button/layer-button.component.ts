@@ -81,7 +81,7 @@ export class LayerButtonComponent implements OnInit, AfterViewInit {
           this.planService.handleLayerButtonInfoClick(this.layerName);
           this.stopAnimation();  // Stop the animation.
         }
-      }, 5);
+      }, 20);
       return;
     } else {
       this.stopAnimation();
@@ -102,7 +102,7 @@ export class LayerButtonComponent implements OnInit, AfterViewInit {
             this.delay = false;
           }, 100);
         }
-      }, 5);
+      }, 20);
       return;
     } else {
       this.stopAnimation();
@@ -120,22 +120,22 @@ export class LayerButtonComponent implements OnInit, AfterViewInit {
   private reverseAnimate(): void {
     this.animationInterval = setInterval(() => {
       if (this.progress > -2) {
-        this.progress--;
+        this.progress += 5;
       } else {
         this.stopAnimation();
       }
-    }, 5);
+    }, 50);
   }
 
   /** Clockwise animation without a toggle */
   private animate(): void {
     this.animationInterval = setInterval(() => {
       if (this.progress < 101) {
-        this.progress++;
+        this.progress += 5;
       } else {
         this.stopAnimation();
       }
-    }, 5);
+    }, 50);
   }
 
   private onEventStart() {

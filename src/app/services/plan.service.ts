@@ -75,7 +75,8 @@ export class PlanService {
       plan: {
         current: null,
         isSet: false,
-        name: ''
+        name: '',
+        displayName: '',
       },
       // Map setup data.
       map: {
@@ -155,7 +156,8 @@ export class PlanService {
    */
   public setupSelectedPlan(plan: Plan): void {
     this.dataTable.plan.current = plan;
-    this.dataTable.plan.name = plan.displayName;
+    this.dataTable.plan.name = plan.name;
+    this.dataTable.plan.displayName = plan.displayName;
     this.dataTable.plan.isSet = true;
     // Store all layers into an array.
     plan.map.mapLayers.forEach(layer => {
@@ -189,7 +191,7 @@ export class PlanService {
   /** Once all of the data is properly initialized, this function will publish the data. */
   private publishSetupData(): void {
     this.planSetSubject.next(this.dataTable.plan.isSet);     // Notify components that the plan is set.
-    this.islandNameSubject.next(this.dataTable.plan.name);
+    this.islandNameSubject.next(this.dataTable.plan.displayName);
     this.yearSubject.next(this.dataTable.year.current);      // Publish current year
     this.yearsSubject.next(this.getYears());                 // Publish the array of all years used in the application.
     this.scenarioListSubject.next(this.dataTable.scenario.all); // Publish a list of scenarios.
@@ -918,6 +920,7 @@ export class PlanService {
     } else if (msg.type === 'file information') {
       msg.message.forEach(d => { // iterate through the loaded files and find the cssdata file.
         if (d.file === 'cssData') {
+          console.log(this.dataTable.plan.name)
           const css_path = d.css[this.dataTable.plan.name];
           // The css data needs to have all of these paths.  If it doesn't, the app will make a new css file.
           if (css_path.charts && css_path.logos && css_path.map && css_path.data) {

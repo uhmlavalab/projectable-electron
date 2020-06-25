@@ -4,7 +4,7 @@ import { PlanService } from '@app/services/plan.service';
 import * as d3 from 'd3';
 
 export const BigIslandPlan: Plan = {
-  name: 'Big Island',
+  name: 'bigisland',
   displayName: 'Big Island',
   landingImagePath: 'assets/plans/bigisland/images/landing-image.jpg',
   secondScreenImagePath: 'assets/plans/bigisland/images/second-screen-images/backgrounds/bigIsland.jpg',
@@ -162,8 +162,9 @@ export const BigIslandPlan: Plan = {
         },
         updateFunction(planService: PlanService, state) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
+          const interval = planService.isMainWindow() ? Math.round(this.parcels.length / 2000) : 1;
           this.parcels.forEach((parcel, index) => {
-            if (!planService.isMainWindow() || index % 7 === 0) {
+            if (index % interval === 0) {
               if (solarTotal > 0) {
                 d3.select(parcel.path)
                   .style('fill', this.fillColor)
@@ -220,8 +221,9 @@ export const BigIslandPlan: Plan = {
         },
         updateFunction(planService: PlanService, state) {
           let windTotal = planService.getGenerationTotalForCurrentYear(['Wind']);
+          const interval = planService.isMainWindow() ? Math.round(this.parcels.length / 2000) : 1;
           this.parcels.forEach((parcel, index) => {
-            if (!planService.isMainWindow() || index % 7 === 0) {
+            if (index % interval === 0) {
               if (windTotal > 0) {
                 d3.select(parcel.path)
                   .style('fill', this.fillColor)

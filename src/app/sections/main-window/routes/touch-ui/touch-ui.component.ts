@@ -182,10 +182,10 @@ export class TouchUiComponent implements AfterViewInit {
               clearInterval(this.menuInterval);
               this.sliding = false;
             } else {
-              left = left + 5;
+              left = left + 20;
               this.slideMenu.nativeElement.style.left = `${left}px`;
             }
-          }, 2);
+          }, 30);
         } else {
           let left = 0;
           this.menuInterval = setInterval(() => {
@@ -193,10 +193,10 @@ export class TouchUiComponent implements AfterViewInit {
               clearInterval(this.menuInterval);
               this.sliding = false;
             } else {
-              left = left - 5;
+              left = left - 20;
               this.slideMenu.nativeElement.style.left = `${left}px`;
             }
-          }, 2);
+          }, 30);
         }
       }
     }

@@ -10,6 +10,7 @@ export interface DataTable {
         current: Plan;
         isSet: boolean;
         name: string;
+        displayName: string;
     };
     map: {
         scale: number;

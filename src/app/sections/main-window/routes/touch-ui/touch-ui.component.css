@@ -318,3 +318,12 @@ app-border-line {
   left: -327px;
   top: 0px;
 }
+
+.grid {
+  position: absolute;
+    width: 47%;
+    height: 60%;
+    left: 22.8%;
+    margin-top: 5%;
+    z-index: 3;
+}

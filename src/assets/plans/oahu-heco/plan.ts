@@ -4,7 +4,7 @@ import { PlanService } from '@app/services/plan.service';
 import * as d3 from 'd3';
 
 export const HecoPlan: Plan = {
-  name: 'Oahu',
+  name: 'oahu-heco',
   displayName: 'Oahu',
   landingImagePath: 'assets/plans/oahu-heco/images/landing-image.jpg',
   secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/backgrounds/oahu-heco-renewable-background.jpg',
@@ -271,16 +271,20 @@ export const HecoPlan: Plan = {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
+          const interval = planService.isMainWindow() ? Math.round(this.parcels.length / 2000) : 1;
+          console.log(interval);
           this.parcels.forEach((parcel, index) => {
-            if (solarTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('display', state === 1 ? 'block' : 'none');
-              solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
-            } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('display', state === 1 ? 'block' : 'none');
+            if (index % interval === 0) {
+              if (solarTotal > 0) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('display', state === 1 ? 'block' : 'none');
+                solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
+              } else {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('display', state === 1 ? 'block' : 'none');
+              }
             }
           });
         },
@@ -383,22 +387,25 @@ export const HecoPlan: Plan = {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
+          const interval = planService.isMainWindow() ? Math.round(this.parcels.length / 2000) : 1;
           this.parcels.forEach((parcel, index) => {
-            if (parcel.properties.IAL === 'Y') {
-              d3.select(parcel.path)
-                .style('fill', 'black')
-                .style('display', state === 1 ? 'block' : 'none')
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
-            } else if (solarTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('display', state === 1 ? 'block' : 'none');
-              solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
-            } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('display', state === 1 ? 'block' : 'none');
+            if (index % interval === 0) {
+              if (parcel.properties.IAL === 'Y') {
+                d3.select(parcel.path)
+                  .style('fill', 'black')
+                  .style('display', state === 1 ? 'block' : 'none')
+                  .style('stroke', this.borderColor)
+                  .style('stroke-width', this.borderWidth + 'px');
+              } else if (solarTotal > 0) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('display', state === 1 ? 'block' : 'none');
+                solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
+              } else {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('display', state === 1 ? 'block' : 'none');
+              }
             }
           });
         },
