@@ -1,1 +1,10 @@
-<p>settings-slide-out works!</p>
+<div class="icon-tab">
+    <img src="../../../../../assets/images/gear-icon.png" class="gear" (click)="toggle()">
+</div>
+<h3>Settings Menu</h3>
+<ul>
+    <li class="button" (click)="togglePositionElements()">Position Elements</li>
+    <li class="button" (click)="resetCss()">Reset All Elements</li>
+    <li class="button" (click)="restartTable()">Restart Table</li>
+    <li class="button" (click)="quitTable()">Quit</li>
+</ul>

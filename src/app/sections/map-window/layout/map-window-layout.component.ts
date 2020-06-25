@@ -29,15 +29,6 @@ export class MapWindowLayoutComponent implements OnDestroy {
     });
   }
 
-
-  reset() {
-    this.windowService.resetAllWindows();
-  }
-
-  close() {
-    this.windowService.closeAppliction();
-  }
-
   ngOnDestroy() {
     this.messageSub.unsubscribe();
   }

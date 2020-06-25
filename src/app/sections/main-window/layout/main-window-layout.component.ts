@@ -18,21 +18,6 @@ export class MainWindowLayoutComponent {
 
   }
 
-  resetCSS() {
-    if (confirm('Resetting CSS Data is permanent.  Click confirm to proceed.')){
-      this.planService.createCssData();
-      this.windowService.resetAllWindows();
-    }
-  }
-
-  reset() {
-    this.windowService.resetAllWindows();
-  }
-
-  close() {
-    this.windowService.closeAppliction();
-  }
-
   reRoute(route: string) {
     this.router.navigate([route], { relativeTo: this.activeRoute });
   }

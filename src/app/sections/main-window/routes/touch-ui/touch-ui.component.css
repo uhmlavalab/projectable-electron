@@ -310,3 +310,11 @@ app-border-line {
   height: 5%;
   top: 42%;
 }
+
+.slide-out {
+  position: absolute;
+  height: 100%;
+  z-index: 9999999999;
+  left: -327px;
+  top: 0px;
+}

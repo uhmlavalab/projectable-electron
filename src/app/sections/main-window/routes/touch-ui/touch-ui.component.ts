@@ -12,6 +12,7 @@ export class TouchUiComponent implements AfterViewInit {
 
   @ViewChild('year', { static: false, read: ElementRef }) yearElement: ElementRef;
   @ViewChild('ttip', { static: false, read: ElementRef }) toolTip: ElementRef;
+  @ViewChild('slideMenu', {static: false, read: ElementRef}) slideMenu: ElementRef;
 
   private layers: { layer: MapLayer, state: number }[];              // Array containing all Layers (used to populate toggle buttons).
   private sectionTitles: { layer: string; map: string; scenario: string; };  // Used to label HTML elements.
@@ -21,6 +22,9 @@ export class TouchUiComponent implements AfterViewInit {
   private settingsIconPath: string;    // Path to the settings icon.
   private showSettingsModal: boolean;  // True, show the reposition modal, false hide it.
   private technologies: { name: string; color: string }[];
+  private menuInterval: any;           // Animation interval for the slide menu.
+  private sliding: boolean;            // True if animation is happening.
+  private firstSlide: boolean;         // Prevents first slide when loading
 
   constructor(private planService: PlanService, private windowService: WindowService) {
     this.setupComplete = false;
@@ -31,6 +35,8 @@ export class TouchUiComponent implements AfterViewInit {
     this.tooltip = { displaying: false, path: '../../../../../assets/images/tooltip.png', currentlySelected: 'none' };
     this.settingsIconPath = '../../../../../assets/images/gear-icon.png';
     this.technologies = [];
+    this.sliding = false;
+    this.firstSlide = true;
   }
 
   ngAfterViewInit() {
@@ -102,10 +108,26 @@ export class TouchUiComponent implements AfterViewInit {
       }
     });
 
+    // Subscribes to a bariable that tells whether to open or close the modal.
+    this.planService.openPositionModalSubject.subscribe(value => {
+      if (value) {
+        this.handleSettingsButtonClick();
+      }
+    });
+
     // When user clicks on a tooltip, the location of the tooltip is received here and the element is moved.
     this.planService.tooltipSubject.subscribe(value => {
       if (value) {
         this.positionTooltip(value.x, value.y);
+      }
+    });
+
+    // When user clicks on the gear icon, the menu slides open or closed
+    this.planService.slideOutSubject.subscribe(open => {
+      if (!this.firstSlide) {
+        this.toggleSlideOut(open);
+      } else {
+        this.firstSlide = false;
       }
     });
   }
@@ -119,10 +141,7 @@ export class TouchUiComponent implements AfterViewInit {
 
   /** opens and closes the settings (positioning) modal. */
   private handleSettingsButtonClick(): void {
-    this.showSettingsModal = !this.showSettingsModal;
-    if (this.showSettingsModal) {
-      this.planService.settingsModalOpened();
-    }
+    this.showSettingsModal = true;
   }
 
   /** When a tooltip is clicked, the position and identifying string are passed here and the correct action is taken by the plan service.
@@ -146,5 +165,41 @@ export class TouchUiComponent implements AfterViewInit {
   private positionTooltip(x: number, y: number): void {
     this.toolTip.nativeElement.style.left = `${x - 20}px`;
     this.toolTip.nativeElement.style.top = `${y - 12}px`;
+  }
+
+  /** Controls the slide in and out of the settings menu. */
+  private toggleSlideOut(open: boolean): void {
+    if (!this.sliding) {
+      try {
+        clearInterval(this.menuInterval);
+      } catch (e) {}
+      finally {
+        this.sliding = true;
+        if (open) {
+          let left = -330;
+          this.menuInterval = setInterval(() => {
+            if (left >= 0) {
+              clearInterval(this.menuInterval);
+              this.sliding = false;
+            } else {
+              left = left + 5;
+              this.slideMenu.nativeElement.style.left = `${left}px`;
+            }
+          }, 2);
+        } else {
+          let left = 0;
+          this.menuInterval = setInterval(() => {
+            if (left <= -330) {
+              clearInterval(this.menuInterval);
+              this.sliding = false;
+            } else {
+              left = left - 5;
+              this.slideMenu.nativeElement.style.left = `${left}px`;
+            }
+          }, 2);
+        }
+      }
+    }
+
   }
 }

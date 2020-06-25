@@ -4,7 +4,7 @@ import { PlanService } from '@app/services/plan.service';
 import * as d3 from 'd3';
 
 export const HecoPlan: Plan = {
-  name: 'heco-oahu',
+  name: 'Oahu',
   displayName: 'Oahu',
   landingImagePath: 'assets/plans/oahu-heco/images/landing-image.jpg',
   secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/backgrounds/oahu-heco-renewable-background.jpg',

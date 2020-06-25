@@ -1,0 +1,38 @@
+:host {
+    width: 20vw;
+    background-color: var(--menu-blue);
+    height: 100%;
+    color: black;
+    padding: 10px;
+}
+.icon-tab {
+    width: 3vw;
+    height: 3vw;
+    position: absolute;
+    left: calc(20vw + 26px);
+    outline: 4px solid var(--menu-blue);
+    padding: 5px;
+    top: 4px;
+    background-color: black;
+}
+
+.icon-tab>.gear {
+    width: 100%;
+    height: 100%;
+}
+
+ul {
+   list-style: none;
+   width: 80%;
+   position: relative;
+   left: -12.5%;
+}
+
+
+.button {
+    outline: 3px solid purple;
+    padding: 10px;
+    width: 100%;
+    margin: 15px;
+    font-weight: 800;
+}

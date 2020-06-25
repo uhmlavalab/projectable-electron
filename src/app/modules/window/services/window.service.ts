@@ -97,7 +97,6 @@ export class WindowService {
 
   public getPlanID(): void {
     ipcRenderer.send('get-plan-id');
-    console.log('test');
   }
 
   private mapWindowMessage(event: Electron.IpcRendererEvent, data: any) {

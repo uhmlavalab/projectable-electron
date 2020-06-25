@@ -65,11 +65,9 @@
     <app-layer-info class="layer-info"></app-layer-info>
   </div>
 </div>
-<div class="settings-button" (click)="handleSettingsButtonClick()">
-  <img src="{{settingsIconPath}}" #settingsButton>
-</div>
 <app-settings-modal [style.display]="this.showSettingsModal ? 'block' : 'none'"></app-settings-modal>
 <div class="tooltip-container" [style.display]="this.tooltip.displaying ? 'block' : 'none'" #ttip>
   <app-tooltip></app-tooltip>
 </div>
 <div class='black-bar'></div>
+<app-settings-slide-out class="slide-out" #slideMenu></app-settings-slide-out>

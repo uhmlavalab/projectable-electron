@@ -40,8 +40,11 @@ export class PlanService {
   // Publishes the resizing data from the position modal.
   public resizeSubject = new BehaviorSubject<{ id: string, width: number, height: number, percent: number }>(null);
   public closeModalSubject = new BehaviorSubject<{ saveData: boolean }>(null);           // Notifies the position modal to close.
+  public openPositionModalSubject = new BehaviorSubject<boolean>(false);
+  public turnSlideOutOffSubject = new BehaviorSubject<boolean>(false);
   public revertPositionsSubject = new BehaviorSubject<object>(null);   // Reverts repositioning on the map screen when changes are canceled.
   // changes slider tab when plus or minus is clicked.
+  public slideOutSubject = new BehaviorSubject<boolean>(false);        // Toggles settings slide menu
   public adjustSliderPositionSubject = new BehaviorSubject<{ percent: number, id: string }>(null);
   public capDataSubject = new BehaviorSubject<object>(null);           // Publishes capacity data.
   public genDataSubject = new BehaviorSubject<object>(null);           // Publishes the generation data.
@@ -847,6 +850,16 @@ export class PlanService {
    */
   public settingsModalOpened(): void {
     this.windowService.sendMessage({ type: 'settings opened', message: true });
+    this.openPositionModalSubject.next(true);
+    this.toggleSlideOut(false);
+    this.turnSlideOutOffSubject.next(true);
+  }
+
+  /** When the gear icon tab is touched or clicked, the settings menu slides in or out from the left side.
+   * @param open true if opening the menu, false if closing the menu.
+   */
+  public toggleSlideOut(open: boolean): void {
+    this.slideOutSubject.next(open);
   }
 
   /** Debugging method that will print the datatable in its current state to the console. */
