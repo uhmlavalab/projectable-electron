@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
 import * as d3 from 'd3';
 import { MapLayer, Parcel } from '@app/interfaces';
@@ -11,10 +11,11 @@ import { WindowService } from '@app/modules/window';
 })
 
 /** This component displays the map and all layers */
-export class MapElementComponent implements OnInit {
+export class MapElementComponent implements OnInit, AfterViewInit {
 
   @ViewChild('mapDiv', { static: true }) mapDiv: ElementRef;
-  @ViewChild('pointer', { static: true}) pointer: ElementRef;
+  @ViewChild('pointer', { static: true }) pointer: ElementRef;
+  @ViewChild('grid', { static: false }) grid: ElementRef;
 
   scale: number;
   width: number;                  // The current width of the map
@@ -58,27 +59,31 @@ export class MapElementComponent implements OnInit {
 
   ngOnInit() {
 
+
+  }
+
+  ngAfterViewInit() {
     if (this.isMiniMap) {
-      this.mapDiv.nativeElement.addEventListener('touchstart', event => {
+      this.grid.nativeElement.addEventListener('touchstart', event => {
         this.passPointerLocation(event, true, true, false);
       }, { passive: false });
-      this.mapDiv.nativeElement.addEventListener('touchend', event => {
+      this.grid.nativeElement.addEventListener('touchend', event => {
         this.passPointerLocation(event, true, false, true);
       }, { passive: false });
-      this.mapDiv.nativeElement.addEventListener('touchmove', event => {
+      this.grid.nativeElement.addEventListener('touchmove', event => {
         this.passPointerLocation(event, true, false, false);
       }, { passive: false });
 
-      this.mapDiv.nativeElement.addEventListener('mousedown', event => {
+      this.grid.nativeElement.addEventListener('mousedown', event => {
         this.passPointerLocation(event, false, true, false);
       });
-      this.mapDiv.nativeElement.addEventListener('mousemove', event => {
+      this.grid.nativeElement.addEventListener('mousemove', event => {
         this.passPointerLocation(event, false, false, false);
       });
-      this.mapDiv.nativeElement.addEventListener('mouseup', event => {
+      this.grid.nativeElement.addEventListener('mouseup', event => {
         this.passPointerLocation(event, false, false, true);
       });
-      this.mapDiv.nativeElement.addEventListener('mouseleave', event => {
+      this.grid.nativeElement.addEventListener('mouseleave', event => {
         this.passPointerLocation(event, false, false, true);
       });
     }
@@ -248,7 +253,7 @@ export class MapElementComponent implements OnInit {
           .attr('d', path)
           .attr('class', layer.name)
           .each(function (d, index) {
-              layer.layer.parcels.push({ path: this, properties: (d.hasOwnProperty(`properties`)) ? d[`properties`] : null } as Parcel);
+            layer.layer.parcels.push({ path: this, properties: (d.hasOwnProperty(`properties`)) ? d[`properties`] : null } as Parcel);
           }).call(() => {
             if (layer.layer.setupFunction !== null) {
               layer.layer.setupFunction(this.planService, layer.state);

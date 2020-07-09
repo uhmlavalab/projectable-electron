@@ -65,6 +65,7 @@ export class PlanService {
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
     this.freshCss = true;            // Fresh css is set to true before checking.
     this.initializeDataTable();      // Set up the data table.
+    this.windowService.cssSubject.subscribe(css => this.setCSS(css));
   }
 
   /** The data table stores the current state of the table. */
@@ -589,6 +590,20 @@ export class PlanService {
  * @param css the css data object.
  */
   private setCSS(css: any): void {
+
+    if (!this.dataTable.plan.name) {
+      setTimeout( () => this.setCSS(css), 100);
+      return;
+    }
+    // The css data needs to have all of these paths.  If it doesn't, the app will make a new css file.
+    if (!(css[this.dataTable.plan.name].charts && css[this.dataTable.plan.name].logos && css[this.dataTable.plan.name].map && css[this.dataTable.plan.name].data)) {
+      // Create New Css File
+      this.createCssData();
+    }
+
+    if (this.windowService.isMain()) {
+      this.windowService.sendMessage({ type: 'css loaded', message: css })
+    }
     /* The freshCss variable will be true throughout this entire function if the css data from the saved file is all 0's.  This
     happens when a new CSS data file is generated.  It will load the settings modal and ask the user to position elements before
     doing anything else */
@@ -645,11 +660,12 @@ export class PlanService {
           });
       }
     }
-
     // If this is a fresh install request the default width sizes of the elements and prompt the user to set new css data.
     if (freshCss) {
       // Need to capture the width of the elements since they were all reset.
-      this.getWidthSubject.next(true);
+      if (!this.windowService.isMain()) {
+        this.getWidthSubject.next(true);
+      }
       this.freshCssSubject.next(freshCss);
     } else {
       this.freshCss = false;
@@ -662,6 +678,7 @@ export class PlanService {
   private storeCssData(): void {
     this.dataTable.components.forEach(e => {
       // Set the path to the css data based on the plan name and if there is a category associated with the element.
+
       const css_path = this.CSS[this.dataTable.plan.name][e.category][e.name];
 
       // Check for changes in the data table.  If they exist, write them to the CSS object.
@@ -917,25 +934,8 @@ export class PlanService {
       this.settingsModalOpenedSubject.next(true);
     } else if (msg.type === 'laser pointer') {
       this.laserPointerSubject.next(msg.message);
-    } else if (msg.type === 'file information') {
-      msg.message.forEach(d => { // iterate through the loaded files and find the cssdata file.
-        if (d.file === 'cssData') {
-          console.log(this.dataTable.plan.name)
-          const css_path = d.css[this.dataTable.plan.name];
-          // The css data needs to have all of these paths.  If it doesn't, the app will make a new css file.
-          if (css_path.charts && css_path.logos && css_path.map && css_path.data) {
-            if (!this.windowService.isMain()) {
-              this.setCSS(d.css);
-              this.windowService.sendMessage({ type: 'css loaded', message: d.css });
-            }
-          } else {
-            // Create New Css File
-            this.createCssData();
-          }
-        }
-      });
     } else if (msg.type === 'css loaded') {
-      if (this.windowService.isMain()) {
+      if (!this.windowService.isMain()) {
         this.setCSS(msg.message);
       }
     } else if (msg.type === 'update cssData file') {

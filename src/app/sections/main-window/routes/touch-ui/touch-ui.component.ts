@@ -104,14 +104,14 @@ export class TouchUiComponent implements AfterViewInit {
     // Subscribes to a bariable that tells whether to open or close the modal.
     this.planService.closeModalSubject.subscribe(value => {
       if (value) {
-        this.handleSettingsButtonClick();
+        this.handleSettingsButtonClick(false);
       }
     });
 
     // Subscribes to a bariable that tells whether to open or close the modal.
     this.planService.openPositionModalSubject.subscribe(value => {
       if (value) {
-        this.handleSettingsButtonClick();
+        this.handleSettingsButtonClick(true);
       }
     });
 
@@ -140,8 +140,8 @@ export class TouchUiComponent implements AfterViewInit {
   }
 
   /** opens and closes the settings (positioning) modal. */
-  private handleSettingsButtonClick(): void {
-    this.showSettingsModal = true;
+  private handleSettingsButtonClick(val): void {
+    this.showSettingsModal = val;
   }
 
   /** When a tooltip is clicked, the position and identifying string are passed here and the correct action is taken by the plan service.

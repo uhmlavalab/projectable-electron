@@ -13,11 +13,17 @@ import { WindowService } from '@app/modules/window';
 export class SettingsModalComponent implements AfterViewInit {
 
   @ViewChild('mapMover', { static: false }) mapElement;     // The map component
+  @ViewChild('mapOverlay', { static: false }) mapOverlay;     // The map component
   @ViewChild('pieMover', { static: false }) pieElement;     // The pie chart component.
+  @ViewChild('pieOverlay', { static: false }) pieOverlay;     // The pie chart component.
   @ViewChild('lineMover', { static: false }) lineElement;   // The line chart component.
+  @ViewChild('lineOverlay', { static: false }) lineOverlay;   // The line chart component.
   @ViewChild('displayingDataMover', { static: false }) displayDataElement;   // The line chart component.
+  @ViewChild('dataOverlay', { static: false }) dataOverlay;   // The line chart component.
   @ViewChild('lavaLogoMover', { static: false }) lavaLogoElement;   // The line chart component.
+  @ViewChild('lavaOverlay', { static: false }) lavaOverlay;   // The line chart component.
   @ViewChild('hecoLogoMover', { static: false }) hecoLogoElement;   // The line chart component.
+  @ViewChild('hecoOverlay', { static: false }) hecoOverlay;   // The line chart component.
   @ViewChild('extraLine', { static: false }) extraLine;   // The line chart component.
   @ViewChild('extraMap', { static: false }) extraMap;   // The line chart component.
   @ViewChild('extraPie', { static: false }) extraPie;   // The line chart component.
@@ -31,7 +37,7 @@ export class SettingsModalComponent implements AfterViewInit {
   private isSet: boolean;
   private z: number;
   // tslint:disable-next-line: max-line-length
-  private elements: { tag: string; category: string; e: ElementRef; extraE: ElementRef; top: number; left: number, extra: boolean, id: string }[];
+  private elements: { tag: string; category: string; e: ElementRef; extraE: ElementRef; top: number; left: number, extra: boolean, id: string, overlay: ElementRef }[];
   private cssData: any;
   private windowData: any;
   private positionHistory: { x: number, y: number }[];
@@ -51,26 +57,28 @@ export class SettingsModalComponent implements AfterViewInit {
     this.planService.getOtherWindowData();
 
     this.elements = [
-      { tag: 'map', category: 'map', e: this.mapElement, extraE: this.extraMap, top: 0, left: 0, extra: false, id: 'resize map' },
-      { tag: 'pie', category: 'charts', e: this.pieElement, extraE: this.extraPie, top: 0, left: 0, extra: false, id: 'resize pie' },
-      { tag: 'line', category: 'charts', e: this.lineElement, extraE: this.extraLine, top: 0, left: 0, extra: false, id: 'resize line' },
+      { tag: 'map', category: 'map', e: this.mapElement, extraE: this.extraMap, top: 0, left: 0, extra: false, id: 'resize map', overlay: this.mapOverlay },
+      { tag: 'pie', category: 'charts', e: this.pieElement, extraE: this.extraPie, top: 0, left: 0, extra: false, id: 'resize pie', overlay: this.pieOverlay },
+      { tag: 'line', category: 'charts', e: this.lineElement, extraE: this.extraLine, top: 0, left: 0, extra: false, id: 'resize line', overlay: this.lineOverlay },
       // tslint:disable-next-line: max-line-length
-      { tag: 'data', category: 'data', e: this.displayDataElement, extraE: this.extraData, top: 0, left: 0, extra: false, id: 'resize data' },
-      { tag: 'heco', category: 'logos', e: this.hecoLogoElement, extraE: this.extraHeco, top: 0, left: 0, extra: false, id: 'resize heco' },
-      { tag: 'lava', category: 'logos', e: this.lavaLogoElement, extraE: this.extraLava, top: 0, left: 0, extra: false, id: 'resize lava' }
+      { tag: 'data', category: 'data', e: this.displayDataElement, extraE: this.extraData, top: 0, left: 0, extra: false, id: 'resize data', overlay: this.dataOverlay },
+      { tag: 'heco', category: 'logos', e: this.hecoLogoElement, extraE: this.extraHeco, top: 0, left: 0, extra: false, id: 'resize heco' , overlay: this.hecoOverlay},
+      { tag: 'lava', category: 'logos', e: this.lavaLogoElement, extraE: this.extraLava, top: 0, left: 0, extra: false, id: 'resize lava', overlay: this.lavaOverlay}
     ];
 
     this.planService.cssSubject.subscribe(data => {
       if (data) {
+
         this.cssData = data;
         if (this.windowData) {
-          console.log()
+          console.log();
           this.positionAll();
         }
       }
     });
 
     this.planService.windowDataSubject.subscribe(data => {
+      console.log(data);
       if (data) {
         this.windowData = data;
         if (this.cssData) {
@@ -86,13 +94,34 @@ export class SettingsModalComponent implements AfterViewInit {
     });
 
     this.elements.forEach(e => {
-      e.e.nativeElement.addEventListener('touchstart', event => {
-        this.startDrag(event.touches, e.e);
+
+      e.overlay.nativeElement.addEventListener('mousedown', event => {
+        this.startDrag(null, e.e);
       }, { passive: false });
-      e.e.nativeElement.addEventListener('touchend', () => {
+      e.overlay.nativeElement.addEventListener('mouseup', () => {
         this.stopDrag();
       }, { passive: false });
-      e.e.nativeElement.addEventListener('touchmove', event => {
+      e.overlay.nativeElement.addEventListener('mouseleave', () => {
+        this.stopDrag();
+      }, { passive: false });
+      e.overlay.nativeElement.addEventListener('mousemove', event => {
+        if (this.dragging) {
+          this.drag(event, e.e, e.tag);
+        }
+      }, { passive: false });
+      e.extraE.nativeElement.addEventListener('mousedown', () => {
+        if (this.dragging) {
+          this.stopDrag();
+        }
+      }, { passive: false });
+
+      e.overlay.nativeElement.addEventListener('touchstart', event => {
+        this.startDrag(event.touches, e.e);
+      }, { passive: false });
+      e.overlay.nativeElement.addEventListener('touchend', () => {
+        this.stopDrag();
+      }, { passive: false });
+      e.overlay.nativeElement.addEventListener('touchmove', event => {
         if (this.dragging) {
           this.drag(event, e.e, e.tag);
         }
@@ -125,7 +154,9 @@ export class SettingsModalComponent implements AfterViewInit {
   private startDrag(touches, el): void {
     this.positionHistory = [];
     this.dragging = true;
-    this.setTouchId(touches, el); // Set the id of the finger that is dragging.
+    if (touches) {
+      this.setTouchId(touches, el); // Set the id of the finger that is dragging.
+    }
     el.nativeElement.style.zIndex = this.z;
     this.z++;
   }
@@ -142,6 +173,9 @@ export class SettingsModalComponent implements AfterViewInit {
       if (this.touchId >= 0) {
         mouseY = event.touches[this.touchId].screenY;
         mouseX = event.touches[this.touchId].screenX;
+      } else {
+        mouseX = event.x;
+        mouseY = event.y;
       }
       this.positionHistory.push({ x: mouseX, y: mouseY });
       if (mouseY && mouseX) {
@@ -233,11 +267,11 @@ export class SettingsModalComponent implements AfterViewInit {
 
   private shrink(tag: string): void {
     const el = this.elements.find( e => e.tag === tag);
-    this.planService.handleSizeAdjustmentClick(-0.3, el.category, tag, el.id);
+    this.planService.handleSizeAdjustmentClick(-0.05, el.category, tag, el.id);
   }
 
   private grow(tag: string): void {
     const el = this.elements.find(e => e.tag === tag);
-    this.planService.handleSizeAdjustmentClick(0.3, el.category, tag, el.id);
+    this.planService.handleSizeAdjustmentClick(0.05, el.category, tag, el.id);
   }
 }

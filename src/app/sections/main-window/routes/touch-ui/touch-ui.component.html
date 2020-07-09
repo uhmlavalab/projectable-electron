@@ -3,12 +3,17 @@
 <!-- This section contains the charts-->
 <div class="left-container">
   <div class="chart pie">
-    <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Generation Chart')">
-    <app-pie-chart></app-pie-chart>
-    
+    <div class="title-wrapper pie-title">
+      <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Generation Chart')">
+      <div class="section-title map-title">Generation</div>
+    </div>
+    <app-pie-chart ></app-pie-chart>
   </div>
   <div class="chart line">
-    <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Capacity Chart')">
+    <div class="title-wrapper line-title">
+      <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Capacity Chart')">
+      <div class="section-title map-title">Capacity</div>
+    </div>
     <app-line-chart></app-line-chart>
   </div>
 </div>
@@ -16,32 +21,34 @@
 <!-- Center column.  Largest column, contains mini map and the year controls -->
 <div class="center-container">
   <div class="top">
-    <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Mini Map')">
-    <div class="section-title">{{sectionTitles.map}}</div>
+    <div class="title-wrapper">
+      <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Mini Map')">
+      <div class="section-title map-title">{{sectionTitles.map}}</div>
+    </div>
+
     <div class="left-column">
       <app-island-selection-buttons class="island-selection-buttons"></app-island-selection-buttons>
     </div>
     <div class="right-column">
       <app-bar></app-bar>
     </div>
-    <!-- <img src="../../../../../assets/images/grid.png" class="grid"> -->
     <app-map-element class="map-container" cdkDrag #map>
     </app-map-element>
     
   </div>
   <div class="middle">
     <div class="left">
-      <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Scenario Selector')">
-      <h3>{{sectionTitles.scenario}}</h3>
+      <div class="title-wrapper">
+        <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Scenario Selector')">
+        <div class="section-title">{{sectionTitles.scenario}}</div>
+      </div>
       <app-scrolling-menu class="scenario-menu" type="scenario" largeFontSize="14px"></app-scrolling-menu>
     </div>
     <div class="middle">
-      <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Renewable Energy Console')">
       <!-- Graphic that shows the year -->
       <app-year class="year-container" #year></app-year>
     </div>
     <div class="right">
-      <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Year Selector')">
       <app-scrolling-menu type="year" largeFontSize="24px"></app-scrolling-menu>
     </div>
   </div>
@@ -49,10 +56,12 @@
 <!-- right column has two rows. -->
 <div class="right-container">
   <div class="top">
-    <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Layer Toggles')">
     <!-- Layer Buttons for turning on and off the layers. -->
     <div class="layer-button-container" #layerButtonContainer>
-      <div class="section-title">{{sectionTitles.layer}}</div>
+      <div class="title-wrapper">
+        <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Layer Toggles')">
+        <div class="section-title">{{sectionTitles.layer}}</div>
+      </div>
       <!-- Wrapper forces the buttons to be 1 to 1 ratio -->
       <div class="buttons-container">
         <div class="layer-button-wrapper" *ngFor="let layer of layers">

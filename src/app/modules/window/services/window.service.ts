@@ -13,6 +13,7 @@ export class WindowService {
   windowName: string;
   windowMessageSubject = new Subject<any>();
   numWindowsSubject = new Subject<any>();
+  cssSubject = new Subject<any>();
   fileData: string[];
   numWindows: any;
   checkNumWindowsInterval: any;
@@ -69,6 +70,7 @@ export class WindowService {
     this.windowName = 'main';
     ipcRenderer.removeListener('message-for-unset-window', () => { });
     ipcRenderer.send('message-to-unset-window', { type: 'set-window', windowName: 'map' });
+    ipcRenderer.on('message-for-main-window', (event, message) => this.mainWindowMessage(event, message));
     ipcRenderer.send('set-main-window');
     this.ngZone.run(() => {
       this.router.navigate(['main-window']);
@@ -160,6 +162,9 @@ export class WindowService {
     ipcRenderer.on('fileLoaded', (event, message) => {
       this.fileData.push(JSON.parse(message));
       ipcRenderer.removeListener('fileLoaded', () => { });
+      if (JSON.parse(message).file === 'cssData') {
+        this.cssSubject.next(JSON.parse(message).css);
+      }
     }
     );
   }

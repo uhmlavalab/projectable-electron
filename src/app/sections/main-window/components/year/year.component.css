@@ -1,15 +1,14 @@
 
 .content-wrapper {
-    width: 150px;
-    height: 150px;
+    width: 60%;
+    height: 60%;
     position: relative;
     border: 1px solid transparent;
     border-radius: 50%;
-    left: 30%;
-    margin-top: 15%;
+    left: 5vw;
+    top: -7.5vw;
     text-align: center;
     font-size: 15px;
-    padding-top: 34px;
 }
 
 .year {
@@ -38,10 +37,12 @@ p {
 }
 
 .year-bar-wrapper {
-    width: 150px;
-    height: 150px;
-    position: absolute;
+    width: 60%;
+    height: 60%;
+    position: relative;
     z-index: 10000;
+    left: 11.5vw;
+    top: 8.5vw;
 }
 
 .year-bar {

@@ -115,8 +115,9 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     this.planService.getWidthSubject.subscribe((val: boolean) => {
       if (val) {
         this.elements.forEach(e => {
+          console.log(e);
           this.planService.updateCSSHeight(e.category, e.tag, e.e.nativeElement.getBoundingClientRect().height);
-          this.planService.updateCSSWidth(e.category, e.tag, e.e.nativeElement.e.getBoundingClientRect().width);
+          this.planService.updateCSSWidth(e.category, e.tag, e.e.nativeElement.getBoundingClientRect().width);
         });
       }
     });
@@ -169,6 +170,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       height = e.getBoundingClientRect().height;
       this.planService.updateCSSHeight(category, elementName, height);
       this.planService.updateCSSWidth(category, elementName, width);
+      console.log(this.cssData);
       const css_path = this.cssData[category][elementName];
       css_path.width = width;
       css_path.height = height;

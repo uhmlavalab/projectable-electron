@@ -11,16 +11,16 @@ export class SettingsSlideOutComponent implements OnInit {
 
   private opened: boolean;
 
-  constructor(private planService: PlanService, private windowService: WindowService) { 
+  constructor(private planService: PlanService, private windowService: WindowService) {
     this.opened = false;
   }
 
   ngOnInit() {
-this.planService.turnSlideOutOffSubject.subscribe(val => {
-  if (val) {
-    this.opened = false;
-  }
-});
+    this.planService.turnSlideOutOffSubject.subscribe(val => {
+      if (val) {
+        this.opened = false;
+      }
+    });
 
   }
   private toggle(): void {
@@ -37,7 +37,7 @@ this.planService.turnSlideOutOffSubject.subscribe(val => {
   }
 
   private resetCss(): void {
-    if (confirm('Resetting CSS Data is permanent.  Click confirm to proceed.')){
+    if (confirm('Resetting CSS Data is permanent.  Click confirm to proceed.')) {
       this.planService.createCssData();
       this.windowService.resetAllWindows();
     }
@@ -45,6 +45,6 @@ this.planService.turnSlideOutOffSubject.subscribe(val => {
 
   /** opens and closes the settings (positioning) modal. */
   private togglePositionElements(): void {
-   this.planService.settingsModalOpened();
+    this.planService.settingsModalOpened();
   }
 }

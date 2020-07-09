@@ -10,13 +10,24 @@
 /* Styles for the UI section Titles */
 .section-title {
   font-size: 18px;
-  width: 100%;
   text-align: center;
   margin-top: 10px;
+  padding-left: 5px;
+  display:inline-block;
+}
+
+.title-wrapper {
+  width: 100%;
+  text-align: center;
 }
 
 app-border-line {
   position: relative;
+}
+
+app-pie-chart {
+  position: relative;
+  top: -1vw;
 }
 
 /* Left Container contains the charts */
@@ -37,7 +48,12 @@ app-border-line {
 
 .pie {
   padding-left: 12%;
-  padding-top: 10%;
+  padding-top: 8%;
+}
+
+.pie-title {
+  position: relative;
+  top: -1.5vw;
 }
 
 .pie-3d {
@@ -46,8 +62,14 @@ app-border-line {
 }
 
 .line {
-  margin-left: -2%;
-  margin-top: -4%;
+  margin-left: -9%;
+  margin-top: -33%;
+}
+
+.line-title {
+  position: relative;
+    top: 7vw;
+    left: 4vw;
 }
 
 .gauge {
@@ -79,7 +101,7 @@ app-border-line {
   position: relative;
   display: inline-block;
   vertical-align: top;
-  left: 5%;
+  left: 6%;
   padding-top: 0;
   margin-top: 1%;
 }
@@ -94,7 +116,7 @@ app-border-line {
   position: relative;
   display: inline-block;
   vertical-align: top;
-  left: 60%;
+  left: 62%;
   padding-top: 0;
   margin-top: -3%;
 }
@@ -105,7 +127,7 @@ app-border-line {
   padding-top: 5%;
   position: relative;
   display: inline-block;
-  left: -21%;
+  left: -18%;
 }
 
 
@@ -124,16 +146,15 @@ app-border-line {
   text-align: center;
 }
 
-.center-container>.middle>.left>h3 {
-  left: 14%;
-  top: 20%;
-  position: absolute;
-  z-index: 9999;
+.center-container>.middle>.left>.title-wrapper {
+  left: 17%;
+  top: 33%;
+  position: relative;
 }
 
 .scenario-menu {
   position: absolute;
-  left: 10%;
+  left: 9%;
 }
 
 .center-container>.middle>.middle {
@@ -248,13 +269,16 @@ app-border-line {
 
 /* Tool Tip Placement */
 .tooltip {
-  width: 20px;
-  height: 20px;
-  position: absolute;
-  z-index: 100000;
+  width: 25px;
+    height: 25px;
+    position: relative;
+    z-index: 100000;
+    display: inline-block;
+    top: 5px;
+    padding-right: 5px;
 }
 
-.center-container>.top>.tooltip {
+/* .center-container>.top>.tooltip {
   left: 42%;
   top: 9.5%;
 }
@@ -291,7 +315,7 @@ app-border-line {
 .right>.top>.tooltip {
   left: -1%;
   top: 1%;
-}
+} */
 
 .tooltip-container {
   position: absolute;
@@ -317,13 +341,4 @@ app-border-line {
   z-index: 9999999999;
   left: -327px;
   top: 0px;
-}
-
-.grid {
-  position: absolute;
-    width: 47%;
-    height: 60%;
-    left: 22.8%;
-    margin-top: 5%;
-    z-index: 3;
 }

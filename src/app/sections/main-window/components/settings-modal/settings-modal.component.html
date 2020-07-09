@@ -1,4 +1,5 @@
 <div class="map-mover mover" #mapMover>
+  <div class="overlay" #mapOverlay></div>
   <img src="../../../../../assets/images/oahu-outline.png">
   <div class="button options" (click)="expand('map')">Map Settings</div>
   <div class="settings-expansion-wrapper" #extraMap>
@@ -13,6 +14,7 @@
   </div>
 </div>
 <div class="chart-mover pie mover" #pieMover>
+  <div class="overlay" #pieOverlay></div>
   <img src="../../../../../assets/images/pie-img.png">
   <div class="button options" (click)="expand('pie')">Pie Chart Settings</div>
   <div class="settings-expansion-wrapper" #extraPie>
@@ -27,6 +29,7 @@
   </div>
 </div>
 <div class="chart-mover mover" #lineMover>
+  <div class="overlay" #lineOverlay></div>
   <img src="../../../../../assets/images/line-img.png">
   <div class="button options" (click)="expand('line')">Line Chart Settings</div>
   <div class="settings-expansion-wrapper" #extraLine>
@@ -41,6 +44,7 @@
   </div>
 </div>
 <div class="displaying-data-mover mover" #displayingDataMover>
+  <div class="overlay" #dataOverlay></div>
   <img src="../../../../../assets/images/display.png">
   <div class="button options" (click)="expand('data')">Data Display Settings</div>
   <div class="settings-expansion-wrapper" #extraData>
@@ -55,6 +59,7 @@
   </div>
 </div>
 <div class="lava-logo-mover mover" #lavaLogoMover>
+  <div class="overlay" #lavaOverlay></div>
   <img src="../../../../../assets/images/lava-logo-curves-01.webp">
   <div class="button options" (click)="expand('lava')">Lava Logo Settings</div>
   <div class="settings-expansion-wrapper" #extraLava>
@@ -69,6 +74,7 @@
   </div>
 </div>
 <div class="heco-logo-mover mover" #hecoLogoMover>
+  <div class="overlay" #hecoOverlay></div>
   <img src="../../../../../assets/images/heco-logo.png">
   <div class="button options" (click)="expand('heco')">Heco Logo Settings</div>
   <div class="settings-expansion-wrapper" #extraHeco>
@@ -86,7 +92,8 @@
   <div class="button finish" (click)="handleClick(true)" #saveButton>Save Changes</div>
   <div class="button finish" (click)="handleClick(false)" #cancelButton>Cancel Changes</div>
 </div>
-<div class="instructions" #instructions>
+
+<div class="instructions" [style.display]="freshCss ? 'block' : 'none'" #instructions>
   <h3>Welcome to the HECO 3d Projection Map</h3>
   <p>We noticed that you do not have a saved Map Layout.  You can now position and resize your display as well as hide any elements that you do not want shown.</p>
   <p>Each map element is represented by a box and icon here.  You can drag an drop them wherever you want to and the cooresponding element that is being projected will move to the cooresponding position</p>

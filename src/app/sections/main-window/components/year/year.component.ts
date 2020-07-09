@@ -67,11 +67,14 @@ export class YearComponent implements AfterViewInit {
 
   /** Moves the year wrapper to the proper location. */
   private positionYearWrapper(): void {
-    const top = this.wrapperElement.nativeElement.getBoundingClientRect().top - this.yearWrapperElement.nativeElement.getBoundingClientRect().top;
-    const left = this.wrapperElement.nativeElement.getBoundingClientRect().left - this.yearWrapperElement.nativeElement.getBoundingClientRect().left;
-
-    this.yearWrapperElement.nativeElement.style.left = `${left + this.yearWrapperElement.nativeElement.getBoundingClientRect().width / 2 - this.barLength / 2 + 1}px`;
-    this.yearWrapperElement.nativeElement.style.top = `${top + this.yearWrapperElement.nativeElement.getBoundingClientRect().height / 2 - 4.5}px`;
+    // const parent = this.yearWrapperElement.nativeElement.parentElement.getBoundingClientRect();
+    // const el = this.yearWrapperElement.nativeElement.getBoundingClientRect();
+    // const centerWidth = parent.width / 2;
+    // const centerHeight = parent.height / 2;
+    // const left = centerWidth - el.width / 2;
+    // const top = centerHeight + el.height;
+    // this.yearWrapperElement.nativeElement.style.left = `${left}px`;
+    // this.yearWrapperElement.nativeElement.style.top = `${top}px`;
   }
 
 
