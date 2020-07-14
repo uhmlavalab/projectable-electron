@@ -12,25 +12,25 @@ import { WindowService } from '@app/modules/window';
  */
 export class SettingsModalComponent implements AfterViewInit {
 
-  @ViewChild('mapMover', { static: false }) mapElement;     // The map component
-  @ViewChild('mapOverlay', { static: false }) mapOverlay;     // The map component
-  @ViewChild('pieMover', { static: false }) pieElement;     // The pie chart component.
-  @ViewChild('pieOverlay', { static: false }) pieOverlay;     // The pie chart component.
-  @ViewChild('lineMover', { static: false }) lineElement;   // The line chart component.
-  @ViewChild('lineOverlay', { static: false }) lineOverlay;   // The line chart component.
+  @ViewChild('mapMover', { static: false }) mapElement;       // The map component
+  @ViewChild('mapOverlay', { static: false }) mapOverlay;     // The draggable overlay
+  @ViewChild('pieMover', { static: false }) pieElement;       // The pie chart component.
+  @ViewChild('pieOverlay', { static: false }) pieOverlay;     // The draggable overlay
+  @ViewChild('lineMover', { static: false }) lineElement;     // The line chart component.
+  @ViewChild('lineOverlay', { static: false }) lineOverlay;   // The draggable overlay
   @ViewChild('displayingDataMover', { static: false }) displayDataElement;   // The line chart component.
-  @ViewChild('dataOverlay', { static: false }) dataOverlay;   // The line chart component.
-  @ViewChild('lavaLogoMover', { static: false }) lavaLogoElement;   // The line chart component.
-  @ViewChild('lavaOverlay', { static: false }) lavaOverlay;   // The line chart component.
-  @ViewChild('hecoLogoMover', { static: false }) hecoLogoElement;   // The line chart component.
-  @ViewChild('hecoOverlay', { static: false }) hecoOverlay;   // The line chart component.
-  @ViewChild('extraLine', { static: false }) extraLine;   // The line chart component.
-  @ViewChild('extraMap', { static: false }) extraMap;   // The line chart component.
-  @ViewChild('extraPie', { static: false }) extraPie;   // The line chart component.
-  @ViewChild('extraData', { static: false }) extraData;   // The line chart component.
-  @ViewChild('extraHeco', { static: false }) extraHeco;   // The line chart component.
-  @ViewChild('extraLava', { static: false }) extraLava;   // The line chart component.
-  @ViewChild('instructions', { static: false }) instructionsView;   // The line chart component.
+  @ViewChild('dataOverlay', { static: false }) dataOverlay;   // The draggable overlay
+  @ViewChild('lavaLogoMover', { static: false }) lavaLogoElement;   // The lava logo component.
+  @ViewChild('lavaOverlay', { static: false }) lavaOverlay;   // The draggable overlay
+  @ViewChild('hecoLogoMover', { static: false }) hecoLogoElement;   // The heco logo component.
+  @ViewChild('hecoOverlay', { static: false }) hecoOverlay;   // The draggable overlay
+  @ViewChild('extraLine', { static: false }) extraLine;       // extra options
+  @ViewChild('extraMap', { static: false }) extraMap;         // extra options
+  @ViewChild('extraPie', { static: false }) extraPie;         // extra options
+  @ViewChild('extraData', { static: false }) extraData;       // extra options
+  @ViewChild('extraHeco', { static: false }) extraHeco;       // extra options
+  @ViewChild('extraLava', { static: false }) extraLava;       // extra options
+  @ViewChild('instructions', { static: false }) instructionsView;   // instructions view loads when new css file
 
   private dragging: boolean;
   private touchId: number;
