@@ -147,7 +147,7 @@ export class LineChartComponent implements AfterViewInit {
       plugins: [{
         beforeInit: function (chart, options) {
           chart.legend.afterFit = function () {
-            this.height = this.height + 40;
+            this.height = this.height + 100;
           };
         }
       }],

@@ -71,14 +71,12 @@ export class SettingsModalComponent implements AfterViewInit {
 
         this.cssData = data;
         if (this.windowData) {
-          console.log();
           this.positionAll();
         }
       }
     });
 
     this.planService.windowDataSubject.subscribe(data => {
-      console.log(data);
       if (data) {
         this.windowData = data;
         if (this.cssData) {
@@ -96,7 +94,7 @@ export class SettingsModalComponent implements AfterViewInit {
     this.elements.forEach(e => {
 
       e.overlay.nativeElement.addEventListener('mousedown', event => {
-        this.startDrag(null, e.e);
+        this.startDrag(null, e.e, e.overlay);
       }, { passive: false });
       e.overlay.nativeElement.addEventListener('mouseup', () => {
         this.stopDrag();
@@ -116,7 +114,7 @@ export class SettingsModalComponent implements AfterViewInit {
       }, { passive: false });
 
       e.overlay.nativeElement.addEventListener('touchstart', event => {
-        this.startDrag(event.touches, e.e);
+        this.startDrag(event.touches, e.e, e.overlay);
       }, { passive: false });
       e.overlay.nativeElement.addEventListener('touchend', () => {
         this.stopDrag();
@@ -151,11 +149,11 @@ export class SettingsModalComponent implements AfterViewInit {
    * @param touches the touchlist provided by the browser.
    * @param el the element that is being positioned.
    */
-  private startDrag(touches, el): void {
+  private startDrag(touches, el, overlay): void {
     this.positionHistory = [];
     this.dragging = true;
     if (touches) {
-      this.setTouchId(touches, el); // Set the id of the finger that is dragging.
+      this.setTouchId(touches, overlay); // Set the id of the finger that is dragging.
     }
     el.nativeElement.style.zIndex = this.z;
     this.z++;

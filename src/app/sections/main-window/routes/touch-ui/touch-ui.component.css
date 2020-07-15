@@ -27,7 +27,7 @@ app-border-line {
 
 app-pie-chart {
   position: relative;
-  top: -1vw;
+  top: 2vw;
 }
 
 /* Left Container contains the charts */
@@ -52,8 +52,9 @@ app-pie-chart {
 }
 
 .pie-title {
-  position: relative;
-  top: -1.5vw;
+  top: -0.5vw;
+    left: -3vw;
+    position: relative;
 }
 
 .pie-3d {
@@ -63,13 +64,13 @@ app-pie-chart {
 
 .line {
   margin-left: -9%;
-  margin-top: -33%;
+  margin-top: -15%;
 }
 
 .line-title {
   position: relative;
-    top: 7vw;
-    left: 4vw;
+  top: 7vw;
+  left: 1vw;
 }
 
 .gauge {
@@ -147,7 +148,7 @@ app-pie-chart {
 }
 
 .center-container>.middle>.left>.title-wrapper {
-  left: 17%;
+  left: 11%;
   top: 33%;
   position: relative;
 }
@@ -339,6 +340,6 @@ app-pie-chart {
   position: absolute;
   height: 100%;
   z-index: 9999999999;
-  left: -327px;
+  left: -400px;
   top: 0px;
 }

@@ -101,7 +101,7 @@ export class TouchUiComponent implements AfterViewInit {
 
     this.windowService.getFileData();  // Nptifies the window service to get the data from any files and publish it.
 
-    // Subscribes to a bariable that tells whether to open or close the modal.
+    // Subscribes to a variable that tells whether to open or close the modal.
     this.planService.closeModalSubject.subscribe(value => {
       if (value) {
         this.handleSettingsButtonClick(false);
@@ -176,7 +176,7 @@ export class TouchUiComponent implements AfterViewInit {
       finally {
         this.sliding = true;
         if (open) {
-          let left = -330;
+          let left = -400;
           this.menuInterval = setInterval(() => {
             if (left >= 0) {
               clearInterval(this.menuInterval);
@@ -189,7 +189,7 @@ export class TouchUiComponent implements AfterViewInit {
         } else {
           let left = 0;
           this.menuInterval = setInterval(() => {
-            if (left <= -330) {
+            if (left <= -400) {
               clearInterval(this.menuInterval);
               this.sliding = false;
             } else {
