@@ -156,7 +156,7 @@ export class TouchUiComponent implements AfterViewInit {
     this.lineDiv.nativeElement.style.top = height * 0.40 + 'px';
     this.lineDiv.nativeElement.style.height =  height * 0.55 + 'px';
     const pWidth = this.lineDiv.nativeElement.parentNode.getBoundingClientRect().width;
-    this.lineDiv.nativeElement.style.left = (pWidth - 400) / 2 + 'px';
+    //this.lineDiv.nativeElement.style.left = (pWidth - 400) / 2 + 'px';
     this.lineDiv.nativeElement.style.paddingTop = '20px';
   }
 
