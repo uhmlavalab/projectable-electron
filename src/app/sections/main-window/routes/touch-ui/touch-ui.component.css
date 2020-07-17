@@ -27,34 +27,31 @@ app-border-line {
 
 app-pie-chart {
   position: relative;
-  top: 2vw;
 }
 
 /* Left Container contains the charts */
 .left-container {
-  width: 20%;
+  width: 26%;
   position: absolute;
   height: 100%;
-  padding: 2%;
   text-align: center;
 }
 
 .left-container>div {
-  height: 43%;
   width: 100%;
-  position: relative;
   text-align: center;
 }
 
 .pie {
-  padding-left: 12%;
-  padding-top: 8%;
+  /* padding-left: 12%;
+  padding-top: 8%; */
+  position: absolute;
 }
 
 .pie-title {
   top: -0.5vw;
-    left: -3vw;
-    position: relative;
+  left: -3vw;
+  position: relative;
 }
 
 .pie-3d {
@@ -63,8 +60,9 @@ app-pie-chart {
 }
 
 .line {
-  margin-left: -9%;
-  margin-top: -15%;
+  /* margin-left: -9%;
+  margin-top: -15%; */
+  position: absolute;
 }
 
 .line-title {

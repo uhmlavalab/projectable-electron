@@ -121,7 +121,7 @@ export class PieChartComponent implements AfterViewInit {
               data: [],
               backgroundColor: [],
               borderColor: [],
-              borderWidth: 4
+              borderWidth: 2
             }]
           },
           yearlyData: {}
@@ -159,23 +159,13 @@ export class PieChartComponent implements AfterViewInit {
     this.myChart = new Chart(this.ctx, {
       type: 'pie',
       options: {
-        // title: {
-        //   display: true,
-        //   text: 'Generation',
-        //   position: 'top',
-        //   fontColor: 'rgb(209, 235, 236)',
-        //   fontSize: 18,
-        //   fontFamily: 'Dalton Maag - Elevon OneG',
-        //   defaultFontFamily: Chart.defaults.global.defaultFontFamily = 'Dalton Maag - Elevon OneG'
-        // },
         legend: {
           display: false,
           labels: {
             fontColor: 'white',
             fontStyle: 'bold',
-            fontSize: 12,
+            fontSize: 14,
             fontFamily: 'Dalton Maag - Elevon OneG'
-
           }
         },
         responsive: false,
@@ -183,7 +173,7 @@ export class PieChartComponent implements AfterViewInit {
           labels: [{
             render: 'label',
             position: 'border',
-            fontSize: 10,
+            fontSize: 14,
             overlap: false,
             fontStyle: 'bold',
             fontColor: 'white',
@@ -193,7 +183,7 @@ export class PieChartComponent implements AfterViewInit {
           {
             render: 'percentage',
             fontColor: 'rgb(209, 235, 236)',
-            fontSize: 8,
+            fontSize: 14,
             fontStyle: 'bold',
             overlap: false,
             fontFamily: 'Dalton Maag - Elevon OneG'

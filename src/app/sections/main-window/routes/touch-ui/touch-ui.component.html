@@ -2,14 +2,14 @@
 <img src="assets/images/BackGround.png" class="background-image">
 <!-- This section contains the charts-->
 <div class="left-container">
-  <div class="chart pie">
+  <div class="chart pie" #pieChartDiv>
     <div class="title-wrapper pie-title">
       <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Generation Chart')">
       <div class="section-title map-title">Generation</div>
     </div>
     <app-pie-chart ></app-pie-chart>
   </div>
-  <div class="chart line">
+  <div class="chart line" #lineChartDiv>
     <div class="title-wrapper line-title">
       <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Capacity Chart')">
       <div class="section-title map-title">Capacity</div>

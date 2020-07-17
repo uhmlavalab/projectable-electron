@@ -142,12 +142,18 @@ export class LineChartComponent implements AfterViewInit {
   }
 
   createLineChart(labels: any[], datasets: any[]) {
+    let legendPadding = 0;
+    if (this.planService.isMainWindow()) {
+      const windowHeight = window.innerHeight;
+      legendPadding = windowHeight * 0.05;
+    }
+
     this.ctx = this.chartDiv.nativeElement.getContext('2d');
     this.myChart = new Chart(this.ctx, {
       plugins: [{
         beforeInit: function (chart, options) {
           chart.legend.afterFit = function () {
-            this.height = this.height + 100;
+            this.height = this.height + legendPadding;
           };
         }
       }],

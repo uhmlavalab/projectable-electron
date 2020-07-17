@@ -13,6 +13,8 @@ export class TouchUiComponent implements AfterViewInit {
   @ViewChild('year', { static: false, read: ElementRef }) yearElement: ElementRef;
   @ViewChild('ttip', { static: false, read: ElementRef }) toolTip: ElementRef;
   @ViewChild('slideMenu', {static: false, read: ElementRef}) slideMenu: ElementRef;
+  @ViewChild('lineChartDiv', {static: false, read: ElementRef}) lineDiv: ElementRef;
+  @ViewChild('pieChartDiv', {static: false, read: ElementRef}) pieDiv: ElementRef;
 
   private layers: { layer: MapLayer, state: number }[];              // Array containing all Layers (used to populate toggle buttons).
   private sectionTitles: { layer: string; map: string; scenario: string; };  // Used to label HTML elements.
@@ -25,6 +27,7 @@ export class TouchUiComponent implements AfterViewInit {
   private menuInterval: any;           // Animation interval for the slide menu.
   private sliding: boolean;            // True if animation is happening.
   private firstSlide: boolean;         // Prevents first slide when loading
+  private slideDistance: number;       // This is the width of the slide menu. It must side this far off screen to hide it.
 
   constructor(private planService: PlanService, private windowService: WindowService) {
     this.setupComplete = false;
@@ -37,9 +40,18 @@ export class TouchUiComponent implements AfterViewInit {
     this.technologies = [];
     this.sliding = false;
     this.firstSlide = true;
+    this.slideDistance = 0; // This distance is set dynamically after component is loaded.
   }
 
   ngAfterViewInit() {
+
+    // Set the position of the slide menu.
+    this.slideDistance = this.slideMenu.nativeElement.getBoundingClientRect().width;
+    this.slideMenu.nativeElement.style.left = -this.slideDistance + 'px';
+
+    // Set the position of the charts
+    this.positionPieChart();
+    this.positionLineChart();
 
     // Since this is the lowest level component of the touch interface, this receives the messages from the map.
     this.windowService.windowMessageSubject.subscribe(msg => {
@@ -132,6 +144,22 @@ export class TouchUiComponent implements AfterViewInit {
     });
   }
 
+  private positionPieChart(): void {
+    const height = window.innerHeight;
+    this.pieDiv.nativeElement.style.top = height * 0.05 + 'px';
+    const pWidth = this.pieDiv.nativeElement.parentNode.getBoundingClientRect().width;
+    this.pieDiv.nativeElement.style.left = (pWidth - 300) / 2 + 'px';
+  }
+
+  private positionLineChart(): void {
+    const height = window.innerHeight;
+    this.lineDiv.nativeElement.style.top = height * 0.40 + 'px';
+    this.lineDiv.nativeElement.style.height =  height * 0.55 + 'px';
+    const pWidth = this.lineDiv.nativeElement.parentNode.getBoundingClientRect().width;
+    this.lineDiv.nativeElement.style.left = (pWidth - 400) / 2 + 'px';
+    this.lineDiv.nativeElement.style.paddingTop = '20px';
+  }
+
   /** Checks to see if the setup is completed.  If it is, the setup Complete variable is set to true. */
   private isSetupComplete(): void {
     if (this.allReady.planSet && this.allReady.scenarioSet && this.allReady.yearSet && this.allReady.layersSet && !this.setupComplete) {
@@ -176,7 +204,7 @@ export class TouchUiComponent implements AfterViewInit {
       finally {
         this.sliding = true;
         if (open) {
-          let left = -400;
+          let left = -this.slideDistance;
           this.menuInterval = setInterval(() => {
             if (left >= 0) {
               clearInterval(this.menuInterval);
@@ -189,7 +217,7 @@ export class TouchUiComponent implements AfterViewInit {
         } else {
           let left = 0;
           this.menuInterval = setInterval(() => {
-            if (left <= -400) {
+            if (left <= -this.slideDistance) {
               clearInterval(this.menuInterval);
               this.sliding = false;
             } else {
