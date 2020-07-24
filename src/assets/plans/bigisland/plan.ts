@@ -47,7 +47,7 @@ export const BigIslandPlan: Plan = {
     height: 2479,
     bounds: [[-156.0618, 20.2696], [-154.8067, 18.9105]],
     baseMapPath: 'assets/plans/bigisland/images/base-map.png',
-    baseMiniMapPath: 'assets/plans/bigisland/images/bi-mini.png',
+    baseMiniMapPath: 'assets/plans/bigisland/images/base-map.png',
     mapLayers: [
       {
         name: 'transmission',
@@ -140,6 +140,7 @@ export const BigIslandPlan: Plan = {
         parcels: [],
         setupFunction(planService: PlanService) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
+          console.log(solarTotal);
           this.parcels.sort((a, b) => parseFloat(b.properties.cf_1) - parseFloat(a.properties.cf_1));
           this.parcels.forEach(parcel => {
             if (solarTotal > 0) {

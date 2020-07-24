@@ -51,7 +51,7 @@ export const HecoPlan: Plan = {
     height: 2794,
     bounds: [[-158.281, 21.710], [-157.647, 21.252]],
     baseMapPath: 'assets/plans/oahu-heco/images/oahu-satellite5.png',
-    baseMiniMapPath: 'assets/plans/oahu-heco/images/Oahu-mini.png',
+    baseMiniMapPath: 'assets/plans/oahu-heco/images/oahu-satellite5.png',
     mapLayers: [
       {
         name: 'transmission',

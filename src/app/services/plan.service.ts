@@ -235,6 +235,7 @@ export class PlanService {
 
   public getGenerationTotalForCurrentYear(technologies: string[]): number {
     let generationTotal = 0;
+    console.log( this.dataTable.data.generation);
     try {
       technologies.forEach(tech => {
         this.dataTable.data.generation[this.dataTable.scenario.name][tech].forEach(el => {
