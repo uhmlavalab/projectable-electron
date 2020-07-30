@@ -261,11 +261,11 @@ export const BigIslandPlan: Plan = {
         parcels: [],
         setupFunction(planService: PlanService) {
           const colors = {
-            A: '#267300' + 'aa',
-            B: '#4ce600' + 'aa',
-            C: '#ffaa00' + 'aa',
-            D: '#a87000' + 'aa',
-            E: '#895a44' + 'aa',
+            A: '#7de87d' + 'aa',
+            B: '#2edd2e' + 'aa',
+            C: '#00d10' + 'aa',
+            D: '#009300' + 'aa',
+            E: '#005400' + 'aa',
           };
           this.parcels.forEach(parcel => {
             d3.select(parcel.path)
