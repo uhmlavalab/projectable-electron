@@ -108,6 +108,15 @@
   left: 40vw;
 }
 
+.legend-mover {
+  height: 200px;
+  width: 200px;
+  border: 1px solid green;
+  border-color: var(--menu-blue);
+  position: absolute;
+  left: 40vw;
+}
+
 .displaying-data-mover {
   height: 200px;
   width: 200px;
@@ -130,6 +139,11 @@
 .map-mover>img {
   width: 50%;
   margin: 4% 25% 4% 25%;
+}
+
+.legend-mover>img {
+  width: 94%;
+  margin: 2%;
 }
 
 .displaying-data-mover>img {

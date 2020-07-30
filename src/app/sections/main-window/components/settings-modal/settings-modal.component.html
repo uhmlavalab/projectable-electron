@@ -88,6 +88,21 @@
     <div class="button show-hide" (click)="show('heco')">Show</div>
   </div>
 </div>
+<div class="legend-mover mover" #legendMover>
+  <div class="overlay" #legendOverlay></div>
+  <img src="../../../../../assets/images/gear-icon.png">
+  <div class="button options" (click)="expand('legend')">Legend Settings</div>
+  <div class="settings-expansion-wrapper" #extraLegend>
+    <p>Resize Legend</p>
+    <app-slider width="90" horizontal="true" type="resize legend" category="legend" name="legend"></app-slider>
+    <div class="small-adjustment-wrapper">
+      <div class="minus" (click)="shrink('legend')">-</div>
+      <div class="plus" (click)="grow('legend')">+</div>
+    </div>
+    <div class="button show-hide" (click)="hide('legend')">Hide</div>
+    <div class="button show-hide" (click)="show('legend')">Show</div>
+  </div>
+</div>
 <div class="button-wrapper">
   <div class="button finish" (click)="handleClick(true)" #saveButton>Save Changes</div>
   <div class="button finish" (click)="handleClick(false)" #cancelButton>Cancel Changes</div>

@@ -30,7 +30,7 @@ export class LegendComponent implements AfterViewInit, OnInit {
       if (val && this.layers !== []) {
         this.layerElements.toArray().forEach(e => {
           if (e.nativeElement.id === val.layer.name) {
-            e.nativeElement.style.opacity = val.state === 1 ? 1 : 0.1;
+            e.nativeElement.style.opacity = val.state === 1 ? 1 : 0.3;
           }
         });
       }

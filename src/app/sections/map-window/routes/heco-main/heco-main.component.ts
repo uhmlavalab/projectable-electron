@@ -18,6 +18,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
   @ViewChild('yearData', { static: false, read: ElementRef }) yearData;   // Component that displays renewable %, year, scenario
   @ViewChild('hecoLogo', { static: false, read: ElementRef }) hecoLogo;   // The heco logo component
   @ViewChild('lavaLogo', { static: false, read: ElementRef }) lavaLogo;   // The lava logo component
+  @ViewChild('legend', { static: false, read: ElementRef }) legend;   // The lava logo component
   @ViewChild('loadingScreen', { static: false, read: ElementRef }) loadingScreen: ElementRef;
 
   private positionData: any;      // Object that contains the position data (height, width, percentage) for each object
@@ -33,6 +34,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     this.positionData.lava = {};
     this.positionData.displayData = {};
     this.positionData.heco = {};
+    this.positionData.legend = {};
     this.cssData = null;
   }
 
@@ -52,7 +54,8 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       { e: this.lineChart, tag: 'line', category: 'charts' },
       { e: this.yearData, tag: 'data', category: 'data' },
       { e: this.hecoLogo, tag: 'heco', category: 'logos' },
-      { e: this.lavaLogo, tag: 'lava', category: 'logos' }
+      { e: this.lavaLogo, tag: 'lava', category: 'logos' },
+      { e: this.legend, tag: 'legend', category: 'legend' }
     ];
 
     // Pass any messages received to the plan service.
@@ -70,6 +73,10 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
         } else if (data.id === 'resize data') {
           this.resizeElement(this.yearData.nativeElement, 'data', 'data', data.width, data.height, data.percent);
           this.adjustFontSize(this.yearData.nativeElement, data.percent);
+        } else if (data.id === 'resize legend') {
+          console.log(data);
+          this.resizeElement(this.legend.nativeElement, 'legend', 'legend', data.width, data.height, data.percent);
+          this.adjustFontSize(this.legend.nativeElement, data.percent);
         }
       }
     });
@@ -80,7 +87,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
         if (data.x && data.y) {
           // Data is percentage from left (x) and top (y) and must be converted to pixel values.
           const x = this.convertPercentToPixel(data.x, true);
-          const y = this.convertPercentToPixel(data.y, false);
+          const y = this.convertPercentToPixel(data.y, false);  
           const e = this.elements.find(element => element.tag === data.id);
           e.e.nativeElement.style.left = `${x}px`;
           e.e.nativeElement.style.top = `${y}px`;
@@ -124,7 +131,6 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     this.planService.getWidthSubject.subscribe((val: boolean) => {
       if (val) {
         this.elements.forEach(e => {
-          console.log(e);
           this.planService.updateCSSHeight(e.category, e.tag, e.e.nativeElement.getBoundingClientRect().height);
           this.planService.updateCSSWidth(e.category, e.tag, e.e.nativeElement.getBoundingClientRect().width);
         });
@@ -154,6 +160,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       this.resizeElement(this.lavaLogo.nativeElement, 'logos', 'lava', cssData.logos.lava.width, cssData.logos.lava.height, cssData.logos.lava.percent);
       // tslint:disable-next-line: max-line-length
       this.resizeElement(this.hecoLogo.nativeElement, 'logos', 'heco', cssData.logos.heco.width, cssData.logos.heco.height, cssData.logos.heco.percent);
+      this.resizeElement(this.legend.nativeElement, 'legend', 'legend', cssData.legend.legend.width, cssData.legend.legend.height, cssData.legend.legend.percent);
       this.adjustFontSize(this.yearData.nativeElement, cssData.data.percent);
     }, 500);
   }
@@ -177,12 +184,13 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
     if (width === 0 || height === 0) {
       width = e.getBoundingClientRect().width;
       height = e.getBoundingClientRect().height;
+
       this.planService.updateCSSHeight(category, elementName, height);
       this.planService.updateCSSWidth(category, elementName, width);
-      console.log(this.cssData);
       const css_path = this.cssData[category][elementName];
       css_path.width = width;
       css_path.height = height;
+      console.log(css_path);
     }
 
     // Resize the element if a valid percentage value was received.

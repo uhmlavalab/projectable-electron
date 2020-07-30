@@ -16,7 +16,8 @@ export const HecoPlan: Plan = {
     { category: 'charts', name: 'line' },
     { category: 'charts', name: 'pie' },
     { category: 'logos', name: 'lava' },
-    { category: 'logos', name: 'heco' }
+    { category: 'logos', name: 'heco' },
+    { category: 'legend', name: 'legend' }
   ],
   minYear: 2016,
   maxYear: 2045,
@@ -122,10 +123,10 @@ export const HecoPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Federal Land', color: '#e60000' , textColor: 'black'},
-          { text: 'State Land', color: '#ff7f7f' , textColor: 'black'},
-          { text: 'Department of Hawaiian Homelands', color: '#895a44' , textColor: 'black'},
-          { text: 'County Land', color: '#00c5ff' , textColor: 'black'},
+          { text: 'Federal Land', color: '#e60000', textColor: 'black' },
+          { text: 'State Land', color: '#ff7f7f', textColor: 'black' },
+          { text: 'Department of Hawaiian Homelands', color: '#895a44', textColor: 'black' },
+          { text: 'County Land', color: '#00c5ff', textColor: 'black' },
         ]
       },
       {
@@ -144,7 +145,7 @@ export const HecoPlan: Plan = {
         parcels: [],
         setupFunction: null,
         updateFunction: null,
-        legend: [{ text: 'Park Lands', color: mapLayerColors.Parks.fill , textColor: 'black'}],
+        legend: [{ text: 'Park Lands', color: mapLayerColors.Parks.fill, textColor: 'black' }],
       },
       {
         name: 'existing_re',
@@ -226,7 +227,7 @@ export const HecoPlan: Plan = {
         },
         legend: [
           { text: 'Viable land for wind energy ', color: 'white', textColor: 'black' },
-          { text: 'Land Area required to meet wind energy goal', color: mapLayerColors.Wind.fill, textColor: 'black'}
+          { text: 'Land Area required to meet wind energy goal', color: mapLayerColors.Wind.fill, textColor: 'black' }
         ],
       },
       {

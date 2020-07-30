@@ -24,12 +24,15 @@ export class SettingsModalComponent implements AfterViewInit {
   @ViewChild('lavaOverlay', { static: false }) lavaOverlay;   // The draggable overlay
   @ViewChild('hecoLogoMover', { static: false }) hecoLogoElement;   // The heco logo component.
   @ViewChild('hecoOverlay', { static: false }) hecoOverlay;   // The draggable overlay
+  @ViewChild('legendMover', { static: false }) legendElement;   // The draggable overlay
+  @ViewChild('legendOverlay', { static: false }) legendOverlay;   // The draggable overlay
   @ViewChild('extraLine', { static: false }) extraLine;       // extra options
   @ViewChild('extraMap', { static: false }) extraMap;         // extra options
   @ViewChild('extraPie', { static: false }) extraPie;         // extra options
   @ViewChild('extraData', { static: false }) extraData;       // extra options
   @ViewChild('extraHeco', { static: false }) extraHeco;       // extra options
   @ViewChild('extraLava', { static: false }) extraLava;       // extra options
+  @ViewChild('extraLegend', { static: false }) extraLegend;       // extra options
   @ViewChild('instructions', { static: false }) instructionsView;   // instructions view loads when new css file
 
   private dragging: boolean;
@@ -63,7 +66,8 @@ export class SettingsModalComponent implements AfterViewInit {
       // tslint:disable-next-line: max-line-length
       { tag: 'data', category: 'data', e: this.displayDataElement, extraE: this.extraData, top: 0, left: 0, extra: false, id: 'resize data', overlay: this.dataOverlay },
       { tag: 'heco', category: 'logos', e: this.hecoLogoElement, extraE: this.extraHeco, top: 0, left: 0, extra: false, id: 'resize heco' , overlay: this.hecoOverlay},
-      { tag: 'lava', category: 'logos', e: this.lavaLogoElement, extraE: this.extraLava, top: 0, left: 0, extra: false, id: 'resize lava', overlay: this.lavaOverlay}
+      { tag: 'lava', category: 'logos', e: this.lavaLogoElement, extraE: this.extraLava, top: 0, left: 0, extra: false, id: 'resize lava', overlay: this.lavaOverlay},
+      { tag: 'legend', category: 'legend', e: this.legendElement, extraE: this.extraLegend, top: 0, left: 0, extra: false, id: 'resize legend', overlay: this.legendOverlay}
     ];
 
     this.planService.cssSubject.subscribe(data => {

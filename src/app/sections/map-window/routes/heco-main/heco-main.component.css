@@ -8,6 +8,10 @@
     position: absolute;
 }
 
+.legend {
+    position: absolute;
+}
+
 .year-data {
     position: absolute;
     color: white;

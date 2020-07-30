@@ -1,16 +1,16 @@
-<app-map-element class="map-container" cdkDrag #map>
+<app-map-element class="map-container" #map>
 </app-map-element>
-<app-line-chart class="line-chart chart" cdkDrag #lineChart>
+<app-line-chart class="line-chart chart" #lineChart>
 </app-line-chart>
-<app-pie-chart class="pie-chart chart" cdkDrag #pieChart>
+<app-pie-chart class="pie-chart chart" #pieChart>
 </app-pie-chart>
-<app-year-data-display class="year-data" cdkDrag #yearData></app-year-data-display>
-<img src="../../../../../assets/images/lava-logo-curves-01.webp" class="lava-logo" #lavaLogo ckdDrag>
-<img src="../../../../../assets/images/heco-logo.png" class="heco-logo" #hecoLogo ckdDrag>
+<app-year-data-display class="year-data" #yearData></app-year-data-display>
+<img src="../../../../../assets/images/lava-logo-curves-01.webp" class="lava-logo" #lavaLogo>
+<img src="../../../../../assets/images/heco-logo.png" class="heco-logo" #hecoLogo>
 <!-- Loading Image -->
 <!-- <div class="loading-screen" #loadingScreen>
     <app-spinning-button text="Loading Data" color="#00d2ff"></app-spinning-button>
 </div> -->
 
 <!-- Legend -->
-<app-legend></app-legend>
+<app-legend class="legend" #legend></app-legend>

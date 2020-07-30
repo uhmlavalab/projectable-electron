@@ -16,7 +16,8 @@ export const MauiPlan: Plan = {
     { category: 'charts', name: 'line' },
     { category: 'charts', name: 'pie' },
     { category: 'logos', name: 'lava' },
-    { category: 'logos', name: 'heco' }
+    { category: 'logos', name: 'heco' },
+    { category: 'legend', name: 'legend' }
   ],
   minYear: 2016,
   maxYear: 2045,

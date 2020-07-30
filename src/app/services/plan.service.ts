@@ -141,7 +141,8 @@ export class PlanService {
         heco: true,
         pie: true,
         data: true,
-        line: true
+        line: true,
+        legend: true
       }
     };
   }
@@ -792,6 +793,7 @@ export class PlanService {
       // set the path to the correct variable location.
       const css_path = this.CSS[this.dataTable.plan.name][elementCategory][elementName];
       css_path.width = widthValue;
+      console.log(widthValue, elementName);
       if (!this.windowService.isMain()) {
         this.windowService.sendMessage({ type: 'update width', message: { cat: elementCategory, name: elementName, width: widthValue } });
       }
@@ -982,6 +984,10 @@ export class PlanService {
         if (css_path.charts.pie.percent && css_path.charts.pie.percent > 0) {
           // tslint:disable-next-line: max-line-length
           this.resizeSubject.next({ id: 'resize pie', width: css_path.charts.pie.width, height: css_path.charts.pie.height, percent: css_path.charts.pie.percent });
+        }
+        if (css_path.legend.legend.percent && css_path.legend.legend.percent > 0) {
+          // tslint:disable-next-line: max-line-length
+          this.resizeSubject.next({ id: 'resize legend', width: css_path.legend.legend.width, height: css_path.legend.legend.height, percent: css_path.legend.legend.percent });
         }
       }
     }
