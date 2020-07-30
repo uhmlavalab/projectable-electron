@@ -25,11 +25,11 @@ export class IslandSelectionButtonsComponent implements OnInit{
     }
 
     private changeIsland(island: string) {
-      if (island !== 'Molokai'){
+      if (island !== 'Molokai' && island !== this.selectedIsland){
         if (confirm('Changing Island to ' + island + '.')){
           this.windowService.changeIsland(this.islands.indexOf(island));
         }
-      } else {
+      } else if (island === 'Molokai') {
         alert('Molokai is currently unavailable.')
       }
     }

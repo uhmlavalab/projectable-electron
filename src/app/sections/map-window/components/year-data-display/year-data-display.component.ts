@@ -32,7 +32,7 @@ export class YearDataDisplayComponent implements OnInit {
       if (percent) {
         this.percentRenewable = percent;
       }
-      this.cdr.detectChanges();
+        this.cdr.detectChanges();
     });
 
     this.planService.scenarioSubject.subscribe(scenario => {
@@ -40,7 +40,7 @@ export class YearDataDisplayComponent implements OnInit {
         this.scenario = scenario.displayName;
       } else {
         this.scenario = 'not set';
-        this.cdr.detectChanges();
+          this.cdr.detectChanges();
       }
     });
 

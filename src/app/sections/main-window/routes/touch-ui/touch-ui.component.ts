@@ -12,9 +12,10 @@ export class TouchUiComponent implements AfterViewInit {
 
   @ViewChild('year', { static: false, read: ElementRef }) yearElement: ElementRef;
   @ViewChild('ttip', { static: false, read: ElementRef }) toolTip: ElementRef;
-  @ViewChild('slideMenu', {static: false, read: ElementRef}) slideMenu: ElementRef;
-  @ViewChild('lineChartDiv', {static: false, read: ElementRef}) lineDiv: ElementRef;
-  @ViewChild('pieChartDiv', {static: false, read: ElementRef}) pieDiv: ElementRef;
+  @ViewChild('slideMenu', { static: false, read: ElementRef }) slideMenu: ElementRef;
+  @ViewChild('lineChartDiv', { static: false, read: ElementRef }) lineDiv: ElementRef;
+  @ViewChild('pieChartDiv', { static: false, read: ElementRef }) pieDiv: ElementRef;
+  @ViewChild('loadingScreen', { static: false, read: ElementRef }) loadingScreen: ElementRef;
 
   private layers: { layer: MapLayer, state: number }[];              // Array containing all Layers (used to populate toggle buttons).
   private sectionTitles: { layer: string; map: string; scenario: string; };  // Used to label HTML elements.
@@ -44,6 +45,13 @@ export class TouchUiComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
+
+    // // Set subscription to remove loading image
+    // this.planService.mapImageLoaded.subscribe(val => {
+    //   if (val) {
+    //     this.loadingScreen.nativeElement.style.display = 'none';
+    //   }
+    // });
 
     // Set the position of the slide menu.
     this.slideDistance = this.slideMenu.nativeElement.getBoundingClientRect().width;
@@ -154,7 +162,7 @@ export class TouchUiComponent implements AfterViewInit {
   private positionLineChart(): void {
     const height = window.innerHeight;
     this.lineDiv.nativeElement.style.top = height * 0.40 + 'px';
-    this.lineDiv.nativeElement.style.height =  height * 0.55 + 'px';
+    this.lineDiv.nativeElement.style.height = height * 0.55 + 'px';
     const pWidth = this.lineDiv.nativeElement.parentNode.getBoundingClientRect().width;
     //this.lineDiv.nativeElement.style.left = (pWidth - 400) / 2 + 'px';
     this.lineDiv.nativeElement.style.paddingTop = '20px';
@@ -200,7 +208,7 @@ export class TouchUiComponent implements AfterViewInit {
     if (!this.sliding) {
       try {
         clearInterval(this.menuInterval);
-      } catch (e) {}
+      } catch (e) { }
       finally {
         this.sliding = true;
         if (open) {

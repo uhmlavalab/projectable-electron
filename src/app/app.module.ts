@@ -15,7 +15,7 @@ import { PlanService } from './services/plan.service';
 
 @NgModule({
   declarations: [
-    AppComponent,
+    AppComponent
   ],
   imports: [
     BrowserModule,

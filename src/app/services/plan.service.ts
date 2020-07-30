@@ -9,8 +9,6 @@ import { SoundsService } from '@app/sounds';
 import * as d3 from 'd3/d3.min';
 import { WindowService } from '@app/modules/window';
 import { DataTable } from '@app/interfaces/data-table';
-import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
-import { Message } from '@angular/compiler/src/i18n/i18n_ast';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +18,7 @@ export class PlanService {
   private dataTable: DataTable; // This variable holds all active data.
   private CSS: any;       // Holds the css data for the positioning of the charts and map objects.
   private freshCss: boolean;    // True when a new css file is loaded, false if data is already in the file.
+  private imageLoaded: boolean;
 
   // Data publishers.
   public planSetSubject = new BehaviorSubject<boolean>(false);          // Tells components when the plan is set.
@@ -61,8 +60,10 @@ export class PlanService {
   public settingsModalOpenedSubject = new BehaviorSubject<boolean>(false); // When the modal is opened, the map needs to turn off layers.
   public settingsCanceledSubject = new BehaviorSubject<boolean>(false); // When modal closed, turn layers back of if they were off.
   public laserPointerSubject = new BehaviorSubject<{ x: number, y: number, start: boolean, end: boolean }>(null);
+  public mapImageLoaded = new BehaviorSubject<boolean>(false);          // Publishes when map image completes loading
 
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
+    this.imageLoaded = false;
     this.freshCss = true;            // Fresh css is set to true before checking.
     this.initializeDataTable();      // Set up the data table.
     this.windowService.cssSubject.subscribe(css => this.setCSS(css));
@@ -235,7 +236,6 @@ export class PlanService {
 
   public getGenerationTotalForCurrentYear(technologies: string[]): number {
     let generationTotal = 0;
-    console.log( this.dataTable.data.generation);
     try {
       technologies.forEach(tech => {
         this.dataTable.data.generation[this.dataTable.scenario.name][tech].forEach(el => {
@@ -574,6 +574,15 @@ export class PlanService {
     return technologies;
   }
 
+  /** The map legend queries this function with a layer name to get the color and text to display.
+   * @param layerName the name of the layer
+   * @retun the text and colors of this layer
+   */
+  public getLegendData(layerName: string): {text: string, color: string, textColor: string}[] {
+    const el = this.dataTable.layers.all.find(e => e.layer.name === layerName);
+    return el.layer.legend;
+  }
+
   /** Returns the current year data.
    * Years array, current year, current renewable percentage for that year, min year, max year.
    * @return the current year data.
@@ -593,7 +602,7 @@ export class PlanService {
   private setCSS(css: any): void {
 
     if (!this.dataTable.plan.name) {
-      setTimeout( () => this.setCSS(css), 100);
+      setTimeout(() => this.setCSS(css), 100);
       return;
     }
     // The css data needs to have all of these paths.  If it doesn't, the app will make a new css file.
@@ -898,6 +907,12 @@ export class PlanService {
     this.windowService.sendMessage({ type: 'get other window data', message: this.windowService.isMain() });
   }
 
+  public notifyMapImageComplete(): void {
+    this.imageLoaded = true;
+    this.windowService.sendMessage({ type: 'image loaded'});
+    this.mapImageLoaded.next(true);
+  }
+
   /** Messages are received by heco-main component and touch-ui component for the two windows.  The messages are sent
    * to this function to be parsed.
    * @param msg the message to be parsed.
@@ -939,6 +954,9 @@ export class PlanService {
       if (!this.windowService.isMain()) {
         this.setCSS(msg.message);
       }
+    } else if (msg.type === 'image loaded') {
+      this.imageLoaded = true;
+      this.mapImageLoaded.next(true);
     } else if (msg.type === 'update cssData file') {
       if (!this.windowService.isMain() && msg.message.saveData) {
         this.storeCssData();

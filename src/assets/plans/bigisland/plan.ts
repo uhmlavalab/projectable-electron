@@ -42,7 +42,7 @@ export const BigIslandPlan: Plan = {
   },
   map: {
     scale: 0.26,
-    miniMapScale: 0.15,
+    miniMapScale: 0.12,
     width: 2179,
     height: 2479,
     bounds: [[-156.0618, 20.2696], [-154.8067, 18.9105]],
@@ -79,7 +79,7 @@ export const BigIslandPlan: Plan = {
               .style('display', state ? 'block' : 'none');
           });
         },
-        legend: [{ text: 'Transmission Lines', color: mapLayerColors.Transmission.border }]
+        legend: [{ text: 'Transmission Lines', color: mapLayerColors.Transmission.border, textColor: 'black' }]
       },
       {
         name: 'dod',
@@ -118,10 +118,10 @@ export const BigIslandPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Federal Land', color: '#e60000' },
-          { text: 'State Land', color: '#ff7f7f' },
-          { text: 'Department of Hawaiian Homelands', color: '#895a44' },
-          { text: 'County Land', color: '#00c5ff' },
+          { text: 'Federal Land', color: '#e60000', textColor: 'black' },
+          { text: 'State Land', color: '#ff7f7f' , textColor: 'black'},
+          { text: 'Department of Hawaiian Homelands', color: '#895a44', textColor: 'black' },
+          { text: 'County Land', color: '#00c5ff', textColor: 'black' },
         ]
       },
       {
@@ -163,7 +163,8 @@ export const BigIslandPlan: Plan = {
         },
         updateFunction(planService: PlanService, state) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
-          const interval = planService.isMainWindow() ? Math.round(this.parcels.length / 2000) : 1;
+          console.log(solarTotal);
+          const interval = planService.isMainWindow() ? 3 : 1;
           this.parcels.forEach((parcel, index) => {
             if (index % interval === 0) {
               if (solarTotal > 0) {
@@ -180,8 +181,8 @@ export const BigIslandPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Viable land for solar energy ', color: 'white' },
-          { text: 'Land Area required to meet solar energy goal', color: mapLayerColors.Solar.fill }
+          { text: 'Viable land for solar energy ', color: 'white', textColor: 'black' },
+          { text: 'Land Area required to meet solar energy goal', color: mapLayerColors.Solar.fill, textColor: 'black' }
         ],
       },
       {
@@ -222,7 +223,7 @@ export const BigIslandPlan: Plan = {
         },
         updateFunction(planService: PlanService, state) {
           let windTotal = planService.getGenerationTotalForCurrentYear(['Wind']);
-          const interval = planService.isMainWindow() ? Math.round(this.parcels.length / 2000) : 1;
+          const interval = planService.isMainWindow() ? 5 : 1;
           this.parcels.forEach((parcel, index) => {
             if (index % interval === 0) {
               if (windTotal > 0) {
@@ -239,8 +240,8 @@ export const BigIslandPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Viable land for wind energy ', color: 'white' },
-          { text: 'Land Area required to meet wind energy goal', color: mapLayerColors.Wind.fill }
+          { text: 'Viable land for wind energy ', color: 'white', textColor: 'black' },
+          { text: 'Land Area required to meet wind energy goal', color: mapLayerColors.Wind.fill, textColor: 'black' }
         ],
       },
       {
@@ -281,11 +282,11 @@ export const BigIslandPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Class A Lands', color: '#7de87d' },
-          { text: 'Class B Lands', color: '#2edd2e' },
-          { text: 'Class C Lands', color: '#00d100' },
-          { text: 'Class D Lands', color: '#009300' },
-          { text: 'Class E Lands', color: '#005400' },
+          { text: 'Class A Lands', color: '#7de87d', textColor: 'black' },
+          { text: 'Class B Lands', color: '#2edd2e', textColor: 'black' },
+          { text: 'Class C Lands', color: '#00d100', textColor: 'black' },
+          { text: 'Class D Lands', color: '#009300', textColor: 'black' },
+          { text: 'Class E Lands', color: '#005400' , textColor: 'black'},
         ]
       }
     ],

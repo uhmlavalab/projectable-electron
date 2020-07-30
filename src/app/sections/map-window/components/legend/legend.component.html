@@ -1,0 +1,7 @@
+<div class="legend-wrapper">
+    <app-legend-item *ngFor="let layer of layers" layerName={{layer.layer.name}}
+    displayName={{layer.layer.displayName}}
+    state={{layer.state}}
+    id={{layer.layer.name}}
+    #layerEl></app-legend-item>
+</div>

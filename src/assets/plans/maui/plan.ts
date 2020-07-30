@@ -43,12 +43,12 @@ export const MauiPlan: Plan = {
 
   map: {
     scale: 0.258,
-    miniMapScale: 0.1,
+    miniMapScale: 0.10,
     width: 3613,
     height: 2794,
     bounds: [[-156.656958, 21.057764], [-156.022083, 20.473471]],
     baseMapPath: 'assets/plans/maui/images/base-map.png',
-    baseMiniMapPath: 'assets/plans/maui/images/base-map.png',
+    baseMiniMapPath: 'assets/plans/maui/images/maui-mini-eva.png',
     mapLayers: [
       {
         name: 'transmission',
@@ -80,7 +80,7 @@ export const MauiPlan: Plan = {
               .style('display', state === 1 ? 'block' : 'none');
           });
         },
-        legend: [{ text: 'Transmission Lines', color: mapLayerColors.Transmission.border }],
+        legend: [{ text: 'Transmission Lines', color: mapLayerColors.Transmission.border, textColor: 'black' }],
       },
       {
         name: 'dod',
@@ -119,10 +119,10 @@ export const MauiPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Federal Land', color: '#e60000' },
-          { text: 'State Land', color: '#ff7f7f' },
-          { text: 'Department of Hawaiian Homelands', color: '#895a44' },
-          { text: 'County Land', color: '#00c5ff' },
+          { text: 'Federal Land', color: '#e60000', textColor: 'black' },
+          { text: 'State Land', color: '#ff7f7f', textColor: 'black' },
+          { text: 'Department of Hawaiian Homelands', color: '#895a44', textColor: 'black' },
+          { text: 'County Land', color: '#00c5ff', textColor: 'black' },
         ]
       },
       {
@@ -141,7 +141,7 @@ export const MauiPlan: Plan = {
         filePath: 'assets/plans/maui/layers/parks.json',
         setupFunction: null,
         updateFunction: null,
-        legend: [{ text: 'Park Lands', color: mapLayerColors.Parks.fill }],
+        legend: [{ text: 'Park Lands', color: mapLayerColors.Parks.fill, textColor: 'black' }],
       },
       {
         name: 'wind',
@@ -205,8 +205,8 @@ export const MauiPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Viable land for wind energy ', color: 'white' },
-          { text: 'Land Area required to meet wind energy goal', color: mapLayerColors.Wind.fill }
+          { text: 'Viable land for wind energy ', color: 'white', textColor: 'black' },
+          { text: 'Land Area required to meet wind energy goal', color: mapLayerColors.Wind.fill, textColor: 'black' }
         ],
       },
       {
@@ -248,7 +248,7 @@ export const MauiPlan: Plan = {
         updateFunction(planService: PlanService, state) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           this.parcels.forEach((parcel, index) => {
-            if (!planService.isMainWindow() || index % 7 === 0) {
+            if (!planService.isMainWindow() || index % 4 === 0) {
               if (solarTotal > 0) {
                 d3.select(parcel.path)
                   .style('fill', this.fillColor)
@@ -263,8 +263,8 @@ export const MauiPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Viable land for solar energy ', color: 'white' },
-          { text: 'Land Area required to meet solar energy goal', color: mapLayerColors.Solar.fill }
+          { text: 'Viable land for solar energy ', color: 'white' , textColor: 'black'},
+          { text: 'Land Area required to meet solar energy goal', color: mapLayerColors.Solar.fill, textColor: 'black'}
         ],
       },
       {
@@ -305,11 +305,11 @@ export const MauiPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Class A Lands', color: '#7de87d' },
-          { text: 'Class B Lands', color: '#2edd2e' },
-          { text: 'Class C Lands', color: '#00d100' },
-          { text: 'Class D Lands', color: '#009300' },
-          { text: 'Class E Lands', color: '#005400' },
+          { text: 'Class A Lands', color: '#7de87d', textColor: 'black' },
+          { text: 'Class B Lands', color: '#2edd2e', textColor: 'black' },
+          { text: 'Class C Lands', color: '#00d100', textColor: 'black' },
+          { text: 'Class D Lands', color: '#009300', textColor: 'black' },
+          { text: 'Class E Lands', color: '#005400', textColor: 'black' },
         ],
       },
     ],

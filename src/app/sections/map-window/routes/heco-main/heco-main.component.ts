@@ -18,6 +18,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
   @ViewChild('yearData', { static: false, read: ElementRef }) yearData;   // Component that displays renewable %, year, scenario
   @ViewChild('hecoLogo', { static: false, read: ElementRef }) hecoLogo;   // The heco logo component
   @ViewChild('lavaLogo', { static: false, read: ElementRef }) lavaLogo;   // The lava logo component
+  @ViewChild('loadingScreen', { static: false, read: ElementRef }) loadingScreen: ElementRef;
 
   private positionData: any;      // Object that contains the position data (height, width, percentage) for each object
   private messageSub = new Subscription();  // Stub that handles all messages coming from the main window.
@@ -36,6 +37,14 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
+
+        // // Set subscription to remove loading image
+        // this.planService.mapImageLoaded.subscribe(val => {
+        //   if (val) {
+        //     this.loadingScreen.nativeElement.style.display = 'none';
+        //   }
+        // });
+
     // Some elements have nested objects, like charts.pie, or logos.lava, some like map do not.
     this.elements = [
       { e: this.mapElement, tag: 'map', category: 'map' },

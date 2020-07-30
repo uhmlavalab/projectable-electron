@@ -83,7 +83,7 @@ export const HecoPlan: Plan = {
               .style('display', state === 1 ? 'block' : 'none');
           });
         },
-        legend: [{ text: 'Transmission Lines', color: mapLayerColors.Transmission.border }],
+        legend: [{ text: 'Transmission Lines', color: mapLayerColors.Transmission.border, textColor: 'black' }],
       },
       {
         name: 'dod',
@@ -122,10 +122,10 @@ export const HecoPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Federal Land', color: '#e60000' },
-          { text: 'State Land', color: '#ff7f7f' },
-          { text: 'Department of Hawaiian Homelands', color: '#895a44' },
-          { text: 'County Land', color: '#00c5ff' },
+          { text: 'Federal Land', color: '#e60000' , textColor: 'black'},
+          { text: 'State Land', color: '#ff7f7f' , textColor: 'black'},
+          { text: 'Department of Hawaiian Homelands', color: '#895a44' , textColor: 'black'},
+          { text: 'County Land', color: '#00c5ff' , textColor: 'black'},
         ]
       },
       {
@@ -144,7 +144,7 @@ export const HecoPlan: Plan = {
         parcels: [],
         setupFunction: null,
         updateFunction: null,
-        legend: [{ text: 'Park Lands', color: mapLayerColors.Parks.fill }],
+        legend: [{ text: 'Park Lands', color: mapLayerColors.Parks.fill , textColor: 'black'}],
       },
       {
         name: 'existing_re',
@@ -162,7 +162,7 @@ export const HecoPlan: Plan = {
         parcels: [],
         setupFunction: null,
         updateFunction: null,
-        legend: [{ text: 'Existing Renewables', color: mapLayerColors.Existing_RE.fill }],
+        legend: [{ text: 'Existing Renewables', color: mapLayerColors.Existing_RE.fill, textColor: 'black' }],
       },
       {
         name: 'wind',
@@ -225,8 +225,8 @@ export const HecoPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Viable land for wind energy ', color: 'white' },
-          { text: 'Land Area required to meet wind energy goal', color: mapLayerColors.Wind.fill }
+          { text: 'Viable land for wind energy ', color: 'white', textColor: 'black' },
+          { text: 'Land Area required to meet wind energy goal', color: mapLayerColors.Wind.fill, textColor: 'black'}
         ],
       },
       {
@@ -289,8 +289,8 @@ export const HecoPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Viable land for solar energy ', color: 'white' },
-          { text: 'Land Area required to meet solar energy goal', color: mapLayerColors.Solar.fill }
+          { text: 'Viable land for solar energy ', color: 'white', textColor: 'black' },
+          { text: 'Land Area required to meet solar energy goal', color: mapLayerColors.Solar.fill, textColor: 'black' }
         ],
       },
       {
@@ -331,11 +331,11 @@ export const HecoPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Class A Lands', color: '#7de87d' },
-          { text: 'Class B Lands', color: '#2edd2e' },
-          { text: 'Class C Lands', color: '#00d100' },
-          { text: 'Class D Lands', color: '#009300' },
-          { text: 'Class E Lands', color: '#005400' },
+          { text: 'Class A Lands', color: '#7de87d', textColor: 'black' },
+          { text: 'Class B Lands', color: '#2edd2e', textColor: 'black' },
+          { text: 'Class C Lands', color: '#00d100', textColor: 'black' },
+          { text: 'Class D Lands', color: '#009300', textColor: 'black' },
+          { text: 'Class E Lands', color: '#005400', textColor: 'black' },
         ],
       },
       {
@@ -410,8 +410,8 @@ export const HecoPlan: Plan = {
           });
         },
         legend: [
-          { text: 'Land defined as Important Agriculture', color: 'black' },
-          { text: 'Land necessary to meet solar energy goal', color: mapLayerColors.Solar.fill }
+          { text: 'Land defined as Important Agriculture', color: 'black', textColor: 'white' },
+          { text: 'Land necessary to meet solar energy goal', color: mapLayerColors.Solar.fill, textColor: 'black' }
         ],
       },
       {
@@ -539,7 +539,7 @@ export const HecoPlan: Plan = {
           });
         },
         legend: [
-          { text: 'The layer changes to red as DER is added.', color: 'linear-gradient(90deg, #f5f500 0%, #f5da00 11%, #f5be00 22%, #f5a300 33%, #f58800 44%, #f56d00 55%, #f55200 66%, #f53600 77%, #f51b00 88%, #f50000 100%)' }
+          { text: 'The layer changes to red as DER is added.', color: 'linear-gradient(90deg, #f5f500 0%, #f5da00 11%, #f5be00 22%, #f5a300 33%, #f58800 44%, #f56d00 55%, #f55200 66%, #f53600 77%, #f51b00 88%, #f50000 100%)', textColor: 'black' }
         ],
       }
     ],

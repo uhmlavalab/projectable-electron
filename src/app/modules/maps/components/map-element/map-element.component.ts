@@ -58,11 +58,13 @@ export class MapElementComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-
-
   }
 
   ngAfterViewInit() {
+    if (this.planService.isMainWindow()) {
+      this.waitForImageLoad();
+    }
+
     if (this.isMiniMap) {
       this.grid.nativeElement.addEventListener('touchstart', event => {
         this.passPointerLocation(event, true, true, false);
@@ -391,5 +393,21 @@ export class MapElementComponent implements OnInit, AfterViewInit {
 
     this.pointer.nativeElement.style.left = `${left}px`;
     this.pointer.nativeElement.style.top = `${top}px`;
+  }
+
+  private waitForImageLoad() {
+
+    if (this.mapDiv) {
+      if (this.mapDiv.nativeElement) {
+        if (this.mapDiv.nativeElement.children) {
+          if (this.mapDiv.nativeElement.children[0]) {
+            console.log('loaded');
+            this.mapDiv.nativeElement.children[0].addEventListener('load', () => this.planService.notifyMapImageComplete());
+            return;
+          }
+        }
+      }
+    }
+    setTimeout(() => this.waitForImageLoad(), 100);
   }
 }

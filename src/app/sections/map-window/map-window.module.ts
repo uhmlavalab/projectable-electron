@@ -18,6 +18,8 @@ import { HecoMainComponent } from './routes/heco-main/heco-main.component';
 import { MapWindowLayoutComponent } from './layout/map-window-layout.component';
 import { YearDataDisplayComponent } from './components/year-data-display/year-data-display.component';
 import { DisplayComponent } from './components/display/display.component';
+import { LegendComponent } from './components/legend/legend.component';
+import { LegendItemComponent } from './components/legend/components/legend-item/legend-item.component';
 
 
 @NgModule({
@@ -26,7 +28,9 @@ import { DisplayComponent } from './components/display/display.component';
     WaitingScreenComponent,
     HecoMainComponent,
     YearDataDisplayComponent,
-    DisplayComponent
+    DisplayComponent,
+    LegendComponent,
+    LegendItemComponent
   ],
   imports: [
     CommonModule,

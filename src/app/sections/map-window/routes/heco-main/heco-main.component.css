@@ -18,3 +18,24 @@
     position: absolute;
     width: 200px;
 }
+
+/* The Loading Image */
+.loading-screen {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 9999999;
+    text-align: center;
+    background-color: black;
+    display: none;
+  }
+  
+  app-spinning-button {
+    position: absolute;
+    width: 20vw;
+    height: 20vw;
+    left: 38vw;
+    top: calc(50% - 12vw);
+  }
