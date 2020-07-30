@@ -18,6 +18,7 @@ export class WindowService {
   numWindows: any;
   checkNumWindowsInterval: any;
   public planIdSubject = new Subject<number>();
+  public loadingSubject = new Subject<boolean>();
 
   constructor(private router: Router, private ngZone: NgZone) {
     this.windowName = '';
@@ -140,7 +141,17 @@ export class WindowService {
 
   private resetCheck(value: boolean) {
     if (value) {
-      window.location.reload();
+      this.loadingSubject.next(true);
+      if (this.windowName === 'main') {
+        setTimeout( ()=> {
+          window.location.reload();
+        }, 1000);
+      } else {
+        window.location.reload();
+      }
+      setTimeout(() => {
+        this.loadingSubject.next(false);
+      }, 1200);  
     }
   }
 

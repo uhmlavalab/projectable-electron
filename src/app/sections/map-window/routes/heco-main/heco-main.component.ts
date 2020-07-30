@@ -40,12 +40,10 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
 
-        // // Set subscription to remove loading image
-        // this.planService.mapImageLoaded.subscribe(val => {
-        //   if (val) {
-        //     this.loadingScreen.nativeElement.style.display = 'none';
-        //   }
-        // });
+    // Set subscription to remove loading image
+    this.windowService.loadingSubject.subscribe(val => {
+        this.loadingScreen.nativeElement.style.display = val ? 'block' : 'none';
+    });
 
     // Some elements have nested objects, like charts.pie, or logos.lava, some like map do not.
     this.elements = [
@@ -87,7 +85,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
         if (data.x && data.y) {
           // Data is percentage from left (x) and top (y) and must be converted to pixel values.
           const x = this.convertPercentToPixel(data.x, true);
-          const y = this.convertPercentToPixel(data.y, false);  
+          const y = this.convertPercentToPixel(data.y, false);
           const e = this.elements.find(element => element.tag === data.id);
           e.e.nativeElement.style.left = `${x}px`;
           e.e.nativeElement.style.top = `${y}px`;
@@ -121,8 +119,8 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
       if (val) {
         try {
           this.elements.find(e => e.tag === val.tag).e.nativeElement.style.display = val.show ? 'block' : 'none';
-        } catch(e) {
-         console.log(e);
+        } catch (e) {
+          console.log(e);
         }
       }
     });
@@ -222,7 +220,7 @@ export class HecoMainComponent implements AfterViewInit, OnDestroy {
    * @param e the element who will have the font size adjusted. (native element must be passed as argument)
    */
   private adjustFontSize(e: any, percentage: any): void {
-      e.style.fontSize = `${percentage / 100 * 2}em`;
+    e.style.fontSize = `${percentage / 100 * 2}em`;
   }
 
   /** The application may have two different resolutions between screens.  Therefore, we send the width and height value as

@@ -46,12 +46,10 @@ export class TouchUiComponent implements AfterViewInit {
 
   ngAfterViewInit() {
 
-    // // Set subscription to remove loading image
-    // this.planService.mapImageLoaded.subscribe(val => {
-    //   if (val) {
-    //     this.loadingScreen.nativeElement.style.display = 'none';
-    //   }
-    // });
+    // Set subscription to remove loading image
+    this.windowService.loadingSubject.subscribe(val => {
+      this.loadingScreen.nativeElement.style.display = val ? 'block' : 'none';
+    });
 
     // Set the position of the slide menu.
     this.slideDistance = this.slideMenu.nativeElement.getBoundingClientRect().width;
