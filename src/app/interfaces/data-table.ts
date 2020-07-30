@@ -60,5 +60,6 @@ export interface DataTable {
         data: boolean;
         pie: boolean;
         line: boolean;
+        legend: boolean;
     }
 }
