@@ -34,13 +34,14 @@ export class SettingsModalComponent implements AfterViewInit {
   @ViewChild('extraLava', { static: false }) extraLava;       // extra options
   @ViewChild('extraLegend', { static: false }) extraLegend;       // extra options
   @ViewChild('instructions', { static: false }) instructionsView;   // instructions view loads when new css file
+  @ViewChild('buttonWrapper', { static: false }) buttons;   // Save and cancel buttons
 
   private dragging: boolean;
   private touchId: number;
   private isSet: boolean;
   private z: number;
   // tslint:disable-next-line: max-line-length
-  private elements: { tag: string; category: string; e: ElementRef; extraE: ElementRef; top: number; left: number, extra: boolean, id: string, overlay: ElementRef }[];
+  private elements: { tag: string; category: string; e: ElementRef; extraE: ElementRef; top: number; left: number, extra: boolean, id: string, overlay: ElementRef, active: boolean }[];
   private cssData: any;
   private windowData: any;
   private positionHistory: { x: number, y: number }[];
@@ -60,14 +61,14 @@ export class SettingsModalComponent implements AfterViewInit {
     this.planService.getOtherWindowData();
 
     this.elements = [
-      { tag: 'map', category: 'map', e: this.mapElement, extraE: this.extraMap, top: 0, left: 0, extra: false, id: 'resize map', overlay: this.mapOverlay },
-      { tag: 'pie', category: 'charts', e: this.pieElement, extraE: this.extraPie, top: 0, left: 0, extra: false, id: 'resize pie', overlay: this.pieOverlay },
-      { tag: 'line', category: 'charts', e: this.lineElement, extraE: this.extraLine, top: 0, left: 0, extra: false, id: 'resize line', overlay: this.lineOverlay },
+      { tag: 'map', category: 'map', e: this.mapElement, extraE: this.extraMap, top: 0, left: 0, extra: false, id: 'resize map', overlay: this.mapOverlay, active: false },
+      { tag: 'pie', category: 'charts', e: this.pieElement, extraE: this.extraPie, top: 0, left: 0, extra: false, id: 'resize pie', overlay: this.pieOverlay, active: false },
+      { tag: 'line', category: 'charts', e: this.lineElement, extraE: this.extraLine, top: 0, left: 0, extra: false, id: 'resize line', overlay: this.lineOverlay, active: false },
       // tslint:disable-next-line: max-line-length
-      { tag: 'data', category: 'data', e: this.displayDataElement, extraE: this.extraData, top: 0, left: 0, extra: false, id: 'resize data', overlay: this.dataOverlay },
-      { tag: 'heco', category: 'logos', e: this.hecoLogoElement, extraE: this.extraHeco, top: 0, left: 0, extra: false, id: 'resize heco' , overlay: this.hecoOverlay},
-      { tag: 'lava', category: 'logos', e: this.lavaLogoElement, extraE: this.extraLava, top: 0, left: 0, extra: false, id: 'resize lava', overlay: this.lavaOverlay},
-      { tag: 'legend', category: 'legend', e: this.legendElement, extraE: this.extraLegend, top: 0, left: 0, extra: false, id: 'resize legend', overlay: this.legendOverlay}
+      { tag: 'data', category: 'data', e: this.displayDataElement, extraE: this.extraData, top: 0, left: 0, extra: false, id: 'resize data', overlay: this.dataOverlay, active: false },
+      { tag: 'heco', category: 'logos', e: this.hecoLogoElement, extraE: this.extraHeco, top: 0, left: 0, extra: false, id: 'resize heco' , overlay: this.hecoOverlay, active: false},
+      { tag: 'lava', category: 'logos', e: this.lavaLogoElement, extraE: this.extraLava, top: 0, left: 0, extra: false, id: 'resize lava', overlay: this.lavaOverlay, active: false},
+      { tag: 'legend', category: 'legend', e: this.legendElement, extraE: this.extraLegend, top: 0, left: 0, extra: false, id: 'resize legend', overlay: this.legendOverlay, active: false}
     ];
 
     this.planService.cssSubject.subscribe(data => {
@@ -98,13 +99,13 @@ export class SettingsModalComponent implements AfterViewInit {
     this.elements.forEach(e => {
 
       e.overlay.nativeElement.addEventListener('mousedown', event => {
-        this.startDrag(null, e.e, e.overlay);
+        this.startDrag(null, e.e, e.overlay, e);
       }, { passive: false });
       e.overlay.nativeElement.addEventListener('mouseup', () => {
-        this.stopDrag();
+        this.stopDrag(e);
       }, { passive: false });
       e.overlay.nativeElement.addEventListener('mouseleave', () => {
-        this.stopDrag();
+        this.stopDrag(e);
       }, { passive: false });
       e.overlay.nativeElement.addEventListener('mousemove', event => {
         if (this.dragging) {
@@ -113,15 +114,15 @@ export class SettingsModalComponent implements AfterViewInit {
       }, { passive: false });
       e.extraE.nativeElement.addEventListener('mousedown', () => {
         if (this.dragging) {
-          this.stopDrag();
+          this.stopDrag(e);
         }
       }, { passive: false });
 
       e.overlay.nativeElement.addEventListener('touchstart', event => {
-        this.startDrag(event.touches, e.e, e.overlay);
+        this.startDrag(event.touches, e.e, e.overlay, e);
       }, { passive: false });
       e.overlay.nativeElement.addEventListener('touchend', () => {
-        this.stopDrag();
+        this.stopDrag(e);
       }, { passive: false });
       e.overlay.nativeElement.addEventListener('touchmove', event => {
         if (this.dragging) {
@@ -130,7 +131,7 @@ export class SettingsModalComponent implements AfterViewInit {
       }, { passive: false });
       e.extraE.nativeElement.addEventListener('touchstart', () => {
         if (this.dragging) {
-          this.stopDrag();
+          this.stopDrag(e);
         }
       }, { passive: false });
     });
@@ -152,8 +153,10 @@ export class SettingsModalComponent implements AfterViewInit {
   /** Begins the dragging process.
    * @param touches the touchlist provided by the browser.
    * @param el the element that is being positioned.
+   * @param overlay the touch overlay that allows dragging
+   * @param e the element (used to turn active on and off)
    */
-  private startDrag(touches, el, overlay): void {
+  private startDrag(touches, el, overlay, e): void {
     this.positionHistory = [];
     this.dragging = true;
     if (touches) {
@@ -161,6 +164,8 @@ export class SettingsModalComponent implements AfterViewInit {
     }
     el.nativeElement.style.zIndex = this.z;
     this.z++;
+    e.active = true;
+    this.updateElementVisibility();
   }
 
   /** Drags an element on the screen and passes the position values to the other window.
@@ -206,11 +211,41 @@ export class SettingsModalComponent implements AfterViewInit {
     }
   }
 
-  private stopDrag(): void {
+  /** Stops the dragging process
+   * @param e the element that is not longer being dragged
+   */
+  private stopDrag(e): void {
     this.dragging = false;
     this.touchId = -1;
+    e.active = false;
+    this.updateElementVisibility();
   }
 
+  /** When elements are dragged or stop dragging, the app toggles the visibility of the
+   * other elements in the modal.
+   */
+  private updateElementVisibility(): void {
+    const count = this.getActiveCount();
+    if (count === 0) {
+      this.elements.forEach(e => e.e.nativeElement.style.display = 'block');
+      this.buttons.nativeElement.style.display = 'block';
+    } else {
+      this.elements.forEach(e => {
+        e.e.nativeElement.style.display = e.active ? 'block' : 'none';
+      });
+      this.buttons.nativeElement.style.display = 'none';
+    }
+  }
+
+  private getActiveCount(): number {
+    let count = 0;
+    this.elements.forEach(e => {
+      if (e.active) {
+        count++;
+      }
+    });
+    return count;
+  }
   private setTouchId(touchlist, el): void {
     if (this.touchId === -1 && touchlist) {
       Object.values(touchlist).forEach((touch: Touch) => {
