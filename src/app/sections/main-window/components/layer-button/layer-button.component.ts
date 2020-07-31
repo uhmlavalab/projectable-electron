@@ -118,9 +118,10 @@ export class LayerButtonComponent implements OnInit, AfterViewInit {
 
   /** Counterclockwise animation without a toggle */
   private reverseAnimate(): void {
+    console.log('test');
     this.animationInterval = setInterval(() => {
       if (this.progress > -2) {
-        this.progress += 5;
+        this.progress -= 5;
       } else {
         this.stopAnimation();
       }
