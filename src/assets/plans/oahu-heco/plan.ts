@@ -2,6 +2,8 @@ import { Plan } from '@app/interfaces';
 import { mapLayerColors, chartColors } from '../defaultColors';
 import { PlanService } from '@app/services/plan.service';
 import * as d3 from 'd3';
+import { IfStmt } from '@angular/compiler';
+import { MapWindowLayoutComponent } from '@app/sections/map-window/layout/map-window-layout.component';
 
 export const HecoPlan: Plan = {
   name: 'oahu-heco',
@@ -271,6 +273,7 @@ export const HecoPlan: Plan = {
         updateFunction(planService: PlanService, state: number) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
+          console.log(curtailmentTotal + " " + solarTotal);
           solarTotal += curtailmentTotal;
           const interval = planService.isMainWindow() ? Math.round(this.parcels.length / 2000) : 1;
           console.log(interval);
@@ -488,7 +491,8 @@ export const HecoPlan: Plan = {
             });
             this.parcels.forEach(parcel => {
               const id = parcel.properties.Building_F.toString().split('_')[1];
-              const year = (planService.getCurrentYear().current).toString();
+              let year = (planService.getCurrentYear().current).toString();   
+              if (year == "2016" || year == "2017") { year = "2018"; }
               if (Number(year) >= 2018) {
                 if (this.capData.hasOwnProperty(id)) {
                   const value = this.capData[id][year];
@@ -516,7 +520,8 @@ export const HecoPlan: Plan = {
         updateFunction(planService: PlanService, state: number) {
           this.parcels.forEach(parcel => {
             const id = parcel.properties.Building_F.toString().split('_')[1];
-            const year = (planService.getCurrentYear().current).toString();
+            let year = (planService.getCurrentYear().current).toString();
+            if (year == "2016" || year == "2017") { year = "2018"; }
             if (Number(year) >= 2018) {
               if (this.capData.hasOwnProperty(id)) {
                 const value = this.capData[id][year];

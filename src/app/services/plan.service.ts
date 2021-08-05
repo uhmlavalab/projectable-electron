@@ -237,6 +237,7 @@ export class PlanService {
 
   public getGenerationTotalForCurrentYear(technologies: string[]): number {
     let generationTotal = 0;
+    console.log(this.dataTable.year.current);
     try {
       technologies.forEach(tech => {
         this.dataTable.data.generation[this.dataTable.scenario.name][tech].forEach(el => {
@@ -370,7 +371,9 @@ export class PlanService {
     if (year >= this.dataTable.year.min && year <= this.dataTable.year.max && this.dataTable.year.current !== year) {
       this.dataTable.year.current = year;                                       // Set the current year in the data table.
       this.yearSubject.next(year);                                              // Publish new year.
+
       this.precentRenewableByYearSubject.next(this.setCurrentPercent(year));    // Publish current percentage data.
+      console.log(this.windowService.isMain() + " " + year);
       if (this.windowService.isMain()) {
         if (play) {
           this.soundsService.playYear(val);
@@ -622,7 +625,7 @@ export class PlanService {
 
     this.CSS = css;
     this.cssSubject.next(this.CSS[this.dataTable.plan.name]);
-
+  
     /* Iterate thorugh the elements array.  Some elements have categories, like charts or logos and others do not.  Toggle the visibility
     of the element based on the saved values in the css file*/
     this.dataTable.components.forEach(e => {
@@ -922,6 +925,7 @@ export class PlanService {
    */
   public handleMessage(msg: any): boolean {
     if (msg.type === 'year change') {
+      console.log(msg);
       this.updateYear(msg.message, false);
     } else if (msg.type === 'percent change') {
       this.dataTable.year.currentRenewablePercent = msg.message;

@@ -54,7 +54,11 @@ export class MapElementComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.planService.updateCSSWidth('map', 'map', this.width);
       this.planService.updateCSSHeight('map', 'map', this.height);
+      
     }, 100);
+    setTimeout(() => {
+this.redrawPaths();
+    }, 3000);
   }
 
   ngOnInit() {
