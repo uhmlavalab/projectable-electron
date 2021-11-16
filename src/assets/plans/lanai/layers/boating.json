@@ -1,0 +1,43 @@
+{
+  "type" : "FeatureCollection",
+  "features" : [
+    {
+      "type" : "Feature",
+      "id" : 1,
+      "geometry" : {
+        "type" : "Point",
+        "coordinates" : [
+          -156.99133603691854,
+          20.7858211772792
+        ]
+      },
+      "properties" : {
+        "OBJECTID" : 1,
+        "id" : 41,
+        "island" : "Lanai",
+        "name" : "Kaumalapau",
+        "facility" : "Small Boat Harbor",
+        "jurisdicti" : "St./Cty. Comm. Only"
+      }
+    },
+    {
+      "type" : "Feature",
+      "id" : 2,
+      "geometry" : {
+        "type" : "Point",
+        "coordinates" : [
+          -156.88810269750638,
+          20.741826068372667
+        ]
+      },
+      "properties" : {
+        "OBJECTID" : 2,
+        "id" : 42,
+        "island" : "Lanai",
+        "name" : "Manele",
+        "facility" : "Small Boat Harbor",
+        "jurisdicti" : "DOBOR Facility"
+      }
+    }
+  ]
+}

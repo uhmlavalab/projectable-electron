@@ -1,0 +1,23 @@
+.buttons-container {
+    width: 80%;
+    position: relative;
+}
+
+.button {
+    width: 90%;
+    left: 3%;
+    position: relative;
+    padding: 4%;
+    border: 1px solid white;
+    margin-top: 2vh;
+    font-size: 9px;
+    transition: background-color .3s liner;
+    color: white;
+    background-color: black;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: white;
+    color: black;
+}

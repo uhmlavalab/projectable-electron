@@ -1,0 +1,28 @@
+:host {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    top: 5vh;
+    left: .5vw;
+}
+.large-video {
+    width: 400px;
+    height: 246px;
+}
+
+.thumbnail-wrapper {
+    width: 100%;
+    position: relative;
+}
+
+.thumbnail {
+    position: relative;
+    width: 23%;
+    height: auto;
+    padding: 1%;
+    display: inline-block;
+}
+
+.thumbnail>iframe {
+    width: 100%;
+}

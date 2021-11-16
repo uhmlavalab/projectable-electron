@@ -145,13 +145,13 @@ export class WindowService {
       if (this.windowName === 'main') {
         setTimeout( ()=> {
           window.location.reload();
-        }, 1000);
+        }, 2000);
       } else {
         window.location.reload();
       }
       setTimeout(() => {
         this.loadingSubject.next(false);
-      }, 1200);  
+      }, 2200);  
     }
   }
 

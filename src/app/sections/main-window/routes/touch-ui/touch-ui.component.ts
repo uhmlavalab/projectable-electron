@@ -29,6 +29,7 @@ export class TouchUiComponent implements AfterViewInit {
   private sliding: boolean;            // True if animation is happening.
   private firstSlide: boolean;         // Prevents first slide when loading
   private slideDistance: number;       // This is the width of the slide menu. It must side this far off screen to hide it.
+  private islandName: string;          // Holds the name of the island to change layour for lanai.
 
   constructor(private planService: PlanService, private windowService: WindowService) {
     this.setupComplete = false;
@@ -42,6 +43,7 @@ export class TouchUiComponent implements AfterViewInit {
     this.sliding = false;
     this.firstSlide = true;
     this.slideDistance = 0; // This distance is set dynamically after component is loaded.
+    this.islandName = '';
   }
 
   ngAfterViewInit() {
@@ -72,6 +74,12 @@ export class TouchUiComponent implements AfterViewInit {
           this.allReady.layersSet = true;
           this.isSetupComplete();
         }
+      }
+    });
+
+    this.planService.islandNameSubject.subscribe(island => {
+      if (island) {
+        this.islandName = island;
       }
     });
 

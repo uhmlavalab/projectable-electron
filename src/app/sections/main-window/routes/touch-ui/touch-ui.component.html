@@ -8,19 +8,25 @@
 <img src="assets/images/BackGround.png" class="background-image">
 <!-- This section contains the charts-->
 <div class="left-container">
-  <div class="chart pie" #pieChartDiv>
+  <div class="chart pie" #pieChartDiv *ngIf="islandName !== 'Lanai'">
     <div class="title-wrapper pie-title">
       <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Generation Chart')">
       <div class="section-title map-title">Generation</div>
     </div>
     <app-pie-chart ></app-pie-chart>
   </div>
-  <div class="chart line" #lineChartDiv>
+  <div *ngIf="islandName == 'Lanai'">
+    <app-video-section></app-video-section>
+  </div>
+  <div class="chart line" #lineChartDiv *ngIf="islandName !== 'Lanai'">
     <div class="title-wrapper line-title">
       <img src="{{tooltip.path}}" class="tooltip" (click)="handleTooltipClick($event, 'Capacity Chart')">
       <div class="section-title map-title">Capacity</div>
     </div>
     <app-line-chart></app-line-chart>
+  </div>
+  <div *ngIf="islandName == 'Lanai'">
+    
   </div>
 </div>
 
@@ -35,8 +41,9 @@
     <div class="left-column">
       <app-island-selection-buttons class="island-selection-buttons"></app-island-selection-buttons>
     </div>
-    <div class="right-column">
-      <app-bar></app-bar>
+    <div class="right-column" >
+      <app-bar *ngIf="islandName !== 'Lanai'"></app-bar>
+      <app-map-image-selection *ngIf="islandName == 'Lanai'"></app-map-image-selection>
     </div>
     <app-map-element class="map-container" cdkDrag #map>
     </app-map-element>

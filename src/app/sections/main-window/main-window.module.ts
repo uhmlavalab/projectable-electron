@@ -32,6 +32,8 @@ import { TooltipComponent } from './components/tooltip/tooltip.component';
 import { IslandSelectionButtonsComponent } from './components/island-selection-buttons/island-selection-buttons.component';
 import { IslandButtonComponent } from './components/island-selection-buttons/components/island-button/island-button.component';
 import { SettingsSlideOutComponent } from './components/settings-slide-out/settings-slide-out.component';
+import { MapImageSelectionComponent } from './components/map-image-selection/map-image-selection.component';
+import { VideoSectionComponent } from './components/video-section/video-section.component';
 
 
 @NgModule({
@@ -52,7 +54,9 @@ import { SettingsSlideOutComponent } from './components/settings-slide-out/setti
     TooltipComponent,
     IslandSelectionButtonsComponent,
     IslandButtonComponent,
-    SettingsSlideOutComponent
+    SettingsSlideOutComponent,
+    MapImageSelectionComponent,
+    VideoSectionComponent
   ],
   imports: [
     CommonModule,
