@@ -76,7 +76,7 @@
     "karma-coverage-istanbul-reporter": "2.1.0",
     "karma-jasmine": "2.0.1",
     "karma-jasmine-html-reporter": "1.4.2",
-    "leaflet": "^1.6.0",
+    "leaflet": "^1.7.1",
     "mocha": "6.2.0",
     "ngx-multi-window": "^0.3.2",
     "npm-run-all": "4.1.5",

@@ -25,8 +25,7 @@
               "src/favicon.512x512.png"
             ],
             "styles": [
-              "src/styles.css",
-              "./node_modules/leaflet/dist/leaflet.css"
+              "src/styles.css"
             ],
             "scripts": [
               "node_modules/chart.js/dist/Chart.bundle.min.js",
