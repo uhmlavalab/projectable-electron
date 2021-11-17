@@ -62,6 +62,8 @@ export class PlanService {
   public laserPointerSubject = new BehaviorSubject<{ x: number, y: number, start: boolean, end: boolean }>(null);
   public mapImageLoaded = new BehaviorSubject<boolean>(false);          // Publishes when map image completes loading
 
+  private debug = true;
+
   constructor(private soundsService: SoundsService, private windowService: WindowService) {
     this.imageLoaded = false;
     this.freshCss = true;            // Fresh css is set to true before checking.
@@ -208,6 +210,7 @@ export class PlanService {
    * @return true if successful, false if failure.
    */
   public loadAllData(): boolean {
+    if (this.debug) console.log('Load All Data');
     // Load All Plan Data
     try {
       this.getCapacityData().then(capData => {
@@ -237,7 +240,6 @@ export class PlanService {
 
   public getGenerationTotalForCurrentYear(technologies: string[]): number {
     let generationTotal = 0;
-    console.log(this.dataTable.year.current);
     try {
       technologies.forEach(tech => {
         this.dataTable.data.generation[this.dataTable.scenario.name][tech].forEach(el => {
@@ -327,6 +329,7 @@ export class PlanService {
 
   /** Gets Capacity Data */
   private getCapacityData(): Promise<any> {
+
     return new Promise((resolve, error) => {
       const capacityData = {};
       d3.csv(this.dataTable.data.capacityPath, data => {
@@ -373,7 +376,6 @@ export class PlanService {
       this.yearSubject.next(year);                                              // Publish new year.
 
       this.precentRenewableByYearSubject.next(this.setCurrentPercent(year));    // Publish current percentage data.
-      console.log(this.windowService.isMain() + " " + year);
       if (this.windowService.isMain()) {
         if (play) {
           this.soundsService.playYear(val);
@@ -604,7 +606,6 @@ export class PlanService {
  * @param css the css data object.
  */
   private setCSS(css: any): void {
-
     if (!this.dataTable.plan.name) {
       setTimeout(() => this.setCSS(css), 100);
       return;
@@ -796,7 +797,6 @@ export class PlanService {
       // set the path to the correct variable location.
       const css_path = this.CSS[this.dataTable.plan.name][elementCategory][elementName];
       css_path.width = widthValue;
-      console.log(widthValue, elementName);
       if (!this.windowService.isMain()) {
         this.windowService.sendMessage({ type: 'update width', message: { cat: elementCategory, name: elementName, width: widthValue } });
       }
@@ -925,7 +925,6 @@ export class PlanService {
    */
   public handleMessage(msg: any): boolean {
     if (msg.type === 'year change') {
-      console.log(msg);
       this.updateYear(msg.message, false);
     } else if (msg.type === 'percent change') {
       this.dataTable.year.currentRenewablePercent = msg.message;

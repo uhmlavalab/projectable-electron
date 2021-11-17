@@ -2,8 +2,6 @@ import { Plan } from '@app/interfaces';
 import { mapLayerColors, chartColors } from '../defaultColors';
 import { PlanService } from '@app/services/plan.service';
 import * as d3 from 'd3';
-import { IfStmt } from '@angular/compiler';
-import { MapWindowLayoutComponent } from '@app/sections/map-window/layout/map-window-layout.component';
 
 export const HecoPlan: Plan = {
   name: 'oahu-heco',
@@ -53,8 +51,8 @@ export const HecoPlan: Plan = {
     width: 3613,
     height: 2794,
     bounds: [[-158.281, 21.710], [-157.647, 21.252]],
-    baseMapPath: 'assets/plans/oahu-heco/images/oahu-satellite5.png',
-    baseMiniMapPath: 'assets/plans/oahu-heco/images/oahu-satellite5.png',
+    baseMapPath: 'assets/plans/oahu-heco/images/oahu-small.webp',
+    baseMiniMapPath: 'assets/plans/oahu-heco/images/oahu-small.webp',
     mapLayers: [
       {
         name: 'transmission',
@@ -211,19 +209,18 @@ export const HecoPlan: Plan = {
         },
         updateFunction(planService: PlanService, state: number) {
           let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']) - 99;
-          this.parcels.forEach((parcel, index) => {
-            if (!planService.isMainWindow() || index % 5 === 0) {
-              if (windTotal > 0) {
-                d3.select(parcel.path)
-                  .style('fill', this.fillColor)
-                  .style('display', state === 1 ? 'block' : 'none')
-                  .style('opacity', 0.85);
-                windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
-              } else {
-                d3.select(parcel.path)
-                  .style('fill', 'transparent')
-                  .style('display', state === 1 ? 'block' : 'none');
-              }
+          const isMain = planService.isMainWindow();
+          this.parcels.forEach(parcel => {
+            if (windTotal > 0) {
+              d3.select(parcel.path)
+                .style('fill', this.fillColor)
+                .style('display', state === 1 ? 'block' : 'none')
+                .style('opacity', 0.85);
+              windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
+            } else {
+              d3.select(parcel.path)
+                .style('fill', 'transparent')
+                .style('display', state === 1 ? 'block' : 'none');
             }
           });
         },
@@ -251,7 +248,7 @@ export const HecoPlan: Plan = {
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
           this.parcels.sort((a, b) => parseFloat(b.properties.cf_1) - parseFloat(a.properties.cf_1));
-          this.parcels.forEach((parcel, index) => {
+          this.parcels.forEach(parcel => {
             if (solarTotal > 0) {
               d3.select(parcel.path)
                 .style('fill', this.fillColor)
@@ -273,10 +270,8 @@ export const HecoPlan: Plan = {
         updateFunction(planService: PlanService, state: number) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
-          console.log(curtailmentTotal + " " + solarTotal);
           solarTotal += curtailmentTotal;
           const interval = planService.isMainWindow() ? Math.round(this.parcels.length / 2000) : 1;
-          console.log(interval);
           this.parcels.forEach((parcel, index) => {
             if (index % interval === 0) {
               if (solarTotal > 0) {
@@ -489,9 +484,9 @@ export const HecoPlan: Plan = {
                 this.capData[id][year] = value;
               }
             });
+            let year = (planService.getCurrentYear().current).toString();
             this.parcels.forEach(parcel => {
               const id = parcel.properties.Building_F.toString().split('_')[1];
-              let year = (planService.getCurrentYear().current).toString();   
               if (year == "2016" || year == "2017") { year = "2018"; }
               if (Number(year) >= 2018) {
                 if (this.capData.hasOwnProperty(id)) {

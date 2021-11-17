@@ -54,11 +54,11 @@ export class MapElementComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.planService.updateCSSWidth('map', 'map', this.width);
       this.planService.updateCSSHeight('map', 'map', this.height);
-      
+
     }, 100);
     setTimeout(() => {
-this.redrawPaths();
-    }, 3000);
+      this.redrawPaths();
+    }, 5000);
   }
 
   ngOnInit() {
@@ -217,7 +217,6 @@ this.redrawPaths();
 
   /** Draw the map once all data is ready. */
   private drawMap(): void {
-
     this.projection = d3.geo.mercator()
       .scale(1)
       .translate([0, 0]);
@@ -400,7 +399,7 @@ this.redrawPaths();
   }
 
   private waitForImageLoad() {
-
+    console.log('waiting');
     if (this.mapDiv) {
       if (this.mapDiv.nativeElement) {
         if (this.mapDiv.nativeElement.children) {

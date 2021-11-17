@@ -41,8 +41,8 @@ export class LayerButtonComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.positionBlock(); // Position the rotation animation block.
-    this.rotateBlock();   // Begin the block rotation.
+    // this.positionBlock(); // Position the rotation animation block.
+    // this.rotateBlock();   // Begin the block rotation.
   }
 
   /** Positions the block.  These values are hard coded and changing them will mess up the positioning. */
@@ -58,7 +58,7 @@ export class LayerButtonComponent implements OnInit, AfterViewInit {
     this.rotateInterval = setInterval( () => {
       this.currentRotation = (this.currentRotation + 0.5) % 360;
       this.block.nativeElement.style.transform = `rotate(${this.currentRotation}deg)`;
-    }, 5);
+    }, 20);
   }
 
   /** The layer button can be clicked instead of pressed.  If clicked, it will load info. */
@@ -118,7 +118,6 @@ export class LayerButtonComponent implements OnInit, AfterViewInit {
 
   /** Counterclockwise animation without a toggle */
   private reverseAnimate(): void {
-    console.log('test');
     this.animationInterval = setInterval(() => {
       if (this.progress > -2) {
         this.progress -= 5;

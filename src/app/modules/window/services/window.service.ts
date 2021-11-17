@@ -105,13 +105,11 @@ export class WindowService {
   private mapWindowMessage(event: Electron.IpcRendererEvent, data: any) {
     this.resetCheck(data.reset);
     this.windowMessageSubject.next(data);
-    //console.log(data);
   }
 
   private mainWindowMessage(event: Electron.IpcRendererEvent, data: any) {
     this.resetCheck(data.reset);
     this.windowMessageSubject.next(data);
-    //console.log(data);
   }
 
   private unsetWindowMessage(event: Electron.IpcRendererEvent, data: any) {
