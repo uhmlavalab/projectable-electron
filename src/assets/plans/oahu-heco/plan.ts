@@ -101,6 +101,7 @@ export const HecoPlan: Plan = {
         filePath: 'assets/plans/oahu-heco/layers/government.json',
         parcels: [],
         setupFunction(planService: PlanService, state) {
+          const opacity = planService.isMainWindow() ? 0.85 : 1;
           const colors = {
             'Public-Federal': '#e60000',
             'Public-State': '#ff7f7f',
@@ -111,7 +112,7 @@ export const HecoPlan: Plan = {
             d3.select(parcel.path)
               .style('fill', colors[parcel.properties.type])
               .style('display', 'none')
-              .style('opacity', 0.85)
+              .style('opacity', opacity)
               .style('stroke', this.borderColor)
               .style('stroke-width', this.borderWidth + 'px');
           });
@@ -210,17 +211,20 @@ export const HecoPlan: Plan = {
         updateFunction(planService: PlanService, state: number) {
           let windTotal = planService.getCapacityTotalForCurrentYear(['Wind']) - 99;
           const isMain = planService.isMainWindow();
-          this.parcels.forEach(parcel => {
-            if (windTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('display', state === 1 ? 'block' : 'none')
-                .style('opacity', 0.85);
-              windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
-            } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('display', state === 1 ? 'block' : 'none');
+
+          this.parcels.forEach((parcel, index) => {
+            if (isMain || index % 15 === 0) {
+              if (windTotal > 0) {
+                d3.select(parcel.path)
+                  .style('fill', this.fillColor)
+                  .style('display', state === 1 ? 'block' : 'none')
+                  .style('opacity', 0.85);
+                windTotal -= (parcel.properties.MWac * 0.2283 * 8760);
+              } else {
+                d3.select(parcel.path)
+                  .style('fill', 'transparent')
+                  .style('display', state === 1 ? 'block' : 'none');
+              }
             }
           });
         },
@@ -244,6 +248,7 @@ export const HecoPlan: Plan = {
         filePath: 'assets/plans/oahu-heco/layers/solar.json',
         parcels: [],
         setupFunction(planService: PlanService, state: number) {
+          if (planService.isMainWindow()) this.fillColor = 'transparent';
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
@@ -271,7 +276,7 @@ export const HecoPlan: Plan = {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
           const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
           solarTotal += curtailmentTotal;
-          const interval = planService.isMainWindow() ? Math.round(this.parcels.length / 2000) : 1;
+          const interval = planService.isMainWindow() ? Math.round(this.parcels.length /5000) : 1;
           this.parcels.forEach((parcel, index) => {
             if (index % interval === 0) {
               if (solarTotal > 0) {

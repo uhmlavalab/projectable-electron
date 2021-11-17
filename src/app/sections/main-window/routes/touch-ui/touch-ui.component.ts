@@ -227,7 +227,7 @@ export class TouchUiComponent implements AfterViewInit {
               left = left + 20;
               this.slideMenu.nativeElement.style.left = `${left}px`;
             }
-          }, 30);
+          }, 5);
         } else {
           let left = 0;
           this.menuInterval = setInterval(() => {
@@ -238,7 +238,7 @@ export class TouchUiComponent implements AfterViewInit {
               left = left - 20;
               this.slideMenu.nativeElement.style.left = `${left}px`;
             }
-          }, 30);
+          }, 5);
         }
       }
     }

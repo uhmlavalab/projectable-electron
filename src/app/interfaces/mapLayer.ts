@@ -15,8 +15,8 @@ export interface MapLayer {
   legendColor: string;
   parcels: Parcel[];
   legend: { text: string, color: string, textColor: string }[];
-  setupFunction(planService: PlanService, state: number): any | null;
-  updateFunction(planService: PlanService, state: number): any | null;
+  setupFunction(planService: any, state: number): any | null;
+  updateFunction(planService: any, state: number): any | null;
 }
 
 export interface Parcel {
