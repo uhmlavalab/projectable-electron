@@ -137,7 +137,7 @@ export const BigIslandPlan: Plan = {
         borderColor: mapLayerColors.Solar.border,
         borderWidth: 0.5,
         legendColor: mapLayerColors.Solar.fill,
-        filePath: 'assets/plans/bigisland/layers/solar.json',
+        filePath: 'assets/plans/bigisland/layers/',
         parcels: [],
         setupFunction(planService: PlanService) {
           let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);

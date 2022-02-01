@@ -191,6 +191,7 @@ export class PlanService {
     this.dataTable.components = plan.mapElements;
     this.publishSetupData();
     this.loadAllData();
+    console.log('done');
   }
 
   /** Once all of the data is properly initialized, this function will publish the data. */
@@ -610,6 +611,8 @@ export class PlanService {
       setTimeout(() => this.setCSS(css), 100);
       return;
     }
+
+    console.log('setting css')
     // The css data needs to have all of these paths.  If it doesn't, the app will make a new css file.
     if (!(css[this.dataTable.plan.name].charts && css[this.dataTable.plan.name].logos && css[this.dataTable.plan.name].map && css[this.dataTable.plan.name].data)) {
       // Create New Css File

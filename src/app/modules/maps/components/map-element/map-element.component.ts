@@ -27,6 +27,7 @@ export class MapElementComponent implements OnInit, AfterViewInit {
   projection: d3.geo.Projection;
   path: d3.geo.Path;
   map: d3.Selection<any>;
+  initialResize: number;
 
   private drawn: boolean;         // True once the map is drawn to the display the first time
   private layers: any[];          // Holds all layers
@@ -36,6 +37,7 @@ export class MapElementComponent implements OnInit, AfterViewInit {
   private isMiniMap: boolean;     // Tells if it is the mini map or main map (used for pointer)
 
   constructor(private planService: PlanService, private windowService: WindowService) {
+    this.initialResize = 0;
     this.allReady = {};
     this.allReady.planSet = false;
     this.allReady.layersSet = false;
@@ -56,9 +58,10 @@ export class MapElementComponent implements OnInit, AfterViewInit {
       this.planService.updateCSSHeight('map', 'map', this.height);
 
     }, 100);
-    setTimeout(() => {
-      this.redrawPaths();
-    }, 5000);
+
+    // setTimeout(() => {
+    //   this.redrawPaths();
+    // }, 10000);
   }
 
   ngOnInit() {
@@ -140,7 +143,7 @@ export class MapElementComponent implements OnInit, AfterViewInit {
       }
     });
 
-    // Ture when the plan is set and the map setup can proceed
+    // Tre when the plan is set and the map setup can proceed
     this.planService.planSetSubject.subscribe(plan => {
       this.allReady.planSet = plan;
       this.updateMap();
@@ -213,6 +216,11 @@ export class MapElementComponent implements OnInit, AfterViewInit {
     this.map.select('image')
       .attr('width', this.width)
       .attr('height', this.height);
+    if (this.initialResize === 0) {
+      this.initialResize = 1;
+      this.redrawPaths();
+      console.log('resizing map');
+    }
   }
 
   /** Draw the map once all data is ready. */
@@ -297,7 +305,7 @@ export class MapElementComponent implements OnInit, AfterViewInit {
         const path = d3.geo.path()
           .projection(proj);
 
-        this.map.selectAll(layer.name)
+        this.map.selectAll(layer.name) 
           .data(geoData.features)
           .enter().append('path')
           .attr('d', path)
