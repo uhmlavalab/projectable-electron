@@ -73,7 +73,7 @@ export class LayerButtonComponent implements OnInit, AfterViewInit {
   private toggleButtonOn(): void {
     if (this.animationInterval < 0) {
       this.animationInterval = setInterval(() => {
-        this.progress++;    // Increment until progress = 100
+        this.progress += 3;    // Increment until progress = 100
         if (this.progress >= 100) {  // At this point the animation is finished.
           this.on = true;            // Button is on.
           this.rotate = true;        // Show the rotation.
@@ -92,7 +92,7 @@ export class LayerButtonComponent implements OnInit, AfterViewInit {
   private toggleButtonOff(): void {
     if (this.animationInterval < 0) {
       this.animationInterval = setInterval(() => {
-        this.progress--;  // Decrement until progress = 0.
+        this.progress -= 3;  // Decrement until progress = 0.
         if (this.progress <= 0) {
           this.on = false;  // Layer if now off.
           this.planService.handleLayerButtonClick(this.layerName);
