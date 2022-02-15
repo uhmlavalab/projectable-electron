@@ -191,7 +191,7 @@ export class PlanService {
     this.dataTable.components = plan.mapElements;
     this.publishSetupData();
     this.loadAllData();
-    console.log('done');
+    console.log('done');  
   }
 
   /** Once all of the data is properly initialized, this function will publish the data. */

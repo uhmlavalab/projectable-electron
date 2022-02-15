@@ -213,7 +213,7 @@ export const HecoPlan: Plan = {
           const isMain = planService.isMainWindow();
 
           this.parcels.forEach((parcel, index) => {
-            if (isMain || index % 15 === 0) {
+            if (!isMain || index % 5 === 0) {
               if (windTotal > 0) {
                 d3.select(parcel.path)
                   .style('fill', this.fillColor)
@@ -403,82 +403,82 @@ export const HecoPlan: Plan = {
           { text: 'Class E Lands', color: '#005400', textColor: 'black' },
         ],
       },
-      {
-        name: 'ial',
-        displayName: 'Important Agricultural Lands',
-        active: false,
-        included: true,
-        iconPath: 'assets/plans/oahu-heco/images/icons/IAL.png',
-        secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/layer-images/solar.jpg',
-        secondScreenText: 'This layer shows the intersection of the NREL solar potential layer and the proposed Important Agricultural Land area proposed by the City and County of Honolulu in 2018. This layer limits the solar layer from filling IAL parcels.',
-        fillColor: mapLayerColors.Solar.fill,
-        borderColor: mapLayerColors.Solar.border,
-        borderWidth: 0.2,
-        legendColor: mapLayerColors.Solar.fill,
-        filePath: 'assets/plans/oahu-heco/layers/solar.json',
-        parcels: [],
-        setupFunction(planService: PlanService, state: number) {
-          let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
-          const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
-          solarTotal += curtailmentTotal;
-          this.parcels.sort((a, b) => parseFloat(b.properties.cf_1) - parseFloat(a.properties.cf_1));
-          this.parcels.forEach((parcel, index) => {
-            if (parcel.properties.IAL === 'Y') {
-              d3.select(parcel.path)
-                .style('fill', 'black')
-                .style('opacity', 0.85)
-                .style('display', 'none')
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
-            } else if (solarTotal > 0) {
-              d3.select(parcel.path)
-                .style('fill', this.fillColor)
-                .style('display', 'none')
-                .style('opacity', 0.85)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
-              solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
-            } else {
-              d3.select(parcel.path)
-                .style('fill', 'transparent')
-                .style('display', 'none')
-                .style('opacity', 0.85)
-                .style('stroke', this.borderColor)
-                .style('stroke-width', this.borderWidth + 'px');
-            }
-          });
-        },
-        updateFunction(planService: PlanService, state: number) {
-          let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
-          const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
-          solarTotal += curtailmentTotal;
-          const interval = planService.isMainWindow() ? Math.round(this.parcels.length / 2000) : 1;
-          this.parcels.forEach((parcel, index) => {
-            if (index % interval === 0) {
-              if (parcel.properties.IAL === 'Y') {
-                d3.select(parcel.path)
-                  .style('fill', 'black')
-                  .style('display', state === 1 ? 'block' : 'none')
-                  .style('stroke', this.borderColor)
-                  .style('stroke-width', this.borderWidth + 'px');
-              } else if (solarTotal > 0) {
-                d3.select(parcel.path)
-                  .style('fill', this.fillColor)
-                  .style('display', state === 1 ? 'block' : 'none');
-                solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
-              } else {
-                d3.select(parcel.path)
-                  .style('fill', 'transparent')
-                  .style('display', state === 1 ? 'block' : 'none');
-              }
-            }
-          });
-        },
-        legend: [
-          { text: 'Land defined as Important Agriculture', color: 'black', textColor: 'white' },
-          { text: 'Land necessary to meet solar energy goal', color: mapLayerColors.Solar.fill, textColor: 'black' }
-        ],
-      },
+      // {
+      //   name: 'ial',
+      //   displayName: 'Important Agricultural Lands',
+      //   active: false,
+      //   included: true,
+      //   iconPath: 'assets/plans/oahu-heco/images/icons/IAL.png',
+      //   secondScreenImagePath: 'assets/plans/oahu-heco/images/second-screen-images/layer-images/solar.jpg',
+      //   secondScreenText: 'This layer shows the intersection of the NREL solar potential layer and the proposed Important Agricultural Land area proposed by the City and County of Honolulu in 2018. This layer limits the solar layer from filling IAL parcels.',
+      //   fillColor: mapLayerColors.Solar.fill,
+      //   borderColor: mapLayerColors.Solar.border,
+      //   borderWidth: 0.2,
+      //   legendColor: mapLayerColors.Solar.fill,
+      //   filePath: 'assets/plans/oahu-heco/layers/solar.json',
+      //   parcels: [],
+      //   setupFunction(planService: PlanService, state: number) {
+      //     let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
+      //     const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
+      //     solarTotal += curtailmentTotal;
+      //     this.parcels.sort((a, b) => parseFloat(b.properties.cf_1) - parseFloat(a.properties.cf_1));
+      //     this.parcels.forEach((parcel, index) => {
+      //       if (parcel.properties.IAL === 'Y') {
+      //         d3.select(parcel.path)
+      //           .style('fill', 'black')
+      //           .style('opacity', 0.85)
+      //           .style('display', 'none')
+      //           .style('stroke', this.borderColor)
+      //           .style('stroke-width', this.borderWidth + 'px');
+      //       } else if (solarTotal > 0) {
+      //         d3.select(parcel.path)
+      //           .style('fill', this.fillColor)
+      //           .style('display', 'none')
+      //           .style('opacity', 0.85)
+      //           .style('stroke', this.borderColor)
+      //           .style('stroke-width', this.borderWidth + 'px');
+      //         solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
+      //       } else {
+      //         d3.select(parcel.path)
+      //           .style('fill', 'transparent')
+      //           .style('display', 'none')
+      //           .style('opacity', 0.85)
+      //           .style('stroke', this.borderColor)
+      //           .style('stroke-width', this.borderWidth + 'px');
+      //       }
+      //     });
+      //   },
+      //   updateFunction(planService: PlanService, state: number) {
+      //     let solarTotal = planService.getGenerationTotalForCurrentYear(['PV']);
+      //     const curtailmentTotal = planService.getCurtailmentTotalForCurrentYear(['PV']);
+      //     solarTotal += curtailmentTotal;
+      //     const interval = planService.isMainWindow() ? Math.round(this.parcels.length / 2000) : 1;
+      //     this.parcels.forEach((parcel, index) => {
+      //       if (index % interval === 0) {
+      //         if (parcel.properties.IAL === 'Y') {
+      //           d3.select(parcel.path)
+      //             .style('fill', 'black')
+      //             .style('display', state === 1 ? 'block' : 'none')
+      //             .style('stroke', this.borderColor)
+      //             .style('stroke-width', this.borderWidth + 'px');
+      //         } else if (solarTotal > 0) {
+      //           d3.select(parcel.path)
+      //             .style('fill', this.fillColor)
+      //             .style('display', state === 1 ? 'block' : 'none');
+      //           solarTotal -= (parcel.properties.cf_1 * parcel.properties.capacity * 8760);
+      //         } else {
+      //           d3.select(parcel.path)
+      //             .style('fill', 'transparent')
+      //             .style('display', state === 1 ? 'block' : 'none');
+      //         }
+      //       }
+      //     });
+      //   },
+      //   legend: [
+      //     { text: 'Land defined as Important Agriculture', color: 'black', textColor: 'white' },
+      //     { text: 'Land necessary to meet solar energy goal', color: mapLayerColors.Solar.fill, textColor: 'black' }
+      //   ],
+      // },
       {
         name: 'der',
         displayName: 'Distributed Energy Resources',
