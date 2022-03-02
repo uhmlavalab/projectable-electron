@@ -71,6 +71,10 @@ export class PlanService {
     this.windowService.cssSubject.subscribe(css => this.setCSS(css));
   }
 
+  public getIslandName(): string {
+    return this.dataTable.plan.name;
+  }
+
   /** The data table stores the current state of the table. */
   private initializeDataTable(): void {
     // The dataTable stores all relevant data and can be printed to the console using the function printDataTable().

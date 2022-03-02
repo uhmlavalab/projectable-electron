@@ -225,6 +225,9 @@ export class MapElementComponent implements OnInit, AfterViewInit {
 
   /** Draw the map once all data is ready. */
   private drawMap(): void {
+    if (this.planService.getIslandName()==='bigisland') {
+      this.mapDiv.nativeElement.style.transform = 'rotate(-20deg)';
+    }
     this.projection = d3.geo.mercator()
       .scale(1)
       .translate([0, 0]);
