@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PlanService } from '@app/services/plan.service';
 import { WindowService } from '@app/modules/window';
+import { SoundsService } from '@app/modules/sounds';
 
 @Component({
   selector: 'app-settings-slide-out',
@@ -11,7 +12,7 @@ export class SettingsSlideOutComponent implements OnInit {
 
   private opened: boolean;
 
-  constructor(private planService: PlanService, private windowService: WindowService) {
+  constructor(private planService: PlanService, private windowService: WindowService, private soundsService: SoundsService) {
     this.opened = false;
   }
 
@@ -41,6 +42,18 @@ export class SettingsSlideOutComponent implements OnInit {
       this.planService.createCssData();
       this.windowService.resetAllWindows();
     }
+  }
+
+  private playIntroduction(): void {
+    this.soundsService.playIntroDescription();
+  }
+
+  private pauseIntroduction(): void {
+    this.soundsService.pauseIntroDescription();
+  }
+
+  private stopIntroduction(): void {
+    this.soundsService.stopIntroDescription();
   }
 
   /** opens and closes the settings (positioning) modal. */

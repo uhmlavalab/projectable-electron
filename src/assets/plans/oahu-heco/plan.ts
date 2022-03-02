@@ -160,7 +160,7 @@ export const HecoPlan: Plan = {
         borderColor: mapLayerColors.Existing_RE.border,
         borderWidth: 1,
         legendColor: mapLayerColors.Existing_RE.fill,
-        filePath: 'assets/plans/oahu-heco/layers/existing_re.json',
+        filePath: 'assets/plans/oahu-heco/layers/RE_Proj_Oahu_existing.json',
         parcels: [],
         setupFunction: null,
         updateFunction: null,

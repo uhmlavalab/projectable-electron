@@ -36,6 +36,7 @@ export class SoundsService {
   private years: {year: number; audio: HTMLAudioElement}[];
   private loadingScenario: HTMLAudioElement;
   private loadingLayer: HTMLAudioElement;
+  private introDescriptionSound: HTMLAudioElement;
 
   private playYearOk: boolean; // when true, its ok to play the year sound.
   private nextYearToPlay: number;
@@ -145,6 +146,10 @@ export class SoundsService {
     this.postApril = new Audio();
     this.postApril.src = '../assets/sounds/Scenarios/Post April.mp3';
     this.postApril.load();
+
+    this.introDescriptionSound = new Audio();
+    this.introDescriptionSound.src = '../assets/sounds/illumination_intro.mp3';
+    this.introDescriptionSound.load();
 
     this.years = [];
     for (let i = 2016; i <= 2045; i++) {
@@ -264,5 +269,18 @@ export class SoundsService {
         }
       }, 1500);
     }
+  }
+
+  public playIntroDescription() {
+    this.introDescriptionSound.play();
+  }
+
+  public pauseIntroDescription() {
+    this.introDescriptionSound.pause();
+  }
+
+  public stopIntroDescription() {
+    this.introDescriptionSound.pause();
+    this.introDescriptionSound.currentTime = 0;
   }
 }
