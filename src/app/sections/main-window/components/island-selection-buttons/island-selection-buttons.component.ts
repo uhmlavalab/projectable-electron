@@ -13,7 +13,7 @@ export class IslandSelectionButtonsComponent implements OnInit{
     private islands: string[];
     private selectedIsland: string;
     constructor(private windowService: WindowService, private planService: PlanService ) {
-      this.islands = ['Oahu', 'Maui', 'Big Island', 'Lanai'];
+      this.islands = ['Oahu', 'Maui', 'Big Island'];
       this.selectedIsland = this.islands[0];
     }
     ngOnInit() {

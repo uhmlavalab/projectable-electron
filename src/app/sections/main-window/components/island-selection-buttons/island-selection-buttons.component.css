@@ -6,7 +6,7 @@
     border: 2px solid var(--menu-blue);
     border-radius: 50%;
     color: var(--main-text-color);
-    margin: 8px 8px 8px 14px;
+    margin: 30px 8px 8px 14px;
 }
 
 .island-button>p {
@@ -14,4 +14,9 @@
     top: 30%;
     width: 100%;
     text-align: center;
+}
+
+.select-island-title {
+    position: relative;
+    margin-bottom: 10%;
 }

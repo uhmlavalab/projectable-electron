@@ -1,4 +1,4 @@
-<h5>Select Island</h5>
+<h5 class="select-island-title">Select Island</h5>
 <div *ngFor="let island of islands">
     <div class="island-button" (click)="changeIsland(island)" [style.opacity]="selectedIsland === island ? 1 : 0.4">
         <p>{{island}}</p>
