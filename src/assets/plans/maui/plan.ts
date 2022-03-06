@@ -47,7 +47,7 @@ export const MauiPlan: Plan = {
     miniMapScale: 0.10,
     width: 3613,
     height: 2794,
-    bounds: [[-156.656958, 21.057764], [-156.022083, 20.473471]],
+    bounds: [[-156.652958, 21.064664], [-156.025083, 20.471071]],
     baseMapPath: 'assets/plans/maui/images/maui-small.webp',
     baseMiniMapPath: 'assets/plans/maui/images/maui-mini-eva.png',
     mapLayers: [

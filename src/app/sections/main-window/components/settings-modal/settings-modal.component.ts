@@ -257,7 +257,7 @@ export class SettingsModalComponent implements AfterViewInit {
   }
 
   private convertPixelToPercentage(pixelValue: number, width: boolean): number {
-    return width ? pixelValue / window.innerWidth * 100 : pixelValue / window.innerHeight * 100;
+    return width ? pixelValue / (window.innerWidth - 300) * 100 : pixelValue / (window.innerHeight - 300) * 100;
   }
   // tslint:disable-next-line: max-line-length
   private positionElement(css: any, e: { tag: string; category: string; e: ElementRef; extraE: ElementRef, top: number, left: number }): void {
