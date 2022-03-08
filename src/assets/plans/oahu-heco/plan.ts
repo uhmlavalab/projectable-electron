@@ -243,7 +243,7 @@ export const HecoPlan: Plan = {
         secondScreenText: 'This layer represents the technical potential of solar based on analysis by the National Renewable Energy Laboratory that accounts for solar irradiance, zoning and use, and slope. The analysis estimates that there is potential for 2970 MW of utility scale solar. This layer fills in orange based on the highest capacity factor.',
         fillColor: mapLayerColors.Solar.fill,
         borderColor: mapLayerColors.Solar.border,
-        borderWidth: 0.2,
+        borderWidth: 0.1,
         legendColor: mapLayerColors.Solar.fill,
         filePath: 'assets/plans/oahu-heco/layers/solar.json',
         parcels: [],
