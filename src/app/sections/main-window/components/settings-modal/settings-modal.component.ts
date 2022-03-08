@@ -277,7 +277,7 @@ export class SettingsModalComponent implements AfterViewInit {
 
   private convertCoordinates(val: number, top: boolean): number {
     const percent = top ? val / this.windowData.height : val / this.windowData.width;
-    return top ? percent * window.innerHeight : percent * window.innerWidth;
+    return top ? percent * (window.innerHeight - 300) : percent * (window.innerWidth - 300);
   }
 
   private expand(id: string): void {

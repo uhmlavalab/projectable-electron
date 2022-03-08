@@ -532,6 +532,7 @@ export class PlanService {
         data: -1
       };
     }
+    if (save) this.windowService.resetAllWindows();
   }
 
   /** When the user uses the position modal to position map elements, the data changes are stored in the datatable.
