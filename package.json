@@ -64,7 +64,7 @@
     "conventional-changelog-cli": "2.0.25",
     "core-js": "3.1.4",
     "d3": "^3.5.4",
-    "electron": "7.0.0",
+    "electron": "22.3.21",
     "electron-builder": "21.2.0",
     "electron-reload": "1.5.0",
     "esri-loader": "^2.14.0",
